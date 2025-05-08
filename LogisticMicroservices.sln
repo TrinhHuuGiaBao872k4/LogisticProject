@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogisticService", "LogisticService\LogisticService.csproj", "{FC4CA440-B202-4DBD-A6AA-3B4133B593FE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaymentService", "PaymentService\PaymentService.csproj", "{A4F83716-99BF-4E61-AB1F-6B374BE67C00}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogisticBlazorWebApp", "LogisticBlazorWebApp\LogisticBlazorWebApp.csproj", "{1707B358-851A-4D48-A1A1-F96B85904BCC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppHost", "AppHost\AppHost.csproj", "{549B9747-04C0-4FE7-90A7-F323EB29595A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FC4CA440-B202-4DBD-A6AA-3B4133B593FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC4CA440-B202-4DBD-A6AA-3B4133B593FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC4CA440-B202-4DBD-A6AA-3B4133B593FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC4CA440-B202-4DBD-A6AA-3B4133B593FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4F83716-99BF-4E61-AB1F-6B374BE67C00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4F83716-99BF-4E61-AB1F-6B374BE67C00}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4F83716-99BF-4E61-AB1F-6B374BE67C00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4F83716-99BF-4E61-AB1F-6B374BE67C00}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1707B358-851A-4D48-A1A1-F96B85904BCC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1707B358-851A-4D48-A1A1-F96B85904BCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1707B358-851A-4D48-A1A1-F96B85904BCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1707B358-851A-4D48-A1A1-F96B85904BCC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{549B9747-04C0-4FE7-90A7-F323EB29595A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{549B9747-04C0-4FE7-90A7-F323EB29595A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{549B9747-04C0-4FE7-90A7-F323EB29595A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{549B9747-04C0-4FE7-90A7-F323EB29595A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
