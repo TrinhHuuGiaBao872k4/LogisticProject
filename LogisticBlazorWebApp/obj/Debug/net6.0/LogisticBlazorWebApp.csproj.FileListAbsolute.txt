@@ -29,3 +29,4 @@ D:\DotNet01\LogisticProject\LogisticBlazorWebApp\obj\Debug\net6.0\refint\Logisti
 D:\DotNet01\LogisticProject\LogisticBlazorWebApp\obj\Debug\net6.0\LogisticBlazorWebApp.pdb
 D:\DotNet01\LogisticProject\LogisticBlazorWebApp\obj\Debug\net6.0\LogisticBlazorWebApp.genruntimeconfig.cache
 D:\DotNet01\LogisticProject\LogisticBlazorWebApp\obj\Debug\net6.0\ref\LogisticBlazorWebApp.dll
+D:\DotNet01\LogisticProject\LogisticBlazorWebApp\obj\Debug\net6.0\LogisticBlazorWebApp.sourcelink.json

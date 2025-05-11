@@ -72,3 +72,4 @@ D:\DotNet01\LogisticProject\AppHost\obj\Debug\net8.0\refint\AppHost.dll
 D:\DotNet01\LogisticProject\AppHost\obj\Debug\net8.0\AppHost.pdb
 D:\DotNet01\LogisticProject\AppHost\obj\Debug\net8.0\AppHost.genruntimeconfig.cache
 D:\DotNet01\LogisticProject\AppHost\obj\Debug\net8.0\ref\AppHost.dll
+D:\DotNet01\LogisticProject\AppHost\obj\Debug\net8.0\AppHost.sourcelink.json
