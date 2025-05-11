@@ -1,11 +1,12 @@
 {
   "Version": 1,
-  "Hash": "LWZ41mRYFHZqGKQuqqY2QxzViIZdUWUmQ2rd92B4Jio=",
+  "Hash": "UeBTsHFBCSjNoUO+TqRcbuNxnqY/JeMTv2qgah78RjY=",
   "Source": "LogisticService",
   "BasePath": "_content/LogisticService",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
   "DiscoveryPatterns": [],
-  "Assets": []
+  "Assets": [],
+  "Endpoints": []
 }

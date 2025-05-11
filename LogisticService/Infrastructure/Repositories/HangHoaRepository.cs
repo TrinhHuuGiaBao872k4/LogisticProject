@@ -1,5 +1,7 @@
 using LogisticService.Models;
-
+using System.Reflection;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 public interface IHangHoaRepository 
 {
     // Add custom methods for Entity here if needed

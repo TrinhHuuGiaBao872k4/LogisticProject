@@ -1,12 +1,36 @@
 using LogisticService.Models;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.Reflection;
+using System.Threading.Tasks;
+using StackExchange.Redis;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        var key = builder.Configuration["Jwt:Key"];
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
+        };
+    });
+
+builder.Services.AddAuthorization();
 
 //Add service entity framework
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -28,11 +52,17 @@ builder.Services.AddCors(options =>
     });
 });
 
+// cache
+builder.Services.AddMemoryCache();
 //cache redis
 builder.Services.AddStackExchangeRedisCache(options =>
 {
     options.Configuration = "localhost:6379"; // hoặc connection string từ Cloud
     options.InstanceName = "Logistic:";
+});
+//Làm việc với nhiều db redis
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp => {
+  return ConnectionMultiplexer.Connect("localhost:6379");
 });
 builder.Services.AddSingleton<RedisHelper>();
 
@@ -57,6 +87,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("allow_all");
 app.MapControllers();
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseHttpsRedirection();
 
 
