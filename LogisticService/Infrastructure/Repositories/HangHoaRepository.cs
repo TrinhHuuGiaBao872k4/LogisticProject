@@ -1,3 +1,6 @@
+using System.Reflection;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using LogisticService.Models;
 
 public interface IHangHoaRepository 

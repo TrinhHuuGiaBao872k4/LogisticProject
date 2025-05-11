@@ -1,5 +1,6 @@
 using LogisticService.Models;
 using Microsoft.EntityFrameworkCore;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,11 +29,17 @@ builder.Services.AddCors(options =>
     });
 });
 
+// cache
+builder.Services.AddMemoryCache();
 //cache redis
 builder.Services.AddStackExchangeRedisCache(options =>
 {
     options.Configuration = "localhost:6379"; // hoặc connection string từ Cloud
     options.InstanceName = "Logistic:";
+});
+//Làm việc với nhiều db redis
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp => {
+  return ConnectionMultiplexer.Connect("localhost:6379");
 });
 builder.Services.AddSingleton<RedisHelper>();
 

@@ -1,8 +1,9 @@
 using LogisticService.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 public interface IHangHoaService
 {
-    
+    Task<dynamic> GetAllHangHoa();
 }
 
 public class HangHoaService : IHangHoaService
@@ -14,5 +15,12 @@ public class HangHoaService : IHangHoaService
     {
         _repository = hangHoaRepository;
         _uow = unitOfWork;
+    }
+    public async Task<dynamic> GetAllHangHoa(){
+        var res = await _uow._hangHoaRepository.GetAllAsync();
+        return new {
+            StatusCode = 200,
+            Data = res.Skip(0).Take(1000)
+        };
     }
 }
