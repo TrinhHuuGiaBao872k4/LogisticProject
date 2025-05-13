@@ -7,5 +7,5 @@ namespace Projects;
 [global::System.Diagnostics.DebuggerDisplay("Type = {GetType().Name,nq}, ProjectPath = {ProjectPath}")]
 public class LogisticService : global::Aspire.Hosting.IProjectMetadata
 {
-    public string ProjectPath => """d:\Cybersoft.net\DuAnCuoiKhoa\LogisticProject\LogisticService\LogisticService.csproj""";
+    public string ProjectPath => """D:\DotNet01\LogisticProject\LogisticService\LogisticService.csproj""";
 }
