@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using LogisticService.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 //using LogisticService.Models;
 
 namespace LogisticService.Controllers
@@ -11,14 +13,42 @@ namespace LogisticService.Controllers
     [ApiController]
     public class HangHoaController : ControllerBase
     {
-        public HangHoaController()
+        public IHangHoaService _hangHoaService;
+        public RedisHelper _redisHelper;
+        public HangHoaController(IHangHoaService hangHoaService, RedisHelper redisHelper)
         {
+            _hangHoaService = hangHoaService;
+            _redisHelper = redisHelper;
         }
 
         [HttpGet("GetAllHangHoa")]
-        public ActionResult<IActionResult> GetAllHangHoa()
+        public async Task<ActionResult> GetAllHangHoa()
         {
-            return Ok();
+            _redisHelper.setDatabaseRedis(1);
+            string cacheKey = "hanghoa_list_db";
+            try
+            {
+                // Thử lấy dữ liệu từ Redis
+                var cachedData = await _redisHelper.GetAsync<IEnumerable<HangHoa>>(cacheKey);
+                // Nếu có dữ liệu trong cache và không rỗng
+                if (cachedData != null && cachedData.Any())
+                {
+                    return Ok(cachedData.ToList());
+                }
+                // Nếu không có trong cache, lấy từ database
+                var hangHoaList = await _hangHoaService.GetAllHangHoa();
+                // Lưu vào cache với định dạng JSON rõ ràng
+                await _redisHelper.SetAsync(cacheKey, hangHoaList, TimeSpan.FromDays(1));
+                return Ok(hangHoaList);
+            }
+            catch (Exception ex)
+            {
+                // Xử lý lỗi và log nếu cần
+                // Trong trường hợp lỗi deserialization, vẫn trả về dữ liệu từ database
+                var hangHoaList = await _hangHoaService.GetAllHangHoa();
+                await _redisHelper.SetAsync(cacheKey, hangHoaList, TimeSpan.FromDays(1));
+                return Ok(hangHoaList);
+            }
         }
     }
 }

@@ -138,3 +138,12 @@ D:\DotNet01\LogisticProject\LogisticService\obj\Debug\net8.0\refint\LogisticServ
 D:\DotNet01\LogisticProject\LogisticService\obj\Debug\net8.0\LogisticService.pdb
 D:\DotNet01\LogisticProject\LogisticService\obj\Debug\net8.0\LogisticService.genruntimeconfig.cache
 D:\DotNet01\LogisticProject\LogisticService\obj\Debug\net8.0\ref\LogisticService.dll
+D:\DotNet01\LogisticProject\LogisticService\bin\Debug\net8.0\Microsoft.Extensions.Caching.Abstractions.dll
+D:\DotNet01\LogisticProject\LogisticService\bin\Debug\net8.0\Microsoft.Extensions.Caching.StackExchangeRedis.dll
+D:\DotNet01\LogisticProject\LogisticService\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+D:\DotNet01\LogisticProject\LogisticService\bin\Debug\net8.0\Microsoft.Extensions.Logging.Abstractions.dll
+D:\DotNet01\LogisticProject\LogisticService\bin\Debug\net8.0\Microsoft.Extensions.Options.dll
+D:\DotNet01\LogisticProject\LogisticService\bin\Debug\net8.0\Microsoft.Extensions.Primitives.dll
+D:\DotNet01\LogisticProject\LogisticService\bin\Debug\net8.0\Pipelines.Sockets.Unofficial.dll
+D:\DotNet01\LogisticProject\LogisticService\bin\Debug\net8.0\StackExchange.Redis.dll
+D:\DotNet01\LogisticProject\LogisticService\bin\Debug\net8.0\System.Diagnostics.DiagnosticSource.dll
