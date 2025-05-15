@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using LogisticService.Models;
@@ -50,5 +51,23 @@ namespace LogisticService.Controllers
                 return Ok(hangHoaList);
             }
         }
+        [HttpGet("GetHangHoaById")]
+        public async Task<ActionResult> GetHangHoaById([FromRoute][Required] string Id)
+        {
+            if (string.IsNullOrEmpty(Id))
+            {
+                return BadRequest("Id không được để trống");  // Trả về 400 nếu Id rỗng
+            }
+
+            var hangHoa = await _hangHoaService.GetHangHoaById(Id);
+
+            if (hangHoa == null)
+            {
+                return NotFound($"Không tìm thấy hàng hóa với Id = {Id}");  // 404 nếu không tồn tại
+            }
+
+            return Ok(hangHoa);  // 200 nếu thành công
+        }
+
     }
 }
