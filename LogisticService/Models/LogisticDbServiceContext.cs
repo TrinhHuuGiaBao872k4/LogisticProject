@@ -386,7 +386,7 @@ public partial class LogisticDbServiceContext : DbContext
 
         modelBuilder.Entity<TinhTrangDonHangChiTiet>(entity =>
         {
-            entity.HasKey(e => e.MaTinhTrangChiTiet).HasName("PK__TinhTran__33B947B65AB91623");
+            entity.HasKey(e => e.MaTinhTrangChiTiet).HasName("PK__TinhTran__33B947B60E8D0B51");
 
             entity.ToTable("TinhTrangDonHangChiTiet");
 
