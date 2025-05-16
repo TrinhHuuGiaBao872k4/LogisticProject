@@ -1,5 +1,7 @@
+using System.Text.Json.Serialization;
 using LogisticService.Models;
 using Microsoft.EntityFrameworkCore;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +17,11 @@ builder.Services.AddDbContext<LogisticDbServiceContext>(options =>
         .UseLazyLoadingProxies(false)
         .UseSqlServer(connectionString));
 //Add middleware controller
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.PropertyNamingPolicy = null;
+    }); 
 
 //bật cors 
 builder.Services.AddCors(options =>
@@ -27,6 +33,31 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod();
     });
 });
+
+//cache-redis
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = "localhost:6379"; // hoặc connection string từ Cloud
+    options.InstanceName = "Logistic:";
+});
+//Làm việc với nhiều db redis
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+{
+    return ConnectionMultiplexer.Connect("localhost:6379");
+});
+builder.Services.AddSingleton<RedisHelper>();
+
+
+
+//Repository Pattern & Unitofwork
+//Unitofwrork
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+//Repository
+builder.Services.AddScoped<IHangHoaRepository, HangHoaRepository>();
+//Service
+builder.Services.AddScoped<IHangHoaService, HangHoaService>();
+
+
 
 var app = builder.Build();
 
