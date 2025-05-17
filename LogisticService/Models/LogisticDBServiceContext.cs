@@ -191,6 +191,7 @@ public partial class LogisticDBServiceContext : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false)
                 .IsFixedLength();
+            entity.Property(e => e.HinhAnh).HasMaxLength(255);
             entity.Property(e => e.MaLoaiHangHoa)
                 .HasMaxLength(20)
                 .IsUnicode(false)

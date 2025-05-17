@@ -23,21 +23,21 @@ namespace LogisticService.Controllers
         }
 
         [HttpGet("GetAllHangHoa")]
-        public async Task<ActionResult> GetAllHangHoa()
+        public async Task<IActionResult> GetAllHangHoa()
         {
             _redisHelper.setDatabaseRedis(1);
             string cacheKey = "hanghoa_list_db";
             try
             {
                 // Thử lấy dữ liệu từ Redis
-                var cachedData = await _redisHelper.GetAsync<IEnumerable<HangHoa>>(cacheKey);
+                var cachedData = await _redisHelper.GetAsync<HTTPResponseClient<IEnumerable<HangHoa>>>(cacheKey);
                 // Nếu có dữ liệu trong cache và không rỗng
-                if (cachedData != null && cachedData.Any())
+                if (cachedData != null)
                 {
-                    return Ok(cachedData.ToList());
+                    return Ok(cachedData);
                 }
                 // Nếu không có trong cache, lấy từ database
-                var hangHoaList = await _hangHoaService.GetAllHangHoa();
+                var hangHoaList = await _hangHoaService.GetAllHangHoaAsync();
                 // Lưu vào cache với định dạng JSON rõ ràng
                 await _redisHelper.SetAsync(cacheKey, hangHoaList, TimeSpan.FromDays(1));
                 return Ok(hangHoaList);
@@ -46,20 +46,20 @@ namespace LogisticService.Controllers
             {
                 // Xử lý lỗi và log nếu cần
                 // Trong trường hợp lỗi deserialization, vẫn trả về dữ liệu từ database
-                var hangHoaList = await _hangHoaService.GetAllHangHoa();
+                var hangHoaList = await _hangHoaService.GetAllHangHoaAsync();
                 await _redisHelper.SetAsync(cacheKey, hangHoaList, TimeSpan.FromDays(1));
                 return Ok(hangHoaList);
             }
         }
-        [HttpGet("GetHangHoaById")]
-        public async Task<ActionResult> GetHangHoaById([FromRoute][Required] string Id)
+        [HttpGet("GetHangHoaById/{Id}")]
+        public async Task<IActionResult> GetHangHoaById([FromRoute][Required] string Id)
         {
             if (string.IsNullOrEmpty(Id))
             {
                 return BadRequest("Id không được để trống");  // Trả về 400 nếu Id rỗng
             }
 
-            var hangHoa = await _hangHoaService.GetHangHoaById(Id);
+            var hangHoa = await _hangHoaService.GetHangHoaByIdAsync(Id);
 
             if (hangHoa == null)
             {

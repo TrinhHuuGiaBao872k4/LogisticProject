@@ -13,6 +13,8 @@ public partial class HangHoa
 
     public DateTime? NgaySanXuat { get; set; }
 
+    public string? HinhAnh { get; set; }
+
     public virtual ICollection<ChiTietDonHang> ChiTietDonHangs { get; set; } = new List<ChiTietDonHang>();
 
     public virtual ICollection<ChiTietPhieuNhapXuat> ChiTietPhieuNhapXuats { get; set; } = new List<ChiTietPhieuNhapXuat>();
