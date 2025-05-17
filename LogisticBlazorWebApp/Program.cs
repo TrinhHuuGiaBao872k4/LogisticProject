@@ -9,6 +9,12 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 
+//Add service httpclient để gọi api
+builder.Services.AddHttpClient();
+
+
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

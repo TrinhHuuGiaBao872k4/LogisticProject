@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using LogisticService.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
-using LogisticService.Models;
-
 [Route("api/[controller]")]
 [ApiController]
 public class UserController : ControllerBase
@@ -17,28 +17,31 @@ public class UserController : ControllerBase
         _config = config;
     }
 
-    // 👉 Đăng ký
+    // Đăng ký
     [HttpPost("register")]
-    public async Task<IActionResult> Register(UserRegisterViewModel model)
+    public async Task<IActionResult> Register(UserRegisterViewModel dto)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var exists = await _context.NguoiDungs.AnyAsync(x => x.TenDanhNhap == model.TenDanhNhap);
-        if (exists) return Conflict("Tên đăng nhập đã tồn tại!");
+        var existingUser = await _context.NguoiDungs
+            .AnyAsync(u => u.TenDanhNhap == dto.TenDanhNhap);
 
-        var hashed = PasswordHasher.HashPassword(model.MatKhau);
+        if (existingUser)
+            return Conflict("Tên đăng nhập đã tồn tại!");
+
+        var hashedPassword = PasswordHasher.HashPassword(dto.MatKhau);
 
         var newUser = new NguoiDung
         {
             MaNguoiDung = $"ND{DateTime.UtcNow.Ticks}",
-            HoTen = model.HoTen,
-            NgaySinh = model.NgaySinh,
-            Cccd = model.CCCD,
-            DiaChi = model.DiaChi,
-            Sdt = model.SDT,
-            TenDanhNhap = model.TenDanhNhap,
-            MatKhau = hashed,
+            HoTen = dto.HoTen,
+            NgaySinh = dto.NgaySinh,
+            Cccd = dto.CCCD,
+            DiaChi = dto.DiaChi,
+            Sdt = dto.SDT,
+            TenDanhNhap = dto.TenDanhNhap,
+            MatKhau = hashedPassword,
             MaVaiTro = "VT003"
         };
 
@@ -48,15 +51,18 @@ public class UserController : ControllerBase
         return Ok("Đăng ký thành công!");
     }
 
-    // 👉 Đăng nhập
+    // Đăng nhập
     [HttpPost("login")]
-    public async Task<IActionResult> Login(UserLoginViewModel model)
+    public async Task<IActionResult> Login(UserLoginViewModel dto)
     {
-        var user = await _context.NguoiDungs.FirstOrDefaultAsync(x => x.TenDanhNhap == model.TenDanhNhap);
-        if (user == null || !PasswordHasher.VerifyPassword(model.MatKhau, user.MatKhau))
+        var user = await _context.NguoiDungs
+            .FirstOrDefaultAsync(u => u.TenDanhNhap == dto.TenDanhNhap);
+
+        if (user == null || !PasswordHasher.VerifyPassword(dto.MatKhau, user.MatKhau))
             return Unauthorized("Sai tên đăng nhập hoặc mật khẩu!");
 
         var token = JwtTokenGenerator.GenerateToken(user, _config);
+
         return Ok(new UserResponseViewModel
         {
             HoTen = user.HoTen,
@@ -65,7 +71,7 @@ public class UserController : ControllerBase
         });
     }
 
-    // 👉 Lấy thông tin user (yêu cầu JWT)
+    // Lấy thông tin profile
     [Authorize]
     [HttpGet("profile")]
     public IActionResult GetProfile()
@@ -81,3 +87,4 @@ public class UserController : ControllerBase
         });
     }
 }
+
