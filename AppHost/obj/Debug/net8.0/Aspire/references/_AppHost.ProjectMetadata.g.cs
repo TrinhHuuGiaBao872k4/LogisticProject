@@ -8,5 +8,5 @@ namespace Projects;
 public class AppHost
 {
     private AppHost() { }
-    public static string ProjectPath => """d:\Cybersoft.net\DuAnCuoiKhoa\LogisticProject\AppHost""";
+    public static string ProjectPath => """D:\Cybersoft.net\DuAnCuoiKhoa\LogisticProject\AppHost""";
 }

@@ -6010,19 +6010,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Gia Bao\\.nuget\\packages\\": {}
+    "C:\\Users\\hoang\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\DotNet01\\LogisticProject\\AppHost\\AppHost.csproj",
+      "projectUniqueName": "D:\\Cybersoft.net\\DuAnCuoiKhoa\\LogisticProject\\AppHost\\AppHost.csproj",
       "projectName": "AppHost",
-      "projectPath": "D:\\DotNet01\\LogisticProject\\AppHost\\AppHost.csproj",
-      "packagesPath": "C:\\Users\\Gia Bao\\.nuget\\packages\\",
-      "outputPath": "D:\\DotNet01\\LogisticProject\\AppHost\\obj\\",
+      "projectPath": "D:\\Cybersoft.net\\DuAnCuoiKhoa\\LogisticProject\\AppHost\\AppHost.csproj",
+      "packagesPath": "C:\\Users\\hoang\\.nuget\\packages\\",
+      "outputPath": "D:\\Cybersoft.net\\DuAnCuoiKhoa\\LogisticProject\\AppHost\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "C:\\Users\\Gia Bao\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\hoang\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -6048,7 +6053,8 @@
         "enableAudit": "true",
         "auditLevel": "low",
         "auditMode": "direct"
-      }
+      },
+      "SdkAnalysisLevel": "9.0.200"
     },
     "frameworks": {
       "net8.0": {
@@ -6099,7 +6105,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.404/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.201/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
