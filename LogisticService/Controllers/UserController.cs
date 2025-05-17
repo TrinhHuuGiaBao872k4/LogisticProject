@@ -8,10 +8,10 @@ using System.Security.Claims;
 [ApiController]
 public class UserController : ControllerBase
 {
-    private readonly LogisticDbServiceContext _context;
+    private readonly LogisticDBServiceContext _context;
     private readonly IConfiguration _config;
 
-    public UserController(LogisticDbServiceContext context, IConfiguration config)
+    public UserController(LogisticDBServiceContext context, IConfiguration config)
     {
         _context = context;
         _config = config;

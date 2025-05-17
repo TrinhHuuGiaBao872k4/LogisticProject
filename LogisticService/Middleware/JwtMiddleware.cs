@@ -14,7 +14,7 @@ public class JwtMiddleware
         _config = config;
     }
 
-    public async Task Invoke(HttpContext context, LogisticDbServiceContext db)
+    public async Task Invoke(HttpContext context, LogisticDBServiceContext db)
     {
         var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
 

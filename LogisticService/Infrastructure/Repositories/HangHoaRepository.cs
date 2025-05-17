@@ -14,8 +14,8 @@ public interface IHangHoaRepository
 
 public class HangHoaRepository :  IHangHoaRepository
 {
-    private readonly LogisticDbServiceContext _context;
-    public HangHoaRepository(LogisticDbServiceContext context)
+    private readonly LogisticDBServiceContext _context;
+    public HangHoaRepository(LogisticDBServiceContext context)
     {
         _context = context;
     }

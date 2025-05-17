@@ -1,6 +1,5 @@
 using LogisticService.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
-using LogisticService.Models.ViewModel;
 
 public interface IHangHoaService
 {
@@ -27,9 +26,6 @@ public class HangHoaService : IHangHoaService
     }
     public async Task<HangHoa> GetHangHoaById(string id){
         var res = await _uow._hangHoaRepository.GetByIdAsync(id);
-        return new ApiResponse<HangHoa>(){
-            StatusCode =200,
-            Data = res
-        };
+        return res;
     }
 }
