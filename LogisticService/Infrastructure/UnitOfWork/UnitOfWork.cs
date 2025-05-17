@@ -11,9 +11,9 @@ public class UnitOfWork: IUnitOfWork
 {
     public IHangHoaRepository _hangHoaRepository{get;}
 
-    private readonly LogisticDbServiceContext _context;
+    private readonly LogisticDBServiceContext _context;
     
-    public UnitOfWork(LogisticDbServiceContext context, IHangHoaRepository hangHoaRepository)
+    public UnitOfWork(LogisticDBServiceContext context, IHangHoaRepository hangHoaRepository)
     {
         _context = context;
         _hangHoaRepository = hangHoaRepository;

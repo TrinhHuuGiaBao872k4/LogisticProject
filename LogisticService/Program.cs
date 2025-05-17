@@ -12,7 +12,7 @@ builder.Services.AddSwaggerGen();
 
 //Add service entity framework
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<LogisticDbServiceContext>(options =>
+builder.Services.AddDbContext<LogisticDBServiceContext>(options =>
     options
         .UseLazyLoadingProxies(false)
         .UseSqlServer(connectionString));
