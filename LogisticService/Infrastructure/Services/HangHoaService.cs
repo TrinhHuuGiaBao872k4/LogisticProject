@@ -7,6 +7,7 @@ public interface IHangHoaService : IServiceBase<HangHoa>
     // Task<HangHoa> GetHangHoaById(string id);
     Task<HTTPResponseClient<IEnumerable<HangHoa>>> GetAllHangHoaAsync();
     Task<HTTPResponseClient<HangHoa?>> GetHangHoaByIdAsync(string id);
+    
 }
 
 public class HangHoaService : ServiceBase<HangHoa>, IHangHoaService
@@ -18,17 +19,6 @@ public class HangHoaService : ServiceBase<HangHoa>, IHangHoaService
     {
 
     }
-    // public async Task<dynamic> GetAllHangHoa(){
-    //     var res = await _uow._hangHoaRepository.GetAllAsync();
-    //     return new {
-    //         StatusCode = 200,
-    //         Data = res.Skip(0).Take(1000)
-    //     };
-    // }
-    // public async Task<HangHoa> GetHangHoaById(string id){
-    //     var res = await _uow._hangHoaRepository.GetByIdAsync(id);
-    //     return res;
-    // }
     public async Task<HTTPResponseClient<IEnumerable<HangHoa>>> GetAllHangHoaAsync()
     {
         var res = await _repository.GetAllAsync();

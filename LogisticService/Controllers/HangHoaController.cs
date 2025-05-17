@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using LogisticService.Models;
+using LogisticService.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 //using LogisticService.Models;
@@ -68,6 +69,26 @@ namespace LogisticService.Controllers
 
             return Ok(hangHoa);  // 200 nếu thành công
         }
-
+        [HttpPost("CreateHangHoa")]
+        public async Task<IActionResult> CreateHangHoa(HangHoaVM hangHoaVM)
+        {
+            HangHoa hangHoa = new HangHoa()
+            {
+                MaHangHoa = hangHoaVM.MaHangHoa,
+                MaLoaiHangHoa = hangHoaVM.MaLoaiHangHoa,
+                TenHangHoa = hangHoaVM.TenHangHoa,
+                NgaySanXuat = hangHoaVM.NgaySanXuat,
+                HinhAnh = hangHoaVM.HinhAnh
+             };
+            await _hangHoaService.AddAsync(hangHoa);
+            return Ok(new HTTPResponseClient<HangHoa>
+            {
+                StatusCode = 200,
+                Data = hangHoa,
+                DateTime = DateTime.Now,
+                Message = "Successfully"
+            });
+        }
+        
     }
 }
