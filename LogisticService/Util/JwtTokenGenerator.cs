@@ -10,8 +10,8 @@ public static class JwtTokenGenerator
     {
         var claims = new[]
         {
-            new Claim(ClaimTypes.Name, user.TenDanhNhap),
-            new Claim(ClaimTypes.Role, user.MaVaiTro)
+            new Claim(ClaimTypes.Name,user.TenDanhNhap),
+            new Claim(ClaimTypes.Role,user.MaVaiTro?.Trim())
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]));

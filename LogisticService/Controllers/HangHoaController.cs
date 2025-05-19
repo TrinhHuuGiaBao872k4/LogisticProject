@@ -109,6 +109,5 @@ namespace LogisticService.Controllers
                 Message = "Successfully"
             });
         }
-        
     }
 }

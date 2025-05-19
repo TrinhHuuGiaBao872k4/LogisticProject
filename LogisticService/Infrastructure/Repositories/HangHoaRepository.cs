@@ -63,7 +63,7 @@ public interface IHangHoaRepository : IRepository<HangHoa>
 }
 public class HangHoaRepository : Repository<HangHoa>,IHangHoaRepository
 {
-    public HangHoaRepository(LogisticDBServiceContext context) : base(context)
+    public HangHoaRepository(LogisticDbServiceContext context) : base(context)
     {
         
     }

@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LogisticService.Models;
 
-public partial class LogisticDBServiceContext : DbContext
+public partial class LogisticDbServiceContext : DbContext
 {
-    public LogisticDBServiceContext()
+    public LogisticDbServiceContext()
     {
     }
 
-    public LogisticDBServiceContext(DbContextOptions<LogisticDBServiceContext> options)
+    public LogisticDbServiceContext(DbContextOptions<LogisticDbServiceContext> options)
         : base(options)
     {
     }
