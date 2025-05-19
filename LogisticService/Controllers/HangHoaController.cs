@@ -79,8 +79,28 @@ namespace LogisticService.Controllers
                 TenHangHoa = hangHoaVM.TenHangHoa,
                 NgaySanXuat = hangHoaVM.NgaySanXuat,
                 HinhAnh = hangHoaVM.HinhAnh
-             };
+            };
             await _hangHoaService.AddAsync(hangHoa);
+            return Ok(new HTTPResponseClient<HangHoa>
+            {
+                StatusCode = 200,
+                Data = hangHoa,
+                DateTime = DateTime.Now,
+                Message = "Successfully"
+            });
+        }
+        [HttpPut("UpdateHangHoa/{id}")]
+        public async Task<IActionResult> UpdateHangHoa([FromRoute] string id, HangHoaVM hangHoaVM)
+        {
+            HangHoa hangHoa = new HangHoa()
+            {
+                MaHangHoa = hangHoaVM.MaHangHoa,
+                MaLoaiHangHoa = hangHoaVM.MaLoaiHangHoa,
+                TenHangHoa = hangHoaVM.TenHangHoa,
+                NgaySanXuat = hangHoaVM.NgaySanXuat,
+                HinhAnh = hangHoaVM.HinhAnh
+            };
+            await _hangHoaService.UpdateAsync(hangHoa);
             return Ok(new HTTPResponseClient<HangHoa>
             {
                 StatusCode = 200,

@@ -23,7 +23,11 @@ public partial class NguoiDung
 
     public string? MatKhau { get; set; }
 
+    public string? MaTrangThai { get; set; }
+
     public virtual ICollection<DonHang> DonHangs { get; set; } = new List<DonHang>();
+
+    public virtual TrangThaiNguoiDung? MaTrangThaiNavigation { get; set; }
 
     public virtual VaiTro? MaVaiTroNavigation { get; set; }
 
