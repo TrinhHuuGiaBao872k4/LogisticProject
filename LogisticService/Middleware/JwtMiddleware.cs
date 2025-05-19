@@ -14,7 +14,7 @@ public class JwtMiddleware
         _config = config;
     }
 
-    public async Task Invoke(HttpContext context, LogisticDBServiceContext db)
+    public async Task Invoke(HttpContext context, LogisticDbServiceContext db)
     {
         var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
 
@@ -33,11 +33,13 @@ public class JwtMiddleware
                     ValidAudience = _config["Jwt:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateLifetime = true,
-                    ClockSkew = TimeSpan.Zero
+                    ClockSkew = TimeSpan.Zero,
+                    RoleClaimType = ClaimTypes.Role
                 }, out SecurityToken validatedToken);
 
                 var jwtToken = (JwtSecurityToken)validatedToken;
                 var username = jwtToken.Claims.First(x => x.Type == ClaimTypes.Name).Value;
+                context.User = new ClaimsPrincipal(new ClaimsIdentity(jwtToken.Claims, "jwt"));
 
                 // Attach user to context
                 context.Items["User"] = db.NguoiDungs.FirstOrDefault(u => u.TenDanhNhap == username);

@@ -12,13 +12,14 @@ public class UnitOfWork : IUnitOfWork
 {
     public IHangHoaRepository _hangHoaRepository { get; }
 
-    private readonly LogisticDBServiceContext _context;
+    private readonly LogisticDbServiceContext _context;
 
-    public UnitOfWork(LogisticDBServiceContext context, IHangHoaRepository hangHoaRepository)
+    public UnitOfWork(LogisticDbServiceContext context, IHangHoaRepository hangHoaRepository)
     {
         _context = context;
         _hangHoaRepository = hangHoaRepository;
     }
+    
     public IRepository<T> GetRepository<T>() where T : class
     {
         if (typeof(T) == typeof(HangHoa))

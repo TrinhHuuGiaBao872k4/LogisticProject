@@ -24,7 +24,7 @@ public class HangHoaService : ServiceBase<HangHoa>, IHangHoaService
         var res = await _repository.GetAllAsync();
         HTTPResponseClient<IEnumerable<HangHoa>> data = new HTTPResponseClient<IEnumerable<HangHoa>>()
         {
-            StatusCode = 200,
+            StatusCode = 200,   
             Data = res.ToList().Skip(0).Take(10),
             DateTime = DateTime.Now,
             Message = "Successfully"

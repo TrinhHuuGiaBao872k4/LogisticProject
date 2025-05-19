@@ -15,10 +15,10 @@ public interface IRepository<T> where T : class
 
 public class Repository<T> : IRepository<T> where T : class
 {
-    protected readonly LogisticDBServiceContext _context;
+    protected readonly LogisticDbServiceContext _context;
     protected readonly DbSet<T> _dbSet;
 
-    public Repository(LogisticDBServiceContext context)
+    public Repository(LogisticDbServiceContext context)
     {
         _context = context;
         _dbSet = _context.Set<T>();

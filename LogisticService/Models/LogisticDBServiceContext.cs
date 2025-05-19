@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LogisticService.Models;
 
-public partial class LogisticDBServiceContext : DbContext
+public partial class LogisticDbServiceContext : DbContext
 {
-    public LogisticDBServiceContext()
+    public LogisticDbServiceContext()
     {
     }
 
-    public LogisticDBServiceContext(DbContextOptions<LogisticDBServiceContext> options)
+    public LogisticDbServiceContext(DbContextOptions<LogisticDbServiceContext> options)
         : base(options)
     {
     }
@@ -48,6 +48,8 @@ public partial class LogisticDBServiceContext : DbContext
     public virtual DbSet<TonKho> TonKhos { get; set; }
 
     public virtual DbSet<TrangThaiDonHang> TrangThaiDonHangs { get; set; }
+
+    public virtual DbSet<TrangThaiNguoiDung> TrangThaiNguoiDungs { get; set; }
 
     public virtual DbSet<VaiTro> VaiTros { get; set; }
 
@@ -303,6 +305,11 @@ public partial class LogisticDBServiceContext : DbContext
                 .HasColumnName("CCCD");
             entity.Property(e => e.DiaChi).HasMaxLength(30);
             entity.Property(e => e.HoTen).HasMaxLength(30);
+            entity.Property(e => e.MaTrangThai)
+                .HasMaxLength(10)
+                .IsUnicode(false)
+                .HasDefaultValue("TT01")
+                .IsFixedLength();
             entity.Property(e => e.MaVaiTro)
                 .HasMaxLength(20)
                 .IsUnicode(false)
@@ -314,6 +321,10 @@ public partial class LogisticDBServiceContext : DbContext
                 .IsUnicode(false)
                 .HasColumnName("SDT");
             entity.Property(e => e.TenDanhNhap).HasMaxLength(30);
+
+            entity.HasOne(d => d.MaTrangThaiNavigation).WithMany(p => p.NguoiDungs)
+                .HasForeignKey(d => d.MaTrangThai)
+                .HasConstraintName("FK_NguoiDung_TrangThaiNguoiDung");
 
             entity.HasOne(d => d.MaVaiTroNavigation).WithMany(p => p.NguoiDungs)
                 .HasForeignKey(d => d.MaVaiTro)
@@ -447,6 +458,19 @@ public partial class LogisticDBServiceContext : DbContext
                 .IsUnicode(false)
                 .IsFixedLength();
             entity.Property(e => e.TenTrangThai).HasMaxLength(20);
+        });
+
+        modelBuilder.Entity<TrangThaiNguoiDung>(entity =>
+        {
+            entity.HasKey(e => e.MaTrangThai).HasName("PK__TrangTha__AADE4138F5811E48");
+
+            entity.ToTable("TrangThaiNguoiDung");
+
+            entity.Property(e => e.MaTrangThai)
+                .HasMaxLength(10)
+                .IsUnicode(false)
+                .IsFixedLength();
+            entity.Property(e => e.TenTrangThai).HasMaxLength(50);
         });
 
         modelBuilder.Entity<VaiTro>(entity =>

@@ -8,10 +8,10 @@ using System.Security.Claims;
 [ApiController]
 public class UserController : ControllerBase
 {
-    private readonly LogisticDBServiceContext _context;
+    private readonly LogisticDbServiceContext _context;
     private readonly IConfiguration _config;
 
-    public UserController(LogisticDBServiceContext context, IConfiguration config)
+    public UserController(LogisticDbServiceContext context, IConfiguration config)
     {
         _context = context;
         _config = config;
@@ -57,9 +57,17 @@ public class UserController : ControllerBase
     {
         var user = await _context.NguoiDungs
             .FirstOrDefaultAsync(u => u.TenDanhNhap == dto.TenDanhNhap);
-
+      
         if (user == null || !PasswordHasher.VerifyPassword(dto.MatKhau, user.MatKhau))
             return Unauthorized("Sai tên đăng nhập hoặc mật khẩu!");
+        if (user.MaTrangThai.Trim() != "TT01")
+            return Unauthorized("Tài khoản của bạn không ở trạng thái hoạt động.");
+        //  Chặn đăng nhập nếu là Admin hoặc SuperAdmin
+        if (user.MaVaiTro?.Trim().ToUpper() == "VT000" || user.MaVaiTro?.Trim().ToUpper() == "VT001")
+        {
+            Console.WriteLine(">> Chặn đăng nhập vai trò Admin hoặc SuperAdmin");
+            return Forbid("Tài khoản này không được phép đăng nhập vào hệ thống!");
+        }
 
         var token = JwtTokenGenerator.GenerateToken(user, _config);
 
@@ -83,8 +91,56 @@ public class UserController : ControllerBase
         {
             message = "Lấy thông tin profile thành công",
             tenDangNhap = username,
-            vaiTro = role
+            vaiTro = role,
         });
+    }
+    [Authorize]
+    [HttpPut("Update-Profile")]
+    public async Task<IActionResult> UpdateProfile([FromBody] UpdateUserViewModel dto)
+    {
+    var username = User.FindFirst(ClaimTypes.Name)?.Value;
+    if (username == null)
+        return Unauthorized("Không xác định được người dùng.");
+
+    var user = await _context.NguoiDungs.FirstOrDefaultAsync(u => u.TenDanhNhap == username);
+    if (user == null)
+        return NotFound("Người dùng không tồn tại.");
+
+    // Cập nhật các trường được phép sửa
+    user.HoTen = dto.HoTen;
+    user.NgaySinh = dto.NgaySinh;
+    user.DiaChi = dto.DiaChi;
+    user.Sdt = dto.Sdt;
+    // Không được cập nhật CanCuoc (Căn cước)
+
+    _context.NguoiDungs.Update(user);
+    await _context.SaveChangesAsync();
+
+    return Ok("Cập nhật thông tin thành công.");
+    }
+    [Authorize]
+    [HttpPut("change-password")]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordViewModel dto)
+    {
+    var username = User.FindFirst(ClaimTypes.Name)?.Value;
+    if (username == null)
+        return Unauthorized("Không xác định được người dùng.");
+
+    var user = await _context.NguoiDungs.FirstOrDefaultAsync(u => u.TenDanhNhap == username);
+    if (user == null)
+        return NotFound("Người dùng không tồn tại.");
+
+    // Kiểm tra mật khẩu cũ
+    if (!PasswordHasher.VerifyPassword(dto.MatKhauCu, user.MatKhau))
+        return BadRequest(" Mật khẩu cũ không đúng.");
+
+    // Hash lại mật khẩu mới
+    user.MatKhau = PasswordHasher.HashPassword(dto.MatKhauMoi);
+
+    _context.NguoiDungs.Update(user);
+    await _context.SaveChangesAsync();
+
+    return Ok("✅ Đổi mật khẩu thành công.");
     }
 }
 
