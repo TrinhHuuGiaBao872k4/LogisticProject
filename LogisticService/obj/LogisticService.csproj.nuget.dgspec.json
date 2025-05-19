@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Cybersoft.net\\DuAnCuoiKhoa\\LogisticProject\\LogisticService\\LogisticService.csproj": {}
+    "d:\\Cybersoft.net\\DuAnCuoiKhoa\\LogisticProject\\LogisticService\\LogisticService.csproj": {}
   },
   "projects": {
-    "D:\\Cybersoft.net\\DuAnCuoiKhoa\\LogisticProject\\LogisticService\\LogisticService.csproj": {
+    "d:\\Cybersoft.net\\DuAnCuoiKhoa\\LogisticProject\\LogisticService\\LogisticService.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Cybersoft.net\\DuAnCuoiKhoa\\LogisticProject\\LogisticService\\LogisticService.csproj",
+        "projectUniqueName": "d:\\Cybersoft.net\\DuAnCuoiKhoa\\LogisticProject\\LogisticService\\LogisticService.csproj",
         "projectName": "LogisticService",
-        "projectPath": "D:\\Cybersoft.net\\DuAnCuoiKhoa\\LogisticProject\\LogisticService\\LogisticService.csproj",
+        "projectPath": "d:\\Cybersoft.net\\DuAnCuoiKhoa\\LogisticProject\\LogisticService\\LogisticService.csproj",
         "packagesPath": "C:\\Users\\hoang\\.nuget\\packages\\",
-        "outputPath": "D:\\Cybersoft.net\\DuAnCuoiKhoa\\LogisticProject\\LogisticService\\obj\\",
+        "outputPath": "d:\\Cybersoft.net\\DuAnCuoiKhoa\\LogisticProject\\LogisticService\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
