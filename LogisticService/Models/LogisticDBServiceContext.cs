@@ -193,6 +193,7 @@ public partial class LogisticDbServiceContext : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false)
                 .IsFixedLength();
+            entity.Property(e => e.GiaHangHoa).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.HinhAnh).HasMaxLength(255);
             entity.Property(e => e.MaLoaiHangHoa)
                 .HasMaxLength(20)

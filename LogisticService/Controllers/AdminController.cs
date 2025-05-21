@@ -69,64 +69,65 @@ public class AdminController : ControllerBase
         return Ok($"Đã cấp quyền {role.TenVaiTro} cho người dùng {user.HoTen}.");
     }
     [Authorize(Roles = "VT000,VT001")]
-[HttpGet("GetAllUsers")]
-public async Task<IActionResult> GetAllUsers()
-{
-    var users = await _context.NguoiDungs
-        .Include(u => u.MaVaiTroNavigation)
-        .Select(u => new
-        {
-            u.MaNguoiDung,
-            u.HoTen,
-            u.TenDanhNhap,
-            u.NgaySinh,
-            u.DiaChi,
-            u.Sdt,
-            u.Cccd,
-            VaiTro = u.MaVaiTroNavigation != null ? u.MaVaiTroNavigation.TenVaiTro : null
-        })
-        .ToListAsync();
+    [HttpGet("GetAllUsers")]
+    public async Task<IActionResult> GetAllUsers()
+    {
+        var users = await _context.NguoiDungs
+            .Include(u => u.MaVaiTroNavigation)
+            .Select(u => new
+            {
+                u.MaNguoiDung,
+                u.HoTen,
+                u.TenDanhNhap,
+                u.NgaySinh,
+                u.DiaChi,
+                u.Sdt,
+                u.Cccd,
+                VaiTro = u.MaVaiTroNavigation != null ? u.MaVaiTroNavigation.TenVaiTro : null
+            })
+            .ToListAsync();
 
-    return Ok(users);
-}
+        return Ok(users);
+    }
     [Authorize(Roles = "VT000,VT001")]
     [HttpGet("ChiTietNguoiDung/{maNguoiDung}")]
     public async Task<IActionResult> GetUserById(string maNguoiDung)
     {
-    var user = await _context.NguoiDungs
-        .Include(u => u.MaVaiTroNavigation)
-        .FirstOrDefaultAsync(u => u.MaNguoiDung == maNguoiDung);
+        var user = await _context.NguoiDungs
+            .Include(u => u.MaVaiTroNavigation)
+            .FirstOrDefaultAsync(u => u.MaNguoiDung == maNguoiDung);
 
-    if (user == null)
-        return NotFound("Không tìm thấy người dùng.");
+        if (user == null)
+            return NotFound("Không tìm thấy người dùng.");
 
-    return Ok(new {
-        user.MaNguoiDung,
-        user.HoTen,
-        user.TenDanhNhap,
-        user.NgaySinh,
-        user.DiaChi,
-        user.Sdt,
-        user.Cccd,
-        user.MaVaiTroNavigation,
-        user.MaTrangThai
-    });
+        return Ok(new
+        {
+            user.MaNguoiDung,
+            user.HoTen,
+            user.TenDanhNhap,
+            user.NgaySinh,
+            user.DiaChi,
+            user.Sdt,
+            user.Cccd,
+            user.MaVaiTroNavigation,
+            user.MaTrangThai
+        });
     }
     [Authorize(Roles = "VT000,VT001")]
     [HttpPut("cap-nhat-trang-thai/{maNguoiDung}/{maTrangThai}")]
     public async Task<IActionResult> CapNhatTrangThaiNguoiDung(string maNguoiDung, string maTrangThai)
     {
-    var user = await _context.NguoiDungs.FirstOrDefaultAsync(u => u.MaNguoiDung == maNguoiDung);
-    if (user == null)
-        return NotFound("Không tìm thấy người dùng.");
+        var user = await _context.NguoiDungs.FirstOrDefaultAsync(u => u.MaNguoiDung == maNguoiDung);
+        if (user == null)
+            return NotFound("Không tìm thấy người dùng.");
 
-    var trangThai = await _context.TrangThaiNguoiDungs.FindAsync(maTrangThai);
-    if (trangThai == null)
-        return BadRequest("Mã trạng thái không hợp lệ.");
+        var trangThai = await _context.TrangThaiNguoiDungs.FindAsync(maTrangThai);
+        if (trangThai == null)
+            return BadRequest("Mã trạng thái không hợp lệ.");
 
-    user.MaTrangThai = maTrangThai;
-    await _context.SaveChangesAsync();
+        user.MaTrangThai = maTrangThai;
+        await _context.SaveChangesAsync();
 
-    return Ok($" Cập nhật trạng thái người dùng {user.HoTen} thành '{trangThai.TenTrangThai}'.");
-}
+        return Ok($" Cập nhật trạng thái người dùng {user.HoTen} thành '{trangThai.TenTrangThai}'.");
+    }
 }
