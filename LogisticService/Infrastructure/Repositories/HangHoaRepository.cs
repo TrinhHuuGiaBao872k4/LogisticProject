@@ -59,7 +59,7 @@ using LogisticService.Models;
 
 public interface IHangHoaRepository : IRepository<HangHoa>
 {
-
+    
 }
 public class HangHoaRepository : Repository<HangHoa>,IHangHoaRepository
 {

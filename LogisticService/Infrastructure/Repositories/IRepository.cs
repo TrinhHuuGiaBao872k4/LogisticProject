@@ -11,6 +11,7 @@ public interface IRepository<T> where T : class
     Task DeleteAsync(string id);
     Task<T?> SingleOrDefaultAsync(Expression<Func<T, bool>> predicate);
     Task<IEnumerable<T>> WhereAsync(Expression<Func<T, bool>> predicate);
+    Task<IEnumerable<T>> GetAllWithNavigationPropertiesAsync(params Expression<Func<T, object>>[] includes);
 }
 
 public class Repository<T> : IRepository<T> where T : class
@@ -24,8 +25,9 @@ public class Repository<T> : IRepository<T> where T : class
         _dbSet = _context.Set<T>();
     }
 
-    public async Task<IEnumerable<T>> GetAllAsync(){
-        return  _dbSet.AsNoTracking();
+    public async Task<IEnumerable<T>> GetAllAsync()
+    {
+        return _dbSet.AsNoTracking();
     }
 
 
@@ -51,11 +53,20 @@ public class Repository<T> : IRepository<T> where T : class
         }
     }
 
-    public async Task<T?> SingleOrDefaultAsync(Expression<Func<T, bool>> predicate)  => await _dbSet.AsNoTracking().SingleOrDefaultAsync(predicate);
+    public async Task<T?> SingleOrDefaultAsync(Expression<Func<T, bool>> predicate) => await _dbSet.AsNoTracking().SingleOrDefaultAsync(predicate);
 
 
-    public async Task<IEnumerable<T>> WhereAsync(Expression<Func<T, bool>> predicate)  => await _dbSet.AsNoTracking().Where(predicate).ToListAsync();
+    public async Task<IEnumerable<T>> WhereAsync(Expression<Func<T, bool>> predicate) => await _dbSet.AsNoTracking().Where(predicate).ToListAsync();
 
+    public async Task<IEnumerable<T>> GetAllWithNavigationPropertiesAsync(params Expression<Func<T, object>>[] includes)
+    {
+        IQueryable<T> query = _context.Set<T>();
+        foreach (var include in includes)
+        {
+            query = query.Include(include);
+        }
+        return await query.ToListAsync();
+    }
 }
 
 

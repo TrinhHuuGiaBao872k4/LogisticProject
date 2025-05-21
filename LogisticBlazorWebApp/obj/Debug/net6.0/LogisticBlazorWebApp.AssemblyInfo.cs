@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LogisticBlazorWebApp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ae1a68b6fedd25b930f4d74825b312a0ad5cc963")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1233005c704f8cf3643ac8dabe507281ef3f120b")]
 [assembly: System.Reflection.AssemblyProductAttribute("LogisticBlazorWebApp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LogisticBlazorWebApp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
