@@ -15,6 +15,8 @@ public partial class HangHoa
 
     public string? HinhAnh { get; set; }
 
+    public decimal? GiaHangHoa { get; set; }
+
     public virtual ICollection<ChiTietDonHang> ChiTietDonHangs { get; set; } = new List<ChiTietDonHang>();
 
     public virtual ICollection<ChiTietPhieuNhapXuat> ChiTietPhieuNhapXuats { get; set; } = new List<ChiTietPhieuNhapXuat>();

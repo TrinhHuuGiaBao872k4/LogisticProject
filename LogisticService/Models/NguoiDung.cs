@@ -27,7 +27,7 @@ public partial class NguoiDung
 
     public virtual ICollection<DonHang> DonHangs { get; set; } = new List<DonHang>();
 
-    public virtual TrangThaiNguoiDung? MaTrangThaiNavigation { get; set; } 
+    public virtual TrangThaiNguoiDung? MaTrangThaiNavigation { get; set; }
 
     public virtual VaiTro? MaVaiTroNavigation { get; set; }
 

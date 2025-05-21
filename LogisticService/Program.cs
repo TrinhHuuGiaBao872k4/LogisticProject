@@ -94,7 +94,9 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 });
 builder.Services.AddSingleton<RedisHelper>();
 
-
+//DonHang
+builder.Services.AddScoped<IDonHangRepository, DonHangRepository>();
+builder.Services.AddScoped<IDonHangService, DonHangService>();
 
 //Repository Pattern & Unitofwork
 //Unitofwrork
