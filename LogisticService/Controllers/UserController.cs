@@ -57,7 +57,7 @@ public class UserController : ControllerBase
     {
         var user = await _context.NguoiDungs
             .FirstOrDefaultAsync(u => u.TenDanhNhap == dto.TenDanhNhap);
-      
+
         if (user == null || !PasswordHasher.VerifyPassword(dto.MatKhau, user.MatKhau))
             return Unauthorized("Sai tên đăng nhập hoặc mật khẩu!");
         if (user.MaTrangThai.Trim() != "TT01")
@@ -98,49 +98,53 @@ public class UserController : ControllerBase
     [HttpPut("Update-Profile")]
     public async Task<IActionResult> UpdateProfile([FromBody] UpdateUserViewModel dto)
     {
-    var username = User.FindFirst(ClaimTypes.Name)?.Value;
-    if (username == null)
-        return Unauthorized("Không xác định được người dùng.");
+        var username = User.FindFirst(ClaimTypes.Name)?.Value;
+        if (username == null)
+            return Unauthorized("Không xác định được người dùng.");
 
-    var user = await _context.NguoiDungs.FirstOrDefaultAsync(u => u.TenDanhNhap == username);
-    if (user == null)
-        return NotFound("Người dùng không tồn tại.");
+        var user = await _context.NguoiDungs.FirstOrDefaultAsync(u => u.TenDanhNhap == username);
+        if (user == null)
+            return NotFound("Người dùng không tồn tại.");
 
-    // Cập nhật các trường được phép sửa
-    user.HoTen = dto.HoTen;
-    user.NgaySinh = dto.NgaySinh;
-    user.DiaChi = dto.DiaChi;
-    user.Sdt = dto.Sdt;
-    // Không được cập nhật CanCuoc (Căn cước)
+        // Cập nhật các trường được phép sửa
+        user.HoTen = dto.HoTen;
+        user.NgaySinh = dto.NgaySinh;
+        user.DiaChi = dto.DiaChi;
+        user.Sdt = dto.Sdt;
+        // Không được cập nhật CanCuoc (Căn cước)
 
-    _context.NguoiDungs.Update(user);
-    await _context.SaveChangesAsync();
+        _context.NguoiDungs.Update(user);
+        await _context.SaveChangesAsync();
 
-    return Ok("Cập nhật thông tin thành công.");
+        return Ok("Cập nhật thông tin thành công.");
     }
     [Authorize]
     [HttpPut("change-password")]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordViewModel dto)
     {
-    var username = User.FindFirst(ClaimTypes.Name)?.Value;
-    if (username == null)
-        return Unauthorized("Không xác định được người dùng.");
+        var username = User.FindFirst(ClaimTypes.Name)?.Value;
+        if (username == null)
+            return Unauthorized("Không xác định được người dùng.");
 
-    var user = await _context.NguoiDungs.FirstOrDefaultAsync(u => u.TenDanhNhap == username);
-    if (user == null)
-        return NotFound("Người dùng không tồn tại.");
+        var user = await _context.NguoiDungs.FirstOrDefaultAsync(u => u.TenDanhNhap == username);
+        if (user == null)
+            return NotFound("Người dùng không tồn tại.");
 
-    // Kiểm tra mật khẩu cũ
-    if (!PasswordHasher.VerifyPassword(dto.MatKhauCu, user.MatKhau))
-        return BadRequest(" Mật khẩu cũ không đúng.");
+        // Kiểm tra mật khẩu cũ
+        if (!PasswordHasher.VerifyPassword(dto.MatKhauCu, user.MatKhau))
+            return BadRequest(" Mật khẩu cũ không đúng.");
 
-    // Hash lại mật khẩu mới
-    user.MatKhau = PasswordHasher.HashPassword(dto.MatKhauMoi);
+        // Hash lại mật khẩu mới
+        user.MatKhau = PasswordHasher.HashPassword(dto.MatKhauMoi);
 
-    _context.NguoiDungs.Update(user);
-    await _context.SaveChangesAsync();
+        _context.NguoiDungs.Update(user);
+        await _context.SaveChangesAsync();
 
+<<<<<<< HEAD
     return Ok(" Đổi mật khẩu thành công.");
+=======
+        return Ok("✅ Đổi mật khẩu thành công.");
+>>>>>>> d87e98937776ce78c7c6854d8f5c6a1c01a814d0
     }
 }
 
