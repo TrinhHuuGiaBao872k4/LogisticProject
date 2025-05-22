@@ -94,9 +94,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 });
 builder.Services.AddSingleton<RedisHelper>();
 
-//DonHang
-builder.Services.AddScoped<IDonHangRepository, DonHangRepository>();
-builder.Services.AddScoped<IDonHangService, DonHangService>();
+
 
 //Repository Pattern & Unitofwork
 //Unitofwrork
@@ -106,7 +104,9 @@ builder.Services.AddScoped<IHangHoaRepository, HangHoaRepository>();
 //Service
 builder.Services.AddScoped<IHangHoaService, HangHoaService>();
 
-
+//DonHang
+builder.Services.AddScoped<IDonHangRepository, DonHangRepository>();
+builder.Services.AddScoped<IDonHangService, DonHangService>();
 
 var app = builder.Build();
 

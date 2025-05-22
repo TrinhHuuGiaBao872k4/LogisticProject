@@ -7,7 +7,7 @@ public interface IHangHoaService : IServiceBase<HangHoa>
     // Task<HangHoa> GetHangHoaById(string id);
     Task<HTTPResponseClient<IEnumerable<HangHoa>>> GetAllHangHoaAsync();
     Task<HTTPResponseClient<HangHoa?>> GetHangHoaByIdAsync(string id);
-    
+    Task<IEnumerable<HangHoa>> GetAllWithNavigationPropertiesAsync();
 }
 
 public class HangHoaService : ServiceBase<HangHoa>, IHangHoaService
@@ -24,7 +24,7 @@ public class HangHoaService : ServiceBase<HangHoa>, IHangHoaService
         var res = await _repository.GetAllAsync();
         HTTPResponseClient<IEnumerable<HangHoa>> data = new HTTPResponseClient<IEnumerable<HangHoa>>()
         {
-            StatusCode = 200,   
+            StatusCode = 200,
             Data = res.ToList().Skip(0).Take(10),
             DateTime = DateTime.Now,
             Message = "Successfully"
@@ -42,5 +42,9 @@ public class HangHoaService : ServiceBase<HangHoa>, IHangHoaService
             Message = "Successfully"
         };
         return data;
+    }
+    public async Task<IEnumerable<HangHoa>> GetAllWithNavigationPropertiesAsync()
+    {
+        return await _repository.GetAllWithNavigationPropertiesAsync(h=>h.ChiTietDonHangs);
     }
 }

@@ -9,6 +9,8 @@ public interface IServiceBase<T> where T : class
     Task DeleteAsync(string id);
     Task<T?> SingleOrDefaultAsync(Expression<Func<T, bool>> predicate);
     Task<IEnumerable<T>> WhereAsync(Expression<Func<T, bool>> predicate);
+    
+
 }
 
 
@@ -59,6 +61,7 @@ public class ServiceBase<T> : IServiceBase<T> where T : class
 
     public async Task<IEnumerable<T>> WhereAsync(Expression<Func<T, bool>> predicate)
     {
-         return await _repository.WhereAsync(predicate);
+        return await _repository.WhereAsync(predicate);
     }
+    
 }

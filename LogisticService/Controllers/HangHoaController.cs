@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using LogisticService.Models;
 using LogisticService.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 //using LogisticService.Models;
@@ -68,6 +69,7 @@ namespace LogisticService.Controllers
 
             return Ok(hangHoa);  // 200 nếu thành công
         }
+        [Authorize(Roles = "VT002")]
         [HttpPost("CreateHangHoa")]
         public async Task<IActionResult> CreateHangHoa(HangHoaVM hangHoaVM)
         {
@@ -88,6 +90,7 @@ namespace LogisticService.Controllers
                 Message = "Successfully"
             });
         }
+        [Authorize(Roles = "VT002")]
         [HttpPut("UpdateHangHoa/{id}")]
         public async Task<IActionResult> UpdateHangHoa([FromRoute] string id, HangHoaVM hangHoaVM)
         {
@@ -108,5 +111,120 @@ namespace LogisticService.Controllers
                 Message = "Successfully"
             });
         }
+        [Authorize(Roles = "VT002")]
+        [HttpDelete("DeleteHangHoaById/{id}")]
+        public async Task<IActionResult> DeleteHangHoaById([FromRoute] string id)
+        {
+            var hangHoa = await _hangHoaService.GetByIdAsync(id);
+            await _hangHoaService.DeleteAsync(id);
+            return Ok(new HTTPResponseClient<HangHoa>
+            {
+                StatusCode = 200,
+                Data = hangHoa,
+                DateTime = DateTime.Now,
+                Message = "Successfully"
+            });
+        }
+        [HttpGet("SearchHangHoa/{searchkey}")]
+        public async Task<IActionResult> SearchHangHoa([FromRoute] string searchkey)
+        {
+            if (string.IsNullOrWhiteSpace(searchkey))
+            {
+                return BadRequest("Từ khóa tìm kiếm không được để trống.");
+            }
+
+            // Tìm kiếm theo tên hoặc mã hàng hóa, không phân biệt chữ hoa/thường
+            var result = await _hangHoaService.WhereAsync(h =>
+                EF.Functions.Like(h.TenHangHoa.ToLower(), $"%{searchkey.ToLower()}%") ||
+                EF.Functions.Like(h.MaHangHoa.ToLower(), $"%{searchkey.ToLower()}%")
+            );
+            if (result == null || !result.Any())
+            {
+                return NotFound(new HTTPResponseClient<IEnumerable<HangHoa>>
+                {
+                    StatusCode = 404,
+                    Data = new List<HangHoa>(),
+                    DateTime = DateTime.Now,
+                    Message = "Không tìm thấy hàng hóa nào phù hợp."
+                });
+            }
+            return Ok(new HTTPResponseClient<IEnumerable<HangHoa>>
+            {
+                StatusCode = 200,
+                Data = result,
+                DateTime = DateTime.Now,
+                Message = $"Tìm thấy {result.Count()} hàng hóa phù hợp."
+            });
+        }
+        [HttpGet("FilterByLoai/{maLoai}")]
+        public async Task<IActionResult> FilterByLoai(string maLoai)
+        {
+            var result = await _hangHoaService.WhereAsync(h => h.MaLoaiHangHoa == maLoai);
+
+            return Ok(new HTTPResponseClient<IEnumerable<HangHoa>>
+            {
+                StatusCode = 200,
+                Data = result,
+                DateTime = DateTime.Now,
+                Message = $"Tìm thấy {result.Count()} hàng hóa theo loại {maLoai}."
+            });
+        }
+        [HttpGet("SortByPriceAsc")]
+        public async Task<IActionResult> SortByPriceAsc()
+        {
+            var result = await _hangHoaService.GetAllAsync();
+            var sorted = result.OrderBy(h => h.GiaHangHoa);
+
+            return Ok(new HTTPResponseClient<IEnumerable<HangHoa>>
+            {
+                StatusCode = 200,
+                Data = sorted,
+                DateTime = DateTime.Now,
+                Message = "Danh sách hàng hóa theo giá tăng dần."
+            });
+        }
+        [HttpGet("SortByPriceDesc")]
+        public async Task<IActionResult> SortByPriceDesc()
+        {
+            var result = await _hangHoaService.GetAllAsync();
+            var sorted = result.OrderByDescending(h => h.GiaHangHoa);
+
+            return Ok(new HTTPResponseClient<IEnumerable<HangHoa>>
+            {
+                StatusCode = 200,
+                Data = sorted,
+                DateTime = DateTime.Now,
+                Message = "Danh sách hàng hóa theo giá giảm dần."
+            });
+        }
+        [HttpGet("SortByNewest")]
+        public async Task<IActionResult> SortByNewest()
+        {
+            var result = await _hangHoaService.GetAllAsync();
+            var sorted = result.OrderByDescending(h => h.NgaySanXuat);
+
+            return Ok(new HTTPResponseClient<IEnumerable<HangHoa>>
+            {
+                StatusCode = 200,
+                Data = sorted,
+                DateTime = DateTime.Now,
+                Message = "Danh sách hàng hóa mới nhất."
+            });
+        }
+        [HttpGet("SortByBestSeller")]
+        public async Task<IActionResult> SortByBestSeller()
+        {
+            var result = await _hangHoaService.GetAllWithNavigationPropertiesAsync();
+            var sorted = result.OrderByDescending(h => h.ChiTietDonHangs.Sum(ct => ct.SoLuong ?? 0)).ToList();
+            return Ok(new HTTPResponseClient<IEnumerable<HangHoa>>
+            {
+                StatusCode = 200,
+                Data = sorted,
+                DateTime = DateTime.Now,
+                Message = "Danh sách hàng hóa bán chạy nhất."
+            });
+        }
+
+
     }
 }

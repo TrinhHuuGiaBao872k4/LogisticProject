@@ -24,8 +24,6 @@ public class UnitOfWork : IUnitOfWork
     {
         _context = context;
         _hangHoaRepository = hangHoaRepository;
-        _context = context;
-        _hangHoaRepository = hangHoaRepository;
         DonHangRepository = donHangRepository;
     }
 
@@ -47,7 +45,9 @@ public class UnitOfWork : IUnitOfWork
         {
             return new Repository<T>(_context);
         }
+        return new Repository<T>(_context);
         throw new NotSupportedException($"No repository found for type {typeof(T).Name}");
+
     }
     public async Task BeginTransaction()
     {
