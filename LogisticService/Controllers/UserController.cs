@@ -140,11 +140,7 @@ public class UserController : ControllerBase
         _context.NguoiDungs.Update(user);
         await _context.SaveChangesAsync();
 
-<<<<<<< HEAD
     return Ok(" Đổi mật khẩu thành công.");
-=======
-        return Ok("✅ Đổi mật khẩu thành công.");
->>>>>>> d87e98937776ce78c7c6854d8f5c6a1c01a814d0
     }
 }
 
