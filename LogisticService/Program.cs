@@ -104,7 +104,9 @@ builder.Services.AddScoped<IHangHoaRepository, HangHoaRepository>();
 //Service
 builder.Services.AddScoped<IHangHoaService, HangHoaService>();
 
-
+//DonHang
+builder.Services.AddScoped<IDonHangRepository, DonHangRepository>();
+builder.Services.AddScoped<IDonHangService, DonHangService>();
 
 var app = builder.Build();
 

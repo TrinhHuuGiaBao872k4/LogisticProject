@@ -399,14 +399,13 @@ public partial class LogisticDbServiceContext : DbContext
 
         modelBuilder.Entity<TinhTrangDonHangChiTiet>(entity =>
         {
-            entity.HasKey(e => e.MaTinhTrangChiTiet).HasName("PK__TinhTran__33B947B60E8D0B51");
+            entity.HasKey(e => e.MaTinhTrangChiTiet).HasName("PK_TinhTrangChiTiet");
 
             entity.ToTable("TinhTrangDonHangChiTiet");
 
             entity.Property(e => e.MaTinhTrangChiTiet)
-                .HasMaxLength(20)
-                .IsUnicode(false)
-                .IsFixedLength();
+                .HasMaxLength(30)
+                .IsUnicode(false);
             entity.Property(e => e.GhiChu).HasMaxLength(255);
             entity.Property(e => e.MaDonHang)
                 .HasMaxLength(20)

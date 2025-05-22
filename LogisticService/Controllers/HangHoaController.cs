@@ -23,7 +23,6 @@ namespace LogisticService.Controllers
             _hangHoaService = hangHoaService;
             _redisHelper = redisHelper;
         }
-
         [HttpGet("GetAllHangHoa")]
         public async Task<IActionResult> GetAllHangHoa()
         {
