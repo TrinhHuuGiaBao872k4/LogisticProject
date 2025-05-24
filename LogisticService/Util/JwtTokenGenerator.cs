@@ -11,6 +11,7 @@ public static class JwtTokenGenerator
         var claims = new[]
         {
             new Claim(ClaimTypes.Name,user.TenDanhNhap),
+            new Claim("MaNguoiDung", user.MaNguoiDung),
             new Claim(ClaimTypes.Role,user.MaVaiTro?.Trim())
         };
 

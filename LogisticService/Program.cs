@@ -37,7 +37,7 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
-
+builder.Services.AddHttpContextAccessor(); 
 //Add service entity framework
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<LogisticDbServiceContext>(options =>

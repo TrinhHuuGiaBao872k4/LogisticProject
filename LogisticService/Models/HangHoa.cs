@@ -17,6 +17,8 @@ public partial class HangHoa
 
     public decimal? GiaHangHoa { get; set; }
 
+    public string MaNguoiDung { get; set; } = null!;
+
     public virtual ICollection<ChiTietDonHang> ChiTietDonHangs { get; set; } = new List<ChiTietDonHang>();
 
     public virtual ICollection<ChiTietPhieuNhapXuat> ChiTietPhieuNhapXuats { get; set; } = new List<ChiTietPhieuNhapXuat>();
@@ -24,6 +26,8 @@ public partial class HangHoa
     public virtual ICollection<DonHangCungCap> DonHangCungCaps { get; set; } = new List<DonHangCungCap>();
 
     public virtual LoaiHangHoa? MaLoaiHangHoaNavigation { get; set; }
+
+    public virtual NguoiDung MaNguoiDungNavigation { get; set; } = null!;
 
     public virtual ICollection<TonKho> TonKhos { get; set; } = new List<TonKho>();
 }
