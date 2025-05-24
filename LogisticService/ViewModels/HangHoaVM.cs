@@ -14,4 +14,5 @@ public partial class HangHoaVM
     public DateTime? NgaySanXuat { get; set; }
 
     public string? HinhAnh { get; set; }
+    public decimal GiaHangHoa { get; set; }
 }
