@@ -5,7 +5,6 @@ namespace LogisticService.Models;
 
 public partial class TinhTrangDonHangChiTiet
 {
-    
     public string MaTinhTrangChiTiet { get; set; } = null!;
 
     public string? MaDonHang { get; set; }
