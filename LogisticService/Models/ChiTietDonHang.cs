@@ -13,6 +13,8 @@ public partial class ChiTietDonHang
 
     public int? SoLuong { get; set; }
 
+    public string MaChiTietDonHang { get; set; } = null!;
+
     public virtual DonHang MaDonHangNavigation { get; set; } = null!;
 
     public virtual HangHoa MaHangHoaNavigation { get; set; } = null!;

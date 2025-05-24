@@ -1,16 +1,16 @@
 using LogisticService.Models;
 
-public interface IDonHangService
+public interface IDonHangService : IServiceBase<DonHang>
 {
 
     Task<string> DatHangAsync(DatHangViewModel model);
     
 }
-public class DonHangService : IDonHangService
+public class DonHangService : ServiceBase<DonHang>, IDonHangService
 {
     private readonly IUnitOfWork _unitOfWork;
 
-    public DonHangService(IUnitOfWork unitOfWork)
+    public DonHangService(IUnitOfWork unitOfWork) : base(unitOfWork)
     {
         _unitOfWork = unitOfWork;
     }

@@ -7,11 +7,11 @@ using System.Security.Claims;
 [ApiController]
 public class DonHangController : ControllerBase
 {
-    private readonly IDonHangService _service;
+    private readonly IDonHangService _donHangService;
     private readonly IUnitOfWork _unitOfWork;
     public DonHangController(IDonHangService service, IUnitOfWork unitOfWork)
     {
-        _service = service;
+        _donHangService = service;
         _unitOfWork = unitOfWork;
     }
 
@@ -20,7 +20,7 @@ public class DonHangController : ControllerBase
     {
         try
         {
-            var maDon = await _service.DatHangAsync(model);
+            var maDon = await _donHangService.DatHangAsync(model);
             return Ok(new { success = true, maDonHang = maDon });
         }
         catch (Exception ex)
@@ -36,7 +36,7 @@ public class DonHangController : ControllerBase
         var user = await _unitOfWork.GetRepository<NguoiDung>().SingleOrDefaultAsync(u => u.MaVaiTro == role);
 
         if (user == null || user.MaVaiTro.Trim() != "VT000")
-                return Unauthorized(new { success = false, message = "Chỉ SuperAdmin mới được cập nhật đơn hàng" });
+            return Unauthorized(new { success = false, message = "Chỉ SuperAdmin mới được cập nhật đơn hàng" });
 
         var donHang = await _unitOfWork.DonHangRepository.GetByIdAsync(maDonHang);
         if (donHang == null)
@@ -78,33 +78,33 @@ public class DonHangController : ControllerBase
         if (donHang == null)
             return NotFound("Không tìm thấy đơn hàng");
 
-       // ✅ Ghi trạng thái mới vào LichSuTrangThaiDonHang
-    var maTrangThai = "TT05"; // Mã trạng thái 'Đã hủy'
+        // ✅ Ghi trạng thái mới vào LichSuTrangThaiDonHang
+        var maTrangThai = "TT05"; // Mã trạng thái 'Đã hủy'
 
-    var lichSu = new LichSuTrangThaiDonHang
-    {
-        MaLichSu = "LS" + DateTime.Now.Ticks,
-        MaDonHang = maDonHang,
-        MaTrangThai = maTrangThai,
-        NgayCapNhat = DateTime.Now,
-        GhiChu = "Đơn hàng bị hủy bởi Admin"
-    };
-    await _unitOfWork.GetRepository<LichSuTrangThaiDonHang>().AddAsync(lichSu);
+        var lichSu = new LichSuTrangThaiDonHang
+        {
+            MaLichSu = "LS" + DateTime.Now.Ticks,
+            MaDonHang = maDonHang,
+            MaTrangThai = maTrangThai,
+            NgayCapNhat = DateTime.Now,
+            GhiChu = "Đơn hàng bị hủy bởi Admin"
+        };
+        await _unitOfWork.GetRepository<LichSuTrangThaiDonHang>().AddAsync(lichSu);
 
-    // ✅ Ghi tình trạng chi tiết
-    var tinhTrang = new TinhTrangDonHangChiTiet
-    {
-        MaTinhTrangChiTiet = "TTCT" + DateTime.Now.Ticks,
-        MaDonHang = maDonHang,
-        NoiDung = "Đơn hàng đã bị hủy",
-        ThoiGian = DateTime.Now,
-        GhiChu = "Admin xử lý hủy"
-    };
-    await _unitOfWork.GetRepository<TinhTrangDonHangChiTiet>().AddAsync(tinhTrang);
+        // ✅ Ghi tình trạng chi tiết
+        var tinhTrang = new TinhTrangDonHangChiTiet
+        {
+            MaTinhTrangChiTiet = "TTCT" + DateTime.Now.Ticks,
+            MaDonHang = maDonHang,
+            NoiDung = "Đơn hàng đã bị hủy",
+            ThoiGian = DateTime.Now,
+            GhiChu = "Admin xử lý hủy"
+        };
+        await _unitOfWork.GetRepository<TinhTrangDonHangChiTiet>().AddAsync(tinhTrang);
 
-    await _unitOfWork.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync();
 
-    return Ok(new { success = true, message = "Đơn hàng đã được chuyển sang trạng thái 'Đã hủy'" });
+        return Ok(new { success = true, message = "Đơn hàng đã được chuyển sang trạng thái 'Đã hủy'" });
     }
 
 }
