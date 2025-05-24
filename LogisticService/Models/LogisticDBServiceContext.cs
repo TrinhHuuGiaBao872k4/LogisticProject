@@ -205,12 +205,22 @@ public partial class LogisticDbServiceContext : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false)
                 .IsFixedLength();
+            entity.Property(e => e.MaNguoiDung)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .HasDefaultValue("SELLER_DEFAULT")
+                .IsFixedLength();
             entity.Property(e => e.NgaySanXuat).HasColumnType("datetime");
             entity.Property(e => e.TenHangHoa).HasMaxLength(30);
 
             entity.HasOne(d => d.MaLoaiHangHoaNavigation).WithMany(p => p.HangHoas)
                 .HasForeignKey(d => d.MaLoaiHangHoa)
                 .HasConstraintName("FK_HangHoa_LoaiHangHoa");
+
+            entity.HasOne(d => d.MaNguoiDungNavigation).WithMany(p => p.HangHoas)
+                .HasForeignKey(d => d.MaNguoiDung)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_HangHoa_NguoiDung");
         });
 
         modelBuilder.Entity<KhoHang>(entity =>
