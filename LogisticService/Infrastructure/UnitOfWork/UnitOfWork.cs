@@ -3,8 +3,9 @@ using LogisticService.Models;
 
 public interface IUnitOfWork : IAsyncDisposable
 {
-    IDonHangRepository DonHangRepository { get; }
+    public IDonHangRepository DonHangRepository { get; }
     public IHangHoaRepository _hangHoaRepository { get; }
+    public INguoiDungRepository _nguoiDungRepository { get; }
 
     Task BeginTransaction();
     IRepository<T> GetRepository<T>() where T : class;
@@ -17,14 +18,16 @@ public class UnitOfWork : IUnitOfWork
 {
     public IDonHangRepository DonHangRepository { get; }
     public IHangHoaRepository _hangHoaRepository { get; }
+    public INguoiDungRepository _nguoiDungRepository { get; }
 
     private readonly LogisticDbServiceContext _context;
 
-    public UnitOfWork(LogisticDbServiceContext context, IHangHoaRepository hangHoaRepository, IDonHangRepository donHangRepository)
+    public UnitOfWork(LogisticDbServiceContext context, IHangHoaRepository hangHoaRepository, IDonHangRepository donHangRepository, INguoiDungRepository nguoiDungRepository)
     {
         _context = context;
         _hangHoaRepository = hangHoaRepository;
         DonHangRepository = donHangRepository;
+        _nguoiDungRepository = nguoiDungRepository;
     }
 
     public IRepository<T> GetRepository<T>() where T : class

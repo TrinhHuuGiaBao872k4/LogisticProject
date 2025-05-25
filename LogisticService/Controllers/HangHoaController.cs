@@ -14,15 +14,15 @@ namespace LogisticService.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class HangHoaController : ControllerBase
+    public class HangHoaController(IHangHoaService _hangHoaService, RedisHelper _redisHelper, JwtAuthService _jwt) : ControllerBase
     {
-        public IHangHoaService _hangHoaService;
-        public RedisHelper _redisHelper;
-        public HangHoaController(IHangHoaService hangHoaService, RedisHelper redisHelper)
-        {
-            _hangHoaService = hangHoaService;
-            _redisHelper = redisHelper;
-        }
+        // public IHangHoaService _hangHoaService;
+        // public RedisHelper _redisHelper;
+        // public HangHoaController(IHangHoaService hangHoaService, RedisHelper redisHelper)
+        // {
+        //     _hangHoaService = hangHoaService;
+        //     _redisHelper = redisHelper;
+        // }
         [HttpGet("GetAllHangHoa")]
         public async Task<IActionResult> GetAllHangHoa()
         {
@@ -69,17 +69,21 @@ namespace LogisticService.Controllers
 
             return Ok(hangHoa);  // 200 nếu thành công
         }
-        [Authorize(Roles = "VT002")]
         [HttpPost("CreateHangHoa")]
+        [Authorize]
         public async Task<IActionResult> CreateHangHoa(HangHoaVM hangHoaVM)
         {
+            var header = HttpContext.Request.Headers;
+            var accessToken = header["Authorization"].First().Substring(7);
+            string res = _jwt.DecodePayloadToken(accessToken);
             HangHoa hangHoa = new HangHoa()
             {
                 MaHangHoa = hangHoaVM.MaHangHoa,
                 MaLoaiHangHoa = hangHoaVM.MaLoaiHangHoa,
                 TenHangHoa = hangHoaVM.TenHangHoa,
                 NgaySanXuat = hangHoaVM.NgaySanXuat,
-                HinhAnh = hangHoaVM.HinhAnh
+                HinhAnh = hangHoaVM.HinhAnh,
+                MaNguoiDung = res
             };
             await _hangHoaService.AddAsync(hangHoa);
             return Ok(new HTTPResponseClient<HangHoa>
@@ -94,6 +98,7 @@ namespace LogisticService.Controllers
         [HttpPut("UpdateHangHoa/{id}")]
         public async Task<IActionResult> UpdateHangHoa([FromRoute] string id, HangHoaVM hangHoaVM)
         {
+            
             HangHoa hangHoa = new HangHoa()
             {
                 MaHangHoa = hangHoaVM.MaHangHoa,

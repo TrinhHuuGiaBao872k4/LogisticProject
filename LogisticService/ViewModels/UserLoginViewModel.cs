@@ -2,9 +2,14 @@ using System.ComponentModel.DataAnnotations;
 
 public class UserLoginViewModel
 {
-   [Required(ErrorMessage = "Tên đăng nhập Không được để trống")]
+    [Required(ErrorMessage = "Tên đăng nhập Không được để trống")]
     public string TenDanhNhap { get; set; }
 
     [Required(ErrorMessage = "Vui lòng nhập mật khẩu")]
     public string MatKhau { get; set; }
+}
+public class UserLoginResultVM
+{
+    public string TenDanhNhap { get; set; }
+    public string AccessToken { get; set; }
 }

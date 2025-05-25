@@ -15,4 +15,5 @@ public partial class HangHoaVM
 
     public string? HinhAnh { get; set; }
     public decimal GiaHangHoa { get; set; }
+
 }

@@ -1,12 +1,15 @@
+using System.Net;
+using System.Security.Claims;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 using LogisticService.Models;
-using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using System.Security.Claims;
-using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -50,25 +53,61 @@ builder.Services.AddControllers().AddJsonOptions(options =>
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
         options.JsonSerializerOptions.PropertyNamingPolicy = null;
     });
-//add authentication
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
-                builder.Configuration["Jwt:Key"])),
+// //add authentication
+// builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//     .AddJwtBearer(options =>
+//     {
+//         options.TokenValidationParameters = new TokenValidationParameters
+//         {
+//             ValidateIssuer = true,
+//             ValidateAudience = true,
+//             ValidateLifetime = true,
+//             ValidateIssuerSigningKey = true,
+//             ValidIssuer = builder.Configuration["Jwt:Issuer"],
+//             ValidAudience = builder.Configuration["Jwt:Audience"],
+//             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+//                 builder.Configuration["Jwt:Key"])),
 
-            RoleClaimType=ClaimTypes.Role
+//             RoleClaimType=ClaimTypes.Role
+//         };
+//     });
+// //add authorization
+
+//Thêm middleware authentication
+var privateKey = builder.Configuration["jwt:Secret-Key"];
+var Issuer = builder.Configuration["jwt:Issuer"];
+var Audience = builder.Configuration["jwt:Audience"];
+// Thêm dịch vụ Authentication vào ứng dụng, sử dụng JWT Bearer làm phương thức xác thực
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{        
+        // Thiết lập các tham số xác thực token
+        options.TokenValidationParameters = new TokenValidationParameters()
+        {
+            // Kiểm tra và xác nhận Issuer (nguồn phát hành token)
+            ValidateIssuer = true, 
+            ValidIssuer = Issuer, // Biến `Issuer` chứa giá trị của Issuer hợp lệ
+            // Kiểm tra và xác nhận Audience (đối tượng nhận token)
+            ValidateAudience = true,
+            ValidAudience = Audience, // Biến `Audience` chứa giá trị của Audience hợp lệ
+            // Kiểm tra và xác nhận khóa bí mật được sử dụng để ký token
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(privateKey)), 
+            // Sử dụng khóa bí mật (`privateKey`) để tạo SymmetricSecurityKey nhằm xác thực chữ ký của token
+            // Giảm độ trễ (skew time) của token xuống 0, đảm bảo token hết hạn chính xác
+            ClockSkew = TimeSpan.Zero, 
+            // Xác định claim chứa vai trò của user (để phân quyền)
+            RoleClaimType = ClaimTypes.Role, 
+            // Xác định claim chứa tên của user
+            NameClaimType = ClaimTypes.Name, 
+            // Kiểm tra thời gian hết hạn của token, không cho phép sử dụng token hết hạn
+            ValidateLifetime = true
         };
-    });
-//add authorization
+});
+//DI Service JWT
+builder.Services.AddScoped<JwtAuthService>();
+// Thêm dịch vụ Authorization để hỗ trợ phân quyền người dùng
+builder.Services.AddAuthorization();
+
 
 //bật cors 
 builder.Services.AddCors(options =>
@@ -101,8 +140,10 @@ builder.Services.AddSingleton<RedisHelper>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 //Repository
 builder.Services.AddScoped<IHangHoaRepository, HangHoaRepository>();
+builder.Services.AddScoped<INguoiDungRepository, NguoiDungRepository>();
 //Service
 builder.Services.AddScoped<IHangHoaService, HangHoaService>();
+builder.Services.AddScoped<INguoiDungService, NguoiDungService>();
 
 //DonHang
 builder.Services.AddScoped<IDonHangRepository, DonHangRepository>();
@@ -118,13 +159,14 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("allow_all");
-app.UseMiddleware<JwtMiddleware>();
-app.UseAuthentication();
-app.UseAuthorization();
+// app.UseMiddleware<JwtMiddleware>();
+
 
 app.MapControllers();
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
+app.UseAuthorization();
 
 
 app.Run();
