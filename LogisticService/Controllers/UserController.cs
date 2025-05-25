@@ -6,16 +6,16 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 [Route("api/[controller]")]
 [ApiController]
-public class UserController : ControllerBase
+public class UserController(LogisticDbServiceContext _context, IConfiguration _config, JwtAuthService _jwt, INguoiDungService _nguoiDungService) : ControllerBase
 {
-    private readonly LogisticDbServiceContext _context;
-    private readonly IConfiguration _config;
+    // private readonly LogisticDbServiceContext _context;
+    // private readonly IConfiguration _config;
 
-    public UserController(LogisticDbServiceContext context, IConfiguration config)
-    {
-        _context = context;
-        _config = config;
-    }
+    // public UserController(LogisticDbServiceContext context, IConfiguration config)
+    // {
+    //     _context = context;
+    //     _config = config;
+    // }
 
     // Đăng ký
     [HttpPost("register")]
@@ -140,7 +140,24 @@ public class UserController : ControllerBase
         _context.NguoiDungs.Update(user);
         await _context.SaveChangesAsync();
 
-    return Ok(" Đổi mật khẩu thành công.");
+        return Ok(" Đổi mật khẩu thành công.");
     }
+
+    [HttpPost("/NguoiDung/DangNhap")]
+    public async Task<ActionResult> DangNhap(UserLoginViewModel userLogin)
+    {
+        var res = await _nguoiDungService.Login(userLogin) as OkObjectResult;
+        var userResult = res?.Value as HTTPResponseClient<UserLoginResultVM>;
+        //Tạo cookie từ server 
+        // var cookieOption =  new CookieOptions(){
+        //     HttpOnly = true,
+        //     Secure = true,
+        //     Expires = DateTime.Now.AddDays(1)
+        // };
+        // HttpContext.Response.Cookies.Append("accessToken",userResult.Data.AccessToken,cookieOption );
+        // Console.WriteLine(@$"token :{ userResult.Data.AccessToken}");
+        return res;
+    }
+
 }
 
