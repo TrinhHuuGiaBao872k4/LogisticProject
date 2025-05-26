@@ -14,7 +14,7 @@ namespace LogisticService.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class HangHoaController(IHangHoaService _hangHoaService, RedisHelper _redisHelper, JwtAuthService _jwt) : ControllerBase
+    public class HangHoaController(IHangHoaService _hangHoaService, RedisHelper _redisHelper, JwtAuthService _jwt, INguoiDungService _nguoiDungService) : ControllerBase
     {
         // public IHangHoaService _hangHoaService;
         // public RedisHelper _redisHelper;
@@ -73,48 +73,109 @@ namespace LogisticService.Controllers
         [Authorize]
         public async Task<IActionResult> CreateHangHoa(HangHoaVM hangHoaVM)
         {
+
             var header = HttpContext.Request.Headers;
-            var accessToken = header["Authorization"].First().Substring(7);
-            string res = _jwt.DecodePayloadToken(accessToken);
-            HangHoa hangHoa = new HangHoa()
+            var token = header["Authorization"].First().Substring(7);
+            if (string.IsNullOrEmpty(token))
             {
-                MaHangHoa = hangHoaVM.MaHangHoa,
-                MaLoaiHangHoa = hangHoaVM.MaLoaiHangHoa,
-                TenHangHoa = hangHoaVM.TenHangHoa,
-                NgaySanXuat = hangHoaVM.NgaySanXuat,
-                HinhAnh = hangHoaVM.HinhAnh,
-                MaNguoiDung = res
-            };
-            await _hangHoaService.AddAsync(hangHoa);
-            return Ok(new HTTPResponseClient<HangHoa>
+                return Unauthorized(new HTTPResponseClient<object>
+                {
+                    StatusCode = 401,
+                    Data = null,
+                    DateTime = DateTime.Now,
+                    Message = "Token không hợp lệ"
+                });
+            }
+            TokenResult res = _jwt.DecodePayloadTokenInfo(token);
+            string VaiTro = res.Role;
+            Console.WriteLine(VaiTro);
+            if (VaiTro == "Seller")
             {
-                StatusCode = 200,
-                Data = hangHoa,
-                DateTime = DateTime.Now,
-                Message = "Successfully"
-            });
+                HangHoa hangHoa = new HangHoa()
+                {
+                    MaHangHoa = await _hangHoaService.GenerateMaHangHoaAsync(),
+                    MaLoaiHangHoa = hangHoaVM.MaLoaiHangHoa,
+                    TenHangHoa = hangHoaVM.TenHangHoa,
+                    NgaySanXuat = hangHoaVM.NgaySanXuat,
+                    HinhAnh = hangHoaVM.HinhAnh,
+                    GiaHangHoa = hangHoaVM.GiaHangHoa,
+                    MaNguoiDung = res.Id
+                };
+                await _hangHoaService.AddAsync(hangHoa);
+                return Ok(new HTTPResponseClient<HangHoa>
+                {
+                    StatusCode = 200,
+                    Data = hangHoa,
+                    DateTime = DateTime.Now,
+                    Message = "Successfully"
+                });
+            }
+            else
+            {
+                return BadRequest(new HTTPResponseClient<HangHoa>
+                {
+                    StatusCode = 400,
+                    Data = null,
+                    DateTime = DateTime.Now,
+                    Message = "Người dùng không phải Seller"
+                });
+            }
         }
-        [Authorize(Roles = "VT002")]
         [HttpPut("UpdateHangHoa/{id}")]
-        public async Task<IActionResult> UpdateHangHoa([FromRoute] string id, HangHoaVM hangHoaVM)
+        [Authorize]
+        public async Task<IActionResult> UpdateHangHoa([FromRoute] string id,[FromBody] HangHoaVM hangHoaVM)
         {
-            
-            HangHoa hangHoa = new HangHoa()
+            var header = HttpContext.Request.Headers;
+            var token = header["Authorization"].First().Substring(7);
+            if (string.IsNullOrEmpty(token))
             {
-                MaHangHoa = hangHoaVM.MaHangHoa,
-                MaLoaiHangHoa = hangHoaVM.MaLoaiHangHoa,
-                TenHangHoa = hangHoaVM.TenHangHoa,
-                NgaySanXuat = hangHoaVM.NgaySanXuat,
-                HinhAnh = hangHoaVM.HinhAnh
-            };
-            await _hangHoaService.UpdateAsync(hangHoa);
-            return Ok(new HTTPResponseClient<HangHoa>
+                return Unauthorized(new HTTPResponseClient<object>
+                {
+                    StatusCode = 401,
+                    Data = null,
+                    DateTime = DateTime.Now,
+                    Message = "Token không hợp lệ"
+                });
+            }
+            TokenResult res = _jwt.DecodePayloadTokenInfo(token);
+            string VaiTro = res.Role;
+            if (VaiTro == "Seller")
             {
-                StatusCode = 200,
-                Data = hangHoa,
-                DateTime = DateTime.Now,
-                Message = "Successfully"
-            });
+                var hangHoa = await _hangHoaService.GetHangHoaByIdAsync(id);
+                if (hangHoa.Data == null)
+                {
+                    return NotFound(new HTTPResponseClient<object>
+                    {
+                        StatusCode = 404,
+                        Data = null,
+                        DateTime = DateTime.Now,
+                        Message = $"Không tìm thấy hàng hóa với mã {id}"
+                    });
+                }
+                var entity  = hangHoa.Data;
+                entity.MaLoaiHangHoa = hangHoaVM.MaLoaiHangHoa ?? entity.MaLoaiHangHoa;
+                entity.TenHangHoa = hangHoaVM.TenHangHoa ?? entity.TenHangHoa;
+                entity.HinhAnh = hangHoaVM.HinhAnh ?? entity.HinhAnh;
+                entity.GiaHangHoa = hangHoaVM.GiaHangHoa ?? entity.GiaHangHoa;
+                await _hangHoaService.UpdateAsync(entity);
+                return Ok(new HTTPResponseClient<HangHoa>
+                {
+                    StatusCode = 200,
+                    Data = entity,
+                    DateTime = DateTime.Now,
+                    Message = "Successfully"
+                });
+            }
+            else
+            {
+                return BadRequest(new HTTPResponseClient<HangHoa>
+                {
+                    StatusCode = 400,
+                    Data = null,
+                    DateTime = DateTime.Now,
+                    Message = "Người dùng không phải Seller"
+                });
+            }
         }
         [Authorize(Roles = "VT002")]
         [HttpDelete("DeleteHangHoaById/{id}")]
