@@ -64,7 +64,7 @@ namespace LogisticService.Controllers
 
             var hangHoa = new HangHoa
             {
-                MaHangHoa = hangHoaVM.MaHangHoa,
+                // MaHangHoa = hangHoaVM.MaHangHoa,
                 MaLoaiHangHoa = hangHoaVM.MaLoaiHangHoa,
                 TenHangHoa = hangHoaVM.TenHangHoa,
                 GiaHangHoa = hangHoaVM.GiaHangHoa,

@@ -38,7 +38,7 @@ public class JwtAuthService
             new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()) // Thời gian tạo token
         };
         List<string> lstRole = new List<string>();
-        var userRoles = _context.Database.SqlQueryRaw<string>($@"SELECT VT.TenVaiTro FROM NguoiDung ND INNER JOIN VaiTro VT ON ND.MaVaiTro = VT.MaVaiTro WHERE ND.MaNguoiDung = '{userLogin.MaNguoiDung};'").ToList();
+        var userRoles = _context.Database.SqlQueryRaw<string>($@"SELECT VT.TenVaiTro FROM NguoiDung ND INNER JOIN VaiTro VT ON ND.MaVaiTro = VT.MaVaiTro WHERE ND.MaNguoiDung = '{userLogin.MaNguoiDung}'").ToList();
         foreach (var item in userRoles)
         {
             claims.Add(new Claim(ClaimTypes.Role, item));
@@ -119,10 +119,12 @@ public class JwtAuthService
             }
             var tokenResult = new TokenResult
             {
+                Id = jwtToken.Claims.FirstOrDefault(c => c.Type == "MaNguoiDung").Value,
                 UserName = jwtToken.Claims.FirstOrDefault(c => c.Type == "TenDanhNhap")?.Value,
                 Sub = jwtToken.Claims.FirstOrDefault(c => c.Type == "sub")?.Value,
                 Jti = jwtToken.Claims.FirstOrDefault(c => c.Type == "jti")?.Value,
                 Iat = int.TryParse(jwtToken.Claims.FirstOrDefault(c => c.Type == "iat")?.Value, out var iat) ? iat : 0,
+                Role = jwtToken.Claims.FirstOrDefault(c => c.Type == "role")?.Value,
                 Nbf = int.TryParse(jwtToken.Claims.FirstOrDefault(c => c.Type == "nbf")?.Value, out var nbf) ? nbf : 0,
                 Exp = int.TryParse(jwtToken.Claims.FirstOrDefault(c => c.Type == "exp")?.Value, out var exp) ? exp : 0,
                 Iss = jwtToken.Issuer,
