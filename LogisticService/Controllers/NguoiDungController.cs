@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 [Route("api/[controller]")]
 [ApiController]
-public class UserController(LogisticDbServiceContext _context, IConfiguration _config, JwtAuthService _jwt, INguoiDungService _nguoiDungService) : ControllerBase
+public class NguoiDungController(LogisticDbServiceContext _context, IConfiguration _config, JwtAuthService _jwt, INguoiDungService _nguoiDungService) : ControllerBase
 {
     // private readonly LogisticDbServiceContext _context;
     // private readonly IConfiguration _config;
@@ -18,66 +18,72 @@ public class UserController(LogisticDbServiceContext _context, IConfiguration _c
     // }
 
     // Đăng ký
+    // [HttpPost("register")]
+    // public async Task<IActionResult> Register(UserRegisterViewModel dto)
+    // {
+    //     if (!ModelState.IsValid)
+    //         return BadRequest(ModelState);
+
+    //     var existingUser = await _context.NguoiDungs
+    //         .AnyAsync(u => u.TenDanhNhap == dto.TenDanhNhap);
+
+    //     if (existingUser)
+    //         return Conflict("Tên đăng nhập đã tồn tại!");
+
+    //     var hashedPassword = PasswordHasher.HashPassword(dto.MatKhau);
+
+    //     var newUser = new NguoiDung
+    //     {
+    //         MaNguoiDung = $"ND{DateTime.UtcNow.Ticks}",
+    //         HoTen = dto.HoTen,
+    //         NgaySinh = dto.NgaySinh,
+    //         Cccd = dto.CCCD,
+    //         DiaChi = dto.DiaChi,
+    //         Sdt = dto.SDT,
+    //         TenDanhNhap = dto.TenDanhNhap,
+    //         MatKhau = hashedPassword,
+    //         MaVaiTro = "VT003"
+    //     };
+
+    //     _context.NguoiDungs.Add(newUser);
+    //     await _context.SaveChangesAsync();
+
+    //     return Ok("Đăng ký thành công!");
+    // }
+
     [HttpPost("register")]
     public async Task<IActionResult> Register(UserRegisterViewModel dto)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
-        var existingUser = await _context.NguoiDungs
-            .AnyAsync(u => u.TenDanhNhap == dto.TenDanhNhap);
-
-        if (existingUser)
-            return Conflict("Tên đăng nhập đã tồn tại!");
-
-        var hashedPassword = PasswordHasher.HashPassword(dto.MatKhau);
-
-        var newUser = new NguoiDung
-        {
-            MaNguoiDung = $"ND{DateTime.UtcNow.Ticks}",
-            HoTen = dto.HoTen,
-            NgaySinh = dto.NgaySinh,
-            Cccd = dto.CCCD,
-            DiaChi = dto.DiaChi,
-            Sdt = dto.SDT,
-            TenDanhNhap = dto.TenDanhNhap,
-            MatKhau = hashedPassword,
-            MaVaiTro = "VT003"
-        };
-
-        _context.NguoiDungs.Add(newUser);
-        await _context.SaveChangesAsync();
-
-        return Ok("Đăng ký thành công!");
+        return await _nguoiDungService.RegisterAsync(dto);
     }
 
     // Đăng nhập
-    [HttpPost("login")]
-    public async Task<IActionResult> Login(UserLoginViewModel dto)
-    {
-        var user = await _context.NguoiDungs
-            .FirstOrDefaultAsync(u => u.TenDanhNhap == dto.TenDanhNhap);
+    // [HttpPost("login")]
+    // public async Task<IActionResult> Login(UserLoginViewModel dto)
+    // {
+    //     var user = await _context.NguoiDungs
+    //         .FirstOrDefaultAsync(u => u.TenDanhNhap == dto.TenDanhNhap);
 
-        if (user == null || !PasswordHasher.VerifyPassword(dto.MatKhau, user.MatKhau))
-            return Unauthorized("Sai tên đăng nhập hoặc mật khẩu!");
-        if (user.MaTrangThai.Trim() != "TT01")
-            return Unauthorized("Tài khoản của bạn không ở trạng thái hoạt động.");
-        //  Chặn đăng nhập nếu là Admin hoặc SuperAdmin
-        if (user.MaVaiTro?.Trim().ToUpper() == "VT000" || user.MaVaiTro?.Trim().ToUpper() == "VT001")
-        {
-            Console.WriteLine(">> Chặn đăng nhập vai trò Admin hoặc SuperAdmin");
-            return Forbid("Tài khoản này không được phép đăng nhập vào hệ thống!");
-        }
+    //     if (user == null || !PasswordHasher.VerifyPassword(dto.MatKhau, user.MatKhau))
+    //         return Unauthorized("Sai tên đăng nhập hoặc mật khẩu!");
+    //     if (user.MaTrangThai.Trim() != "TT01")
+    //         return Unauthorized("Tài khoản của bạn không ở trạng thái hoạt động.");
+    //     //  Chặn đăng nhập nếu là Admin hoặc SuperAdmin
+    //     if (user.MaVaiTro?.Trim().ToUpper() == "VT000" || user.MaVaiTro?.Trim().ToUpper() == "VT001")
+    //     {
+    //         Console.WriteLine(">> Chặn đăng nhập vai trò Admin hoặc SuperAdmin");
+    //         return Forbid("Tài khoản này không được phép đăng nhập vào hệ thống!");
+    //     }
 
-        var token = JwtTokenGenerator.GenerateToken(user, _config);
+    //     var token = JwtTokenGenerator.GenerateToken(user, _config);
 
-        return Ok(new UserResponseViewModel
-        {
-            HoTen = user.HoTen,
-            TenDanhNhap = user.TenDanhNhap,
-            Token = token
-        });
-    }
+    //     return Ok(new UserResponseViewModel
+    //     {
+    //         HoTen = user.HoTen,
+    //         TenDanhNhap = user.TenDanhNhap,
+    //         Token = token
+    //     });
+    // }
 
     // Lấy thông tin profile
     [Authorize]

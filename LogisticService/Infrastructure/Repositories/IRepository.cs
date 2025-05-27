@@ -12,6 +12,7 @@ public interface IRepository<T> where T : class
     Task<T?> SingleOrDefaultAsync(Expression<Func<T, bool>> predicate);
     Task<IEnumerable<T>> WhereAsync(Expression<Func<T, bool>> predicate);
     Task<IEnumerable<T>> GetAllWithNavigationPropertiesAsync(params Expression<Func<T, object>>[] includes);
+    Task<bool> AnyAsync(Expression<Func<T, bool>> predicate);
 }
 
 public class Repository<T> : IRepository<T> where T : class
@@ -66,6 +67,10 @@ public class Repository<T> : IRepository<T> where T : class
             query = query.Include(include);
         }
         return await query.ToListAsync();
+    }
+    public async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate)
+    {
+        return await _dbSet.AnyAsync(predicate);
     }
 }
 
