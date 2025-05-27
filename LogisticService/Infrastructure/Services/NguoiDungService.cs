@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 public interface INguoiDungService : IServiceBase<NguoiDung>
 {
     Task<ActionResult> Login(UserLoginViewModel userLogin);
+    Task<string> GenerateMaNguoiDungAsync();
+    Task<ActionResult> RegisterAsync(UserRegisterViewModel dto);
 }
 
 public class NguoiDungService : ServiceBase<NguoiDung>, INguoiDungService
@@ -32,7 +34,7 @@ public class NguoiDungService : ServiceBase<NguoiDung>, INguoiDungService
                 DateTime = DateTime.Now,
                 Data = usResult
             };
-            
+
             return new OkObjectResult(resOb);
         }
         var failOb = new HTTPResponseClient<UserLoginResultVM>()
@@ -44,8 +46,72 @@ public class NguoiDungService : ServiceBase<NguoiDung>, INguoiDungService
         };
         return new BadRequestObjectResult(failOb);
     }
-    // public Task<dynamic> Register(dynamic newUser)
-    // {
-    //     throw new NotImplementedException();
-    // }
+    public async Task<string> GenerateMaNguoiDungAsync()
+    {
+        string prefix = "ND";
+        string newMa;
+        bool exists;
+
+        do
+        {
+            newMa = $"{prefix}{DateTime.Now.Ticks}";
+            exists = await _repository.AnyAsync(n => n.MaNguoiDung == newMa);
+
+            // Nếu muốn an toàn hơn, bạn có thể thêm Task.Delay(1) để tránh trùng Ticks
+            if (exists) await Task.Delay(1);
+
+        } while (exists);
+
+        return newMa;
+    }
+    public async Task<ActionResult> RegisterAsync(UserRegisterViewModel dto)
+    {
+        // Kiểm tra trùng tên đăng nhập
+        var existingUser = await _repository.SingleOrDefaultAsync(u => u.TenDanhNhap == dto.TenDanhNhap);
+        if (existingUser != null)
+        {
+            var conflictResponse = new HTTPResponseClient<object>
+            {
+                StatusCode = 409,
+                Message = "Tên đăng nhập đã tồn tại!",
+                DateTime = DateTime.Now,
+                Data = null
+            };
+            return new ConflictObjectResult(conflictResponse);
+        }
+
+        // Tạo mã người dùng duy nhất
+        string maNguoiDung = await GenerateMaNguoiDungAsync();
+
+        // Hash mật khẩu
+        var hashedPassword = PasswordHelper.HashPassword(dto.MatKhau);
+
+        // Tạo đối tượng người dùng mới
+        var newUser = new NguoiDung
+        {
+            MaNguoiDung = maNguoiDung,
+            HoTen = dto.HoTen,
+            NgaySinh = dto.NgaySinh,
+            Cccd = dto.CCCD,
+            DiaChi = dto.DiaChi,
+            Sdt = dto.SDT,
+            TenDanhNhap = dto.TenDanhNhap,
+            MatKhau = hashedPassword,
+            MaVaiTro = "VT003",
+            MaTrangThai = "TT01",
+        };
+
+        await _repository.AddAsync(newUser);
+        await _uow.SaveChangesAsync();
+
+        var successResponse = new HTTPResponseClient<NguoiDung>
+        {
+            StatusCode = 200,
+            Message = "Đăng ký thành công!",
+            DateTime = DateTime.Now,
+            Data = newUser
+        };
+
+        return new OkObjectResult(successResponse);
+    }
 }
