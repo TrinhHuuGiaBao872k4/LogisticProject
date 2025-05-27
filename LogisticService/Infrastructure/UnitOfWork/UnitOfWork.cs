@@ -48,6 +48,10 @@ public class UnitOfWork : IUnitOfWork
         {
             return new Repository<T>(_context);
         }
+        if (typeof(T) == typeof(NguoiDung))
+        {
+            return (IRepository<T>)_nguoiDungRepository;
+        }
         return new Repository<T>(_context);
         throw new NotSupportedException($"No repository found for type {typeof(T).Name}");
 
