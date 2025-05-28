@@ -177,19 +177,46 @@ namespace LogisticService.Controllers
                 });
             }
         }
-        [Authorize(Roles = "VT002")]
         [HttpDelete("DeleteHangHoaById/{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteHangHoaById([FromRoute] string id)
         {
-            var hangHoa = await _hangHoaService.GetByIdAsync(id);
-            await _hangHoaService.DeleteAsync(id);
-            return Ok(new HTTPResponseClient<HangHoa>
+            var header = HttpContext.Request.Headers;
+            var token = header["Authorization"].First().Substring(7);
+            if (string.IsNullOrEmpty(token))
             {
-                StatusCode = 200,
-                Data = hangHoa,
-                DateTime = DateTime.Now,
-                Message = "Successfully"
-            });
+                return Unauthorized(new HTTPResponseClient<object>
+                {
+                    StatusCode = 401,
+                    Data = null,
+                    DateTime = DateTime.Now,
+                    Message = "Token không hợp lệ"
+                });
+            }
+            TokenResult res = _jwt.DecodePayloadTokenInfo(token);
+            string VaiTro = res.Role;
+            if (VaiTro == "Seller")
+            {
+                var hangHoa = await _hangHoaService.GetByIdAsync(id);
+                await _hangHoaService.DeleteAsync(id);
+                return Ok(new HTTPResponseClient<HangHoa>
+                {
+                    StatusCode = 200,
+                    Data = hangHoa,
+                    DateTime = DateTime.Now,
+                    Message = "Successfully"
+                });
+            }
+            else
+            {
+                return BadRequest(new HTTPResponseClient<HangHoa>
+                {
+                    StatusCode = 400,
+                    Data = null,
+                    DateTime = DateTime.Now,
+                    Message = "Người dùng không phải Seller"
+                });
+            }
         }
         [HttpGet("SearchHangHoa/{searchkey}")]
         public async Task<IActionResult> SearchHangHoa([FromRoute] string searchkey)
