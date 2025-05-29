@@ -88,7 +88,6 @@ namespace LogisticService.Controllers
             }
             TokenResult res = _jwt.DecodePayloadTokenInfo(token);
             string VaiTro = res.Role;
-            Console.WriteLine(VaiTro);
             if (VaiTro == "Seller")
             {
                 HangHoa hangHoa = new HangHoa()
