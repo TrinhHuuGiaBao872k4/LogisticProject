@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using LogisticService.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using Microsoft.AspNetCore.OutputCaching;
 [Route("api/[controller]")]
 [ApiController]
 public class NguoiDungController(LogisticDbServiceContext _context, IConfiguration _config, JwtAuthService _jwt, INguoiDungService _nguoiDungService) : ControllerBase
@@ -87,66 +88,87 @@ public class NguoiDungController(LogisticDbServiceContext _context, IConfigurati
 
     // Lấy thông tin profile
     [Authorize]
+    [OutputCache(Duration = 60, VaryByHeaderNames = new[] { "Authorization" })]
     [HttpGet("profile")]
-    public IActionResult GetProfile()
+    public async Task<ActionResult> GetProfile([FromHeader] string authorization)
     {
-        var username = User.FindFirstValue(ClaimTypes.Name);
-        var role = User.FindFirstValue(ClaimTypes.Role);
-
-        return Ok(new
+        var header = HttpContext.Request.Headers;
+        var token = header["Authorization"].First().Substring(7);
+        if (string.IsNullOrEmpty(token))
         {
-            message = "Lấy thông tin profile thành công",
-            tenDangNhap = username,
-            vaiTro = role,
-        });
+            return Unauthorized(new HTTPResponseClient<object>
+            {
+                StatusCode = 401,
+                Data = null,
+                DateTime = DateTime.Now,
+                Message = "Token không hợp lệ"
+            });
+        }
+        TokenResult res = _jwt.DecodePayloadTokenInfo(token);
+
+        // var username = User.FindFirstValue(ClaimTypes.Name);
+        // var role = User.FindFirstValue(ClaimTypes.Role);
+        NguoiDung nguoiDung = await _nguoiDungService.GetByIdAsync(res.Id);
+        if (nguoiDung == null)
+        {
+            return BadRequest(new HTTPResponseClient<NguoiDung>
+            {
+                StatusCode = 400,
+                Data = null,
+                DateTime = DateTime.Now,
+                Message = "Không lấy được thông tin người dùng"
+            });
+        }
+        else
+        {
+            return Ok(new HTTPResponseClient<NguoiDung>
+                {
+                    StatusCode = 200,
+                    Data = nguoiDung,
+                    DateTime = DateTime.Now,
+                    Message = "Successfully"
+                });
+        }
     }
     [Authorize]
+    [OutputCache(Duration = 60, VaryByHeaderNames = new[] { "Authorization" })]
     [HttpPut("Update-Profile")]
-    public async Task<IActionResult> UpdateProfile([FromBody] UpdateUserViewModel dto)
+    public async Task<ActionResult> UpdateProfile([FromBody] UpdateUserViewModel dto)
     {
-        var username = User.FindFirst(ClaimTypes.Name)?.Value;
-        if (username == null)
-            return Unauthorized("Không xác định được người dùng.");
-
-        var user = await _context.NguoiDungs.FirstOrDefaultAsync(u => u.TenDanhNhap == username);
-        if (user == null)
-            return NotFound("Người dùng không tồn tại.");
-
-        // Cập nhật các trường được phép sửa
-        user.HoTen = dto.HoTen;
-        user.NgaySinh = dto.NgaySinh;
-        user.DiaChi = dto.DiaChi;
-        user.Sdt = dto.Sdt;
-        // Không được cập nhật CanCuoc (Căn cước)
-
-        _context.NguoiDungs.Update(user);
-        await _context.SaveChangesAsync();
-
-        return Ok("Cập nhật thông tin thành công.");
+        var header = HttpContext.Request.Headers;
+        var token = header["Authorization"].First().Substring(7);
+        if (string.IsNullOrEmpty(token))
+        {
+            return Unauthorized(new HTTPResponseClient<object>
+            {
+                StatusCode = 401,
+                Data = null,
+                DateTime = DateTime.Now,
+                Message = "Token không hợp lệ"
+            });
+        }
+        TokenResult res = _jwt.DecodePayloadTokenInfo(token);
+        return await _nguoiDungService.UpdateProfileAsync(res.Id, dto);
     }
     [Authorize]
+    [OutputCache(Duration = 60, VaryByHeaderNames = new[] { "Authorization" })]
     [HttpPut("change-password")]
-    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordViewModel dto)
+    public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordViewModel dto)
     {
-        var username = User.FindFirst(ClaimTypes.Name)?.Value;
-        if (username == null)
-            return Unauthorized("Không xác định được người dùng.");
-
-        var user = await _context.NguoiDungs.FirstOrDefaultAsync(u => u.TenDanhNhap == username);
-        if (user == null)
-            return NotFound("Người dùng không tồn tại.");
-
-        // Kiểm tra mật khẩu cũ
-        if (!PasswordHasher.VerifyPassword(dto.MatKhauCu, user.MatKhau))
-            return BadRequest(" Mật khẩu cũ không đúng.");
-
-        // Hash lại mật khẩu mới
-        user.MatKhau = PasswordHasher.HashPassword(dto.MatKhauMoi);
-
-        _context.NguoiDungs.Update(user);
-        await _context.SaveChangesAsync();
-
-        return Ok(" Đổi mật khẩu thành công.");
+        var header = HttpContext.Request.Headers;
+        var token = header["Authorization"].First().Substring(7);
+        if (string.IsNullOrEmpty(token))
+        {
+            return Unauthorized(new HTTPResponseClient<object>
+            {
+                StatusCode = 401,
+                Data = null,
+                DateTime = DateTime.Now,
+                Message = "Token không hợp lệ"
+            });
+        }
+        TokenResult res = _jwt.DecodePayloadTokenInfo(token);
+        return await _nguoiDungService.ChangePasswordAsync(res.Id, dto);
     }
 
 

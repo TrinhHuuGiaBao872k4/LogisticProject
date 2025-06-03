@@ -1,10 +1,43 @@
 ﻿@page "/"
 
 
+<div class="container">
+<h1 class="text-center mt-3 text-primary ">Chào mừng bạn đã đến với hệ thống CyberLogistic</h1>
+<h3 class="text-center text-success">Danh sách sản phẩm</h3>
+<div class="row">
+    <div class=" col-md-3 mt-3 ">
+        @foreach(var item in products)
+        {
+              <div class="card">
+            <img src="" alt="">
+            <div class="card-body">
+                <h3 class="card-title">@item.Name</h3>
+                <p>@item.Price</p>
+                <a href="" class="btn btn-dark">ViewDetail</a>
+            </div>
+        </div>
+        }
+      
+    </div>
+</div>
+</div>
 
-<h1 style="color:#682EC7">Chào mừng bạn đã đến với hệ thống CyberLogistic</h1>
 
+@code {
+    // Mock data (sau này thay bằng API call nha bạn iu)
+    private List<Product> products = new()
+    {
+        new Product { Name = "Sản phẩm A", Description = "Mô tả ngắn gọn cho sản phẩm A", Price = 150000, ImageUrl = "https://www.bing.com/th?id=ODF.Etqqzu9HGo_U6-nSX-DlZA&pid=Api" },
+        new Product { Name = "Sản phẩm B", Description = "Mô tả ngắn gọn cho sản phẩm B", Price = 250000, ImageUrl = "https://www.bing.com/th?id=ODF.Etqqzu9HGo_U6-nSX-DlZA&pid=Api" },
+        new Product { Name = "Sản phẩm C", Description = "Mô tả ngắn gọn cho sản phẩm C", Price = 350000, ImageUrl = "https://www.bing.com/th?id=ODF.Etqqzu9HGo_U6-nSX-DlZA&pid=Api" },
+        new Product { Name = "Sản phẩm D", Description = "Mô tả ngắn gọn cho sản phẩm D", Price = 450000, ImageUrl = "https://www.bing.com/th?id=ODF.Etqqzu9HGo_U6-nSX-DlZA&pid=Api" },
+    };
 
-
-
-
+    public class Product
+    {
+        public string Name { get; set; } = "";
+        public string Description { get; set; } = "";
+        public decimal Price { get; set; }
+        public string ImageUrl { get; set; } = "";
+    }
+}

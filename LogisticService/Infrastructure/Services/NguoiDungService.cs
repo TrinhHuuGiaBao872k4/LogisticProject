@@ -7,6 +7,8 @@ public interface INguoiDungService : IServiceBase<NguoiDung>
     Task<ActionResult> Login(UserLoginViewModel userLogin);
     Task<string> GenerateMaNguoiDungAsync();
     Task<ActionResult> RegisterAsync(UserRegisterViewModel dto);
+    Task<ActionResult> UpdateProfileAsync(string userId, UpdateUserViewModel dto);
+    Task<ActionResult> ChangePasswordAsync(string userId, ChangePasswordViewModel dto);
 }
 
 public class NguoiDungService : ServiceBase<NguoiDung>, INguoiDungService
@@ -114,4 +116,116 @@ public class NguoiDungService : ServiceBase<NguoiDung>, INguoiDungService
 
         return new OkObjectResult(successResponse);
     }
+    public async Task<ActionResult> UpdateProfileAsync(string maNguoiDung, UpdateUserViewModel dto)
+    {
+        var nguoiDung = await _repository.SingleOrDefaultAsync(m => m.MaNguoiDung == maNguoiDung);
+        if (nguoiDung == null)
+        {
+            var notFoundResponse = new HTTPResponseClient<object>
+            {
+                StatusCode = 404,
+                Message = "Người dùng không tồn tại.",
+                DateTime = DateTime.Now,
+                Data = null
+            };
+            return new NotFoundObjectResult(notFoundResponse);
+        }
+
+        // Cập nhật các trường cho phép sửa
+        nguoiDung.HoTen = dto.HoTen;
+        nguoiDung.NgaySinh = dto.NgaySinh;
+        nguoiDung.DiaChi = dto.DiaChi;
+        nguoiDung.Sdt = dto.Sdt;
+
+        try
+        {
+            _repository.Update(nguoiDung);
+            await _uow.SaveChangesAsync();
+
+            var successResponse = new HTTPResponseClient<NguoiDung>
+            {
+                StatusCode = 200,
+                Message = "Cập nhật thông tin thành công.",
+                DateTime = DateTime.Now,
+                Data = nguoiDung
+            };
+            return new OkObjectResult(successResponse);
+        }
+        catch (Exception ex)
+        {
+            var errorResponse = new HTTPResponseClient<object>
+            {
+                StatusCode = 500,
+                Message = $"Có lỗi xảy ra: {ex.Message}",
+                DateTime = DateTime.Now,
+                Data = null
+            };
+            return new ObjectResult(errorResponse) { StatusCode = 500 };
+        }
+    }
+    public async Task<ActionResult> ChangePasswordAsync(string maNguoiDung, ChangePasswordViewModel dto)
+    {
+        try
+        {
+            var nguoiDung = await _repository.SingleOrDefaultAsync(m => m.MaNguoiDung == maNguoiDung);
+            if (nguoiDung == null)
+            {
+                return new NotFoundObjectResult(new HTTPResponseClient<object>
+                {
+                    StatusCode = 404,
+                    Message = "Người dùng không tồn tại.",
+                    DateTime = DateTime.Now,
+                    Data = null
+                });
+            }
+
+            if (!PasswordHelper.VerifyPassword(dto.MatKhauCu, nguoiDung.MatKhau))
+            {
+                return new BadRequestObjectResult(new HTTPResponseClient<object>
+                {
+                    StatusCode = 400,
+                    Message = "Mật khẩu cũ không đúng.",
+                    DateTime = DateTime.Now,
+                    Data = null
+                });
+            }
+
+            if (dto.MatKhauMoi == dto.MatKhauCu)
+            {
+                return new BadRequestObjectResult(new HTTPResponseClient<object>
+                {
+                    StatusCode = 400,
+                    Message = "Mật khẩu mới không được trùng mật khẩu cũ.",
+                    DateTime = DateTime.Now,
+                    Data = null
+                });
+            }
+
+            nguoiDung.MatKhau = PasswordHelper.HashPassword(dto.MatKhauMoi);
+            _repository.Update(nguoiDung);
+            await _uow.SaveChangesAsync();
+
+            return new OkObjectResult(new HTTPResponseClient<NguoiDung>
+            {
+                StatusCode = 200,
+                Message = "Đổi mật khẩu thành công.",
+                DateTime = DateTime.Now,
+                Data = nguoiDung
+            });
+        }
+        catch (Exception ex)
+        {
+            return new ObjectResult(new HTTPResponseClient<object>
+            {
+                StatusCode = 500,
+                Message = $"Có lỗi xảy ra: {ex.Message}",
+                DateTime = DateTime.Now,
+                Data = null
+            })
+            {
+                StatusCode = 500
+            };
+        }
+    }
+
 }
