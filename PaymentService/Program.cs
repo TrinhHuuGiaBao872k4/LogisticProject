@@ -19,6 +19,9 @@ builder.Services.AddCors(options =>
     });
 });
 
+
+builder.WebHost.UseUrls("http://*:81");
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -33,6 +36,7 @@ app.MapControllers();
 app.UseHttpsRedirection();
 
 
+app.Urls.Add("http://*:81");
 
 app.Run();
 

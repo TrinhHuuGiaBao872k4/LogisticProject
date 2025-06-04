@@ -12,7 +12,8 @@ builder.Services.AddSingleton<WeatherForecastService>();
 //Add service httpclient để gọi api
 builder.Services.AddHttpClient();
 
-
+//deploy cài đặt lắng nghe port 80
+builder.WebHost.UseUrls("http://*:80");
 
 
 var app = builder.Build();
@@ -33,5 +34,7 @@ app.UseRouting();
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
+
+app.Urls.Add("http://*:80");
 
 app.Run();
