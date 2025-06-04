@@ -23,6 +23,7 @@
     <ProjectReference Include="..\LogisticService\LogisticService.csproj" />
     <ProjectReference Include="..\PaymentService\PaymentService.csproj" />
     <ProjectReference Include="..\LogisticBlazorWebApp\LogisticBlazorWebApp.csproj" />
+    <ProjectReference Include="..\GateWayService\GateWayService.csproj" />
   </ItemGroup>
 
 </Project>

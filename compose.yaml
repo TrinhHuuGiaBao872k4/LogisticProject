@@ -1,0 +1,103 @@
+# Khai báo phiên bản Docker Compose
+version: "3.8"
+
+services:
+  # Dịch vụ chính: app
+  logisticservice:
+    # Đặt tên cụ thể cho container
+    container_name: logistic_service
+    # Cấu hình build image từ Dockerfile
+    build:
+      # Thư mục hiện tại là context build
+      context: ./LogisticService
+      # Tên file Dockerfile sử dụng
+      dockerfile: Dockerfile
+    # Mở cổng cho container: máy host:container
+    ports:
+      - "8787:82"
+    # Biến môi trường truyền vào container
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+
+    # Gắn container vào network "webnet"
+    networks:
+      - webnet
+
+  paymentservice:
+    # Đặt tên cụ thể cho container
+    container_name: payment_service
+    # Cấu hình build image từ Dockerfile
+    build:
+      # Thư mục hiện tại là context build
+      context: ./PaymentService
+      # Tên file Dockerfile sử dụng
+      dockerfile: Dockerfile
+    # Mở cổng cho container: máy host:container
+    ports:
+      - "8877:81"
+    # Biến môi trường truyền vào container
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+
+    # Gắn container vào network "webnet"
+    networks:
+      - webnet
+
+  logisticblazorwebapp:
+    # Đặt tên cụ thể cho container
+    container_name: logistic_blazor_web_app
+    # Cấu hình build image từ Dockerfile
+    build:
+      # Thư mục hiện tại là context build
+      context: ./LogisticBlazorWebApp
+      # Tên file Dockerfile sử dụng
+      dockerfile: Dockerfile
+    # Mở cổng cho container: máy host:container
+    ports:
+      - "5000:80"
+    # Biến môi trường truyền vào container
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - LOGISTIC_API_BASE_URL=http://logistic_service
+      - PAYMENT_API_BASE_URL=http://payment_service
+    depends_on:
+      - logisticservice
+      - paymentservice
+
+    # Gắn container vào network "webnet"
+    networks:
+      - webnet
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    hostname: kafka
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zoo:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    depends_on:
+      - zoo
+    networks:
+      - webnet
+
+  zoo:
+    image: confluentinc/cp-zookeeper:7.6.0
+    hostname: zoo
+    container_name: zoo
+    ports: 
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - webnet
+
+# Định nghĩa network "webnet" với driver bridge (mặc định)
+networks:
+  webnet:
+    driver: bridge
+
