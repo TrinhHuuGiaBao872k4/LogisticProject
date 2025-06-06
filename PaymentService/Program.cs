@@ -19,8 +19,10 @@ builder.Services.AddCors(options =>
     });
 });
 
-
-builder.WebHost.UseUrls("http://*:81");
+if (builder.Environment.IsProduction())
+{
+    builder.WebHost.UseUrls("http://*:81");
+}
 
 var app = builder.Build();
 
@@ -36,7 +38,10 @@ app.MapControllers();
 app.UseHttpsRedirection();
 
 
-app.Urls.Add("http://*:81");
+if (app.Environment.IsProduction())
+{
+    app.Urls.Add("http://*:81");
+}
 
 app.Run();
 
