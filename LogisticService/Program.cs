@@ -149,7 +149,11 @@ builder.Services.AddScoped<INguoiDungService, NguoiDungService>();
 builder.Services.AddScoped<IDonHangRepository, DonHangRepository>();
 builder.Services.AddScoped<IDonHangService, DonHangService>();
 
- builder.WebHost.UseUrls("http://*:82");
+
+if (builder.Environment.IsProduction())
+{
+    builder.WebHost.UseUrls("http://*:82");
+}
 
 var app = builder.Build();
 
@@ -169,7 +173,10 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
- app.Urls.Add("http://*:82");
+if (app.Environment.IsProduction())
+{
+    app.Urls.Add("http://*:82");
+}
 
 app.Run();
 
