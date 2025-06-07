@@ -26,6 +26,8 @@ COPY --from=build /app .
 # EXPOSE cổng để container lắng nghe
 # ENV ASPNETCORE_URLS=http://+:80
 # EXPOSE 80
+ENV ASPNETCORE_URLS=http://+:81
+EXPOSE 81
 
 # Lệnh chạy app khi container start
 ENTRYPOINT ["dotnet", "PaymentService.dll"]

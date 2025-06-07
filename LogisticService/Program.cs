@@ -150,6 +150,7 @@ builder.Services.AddScoped<IDonHangRepository, DonHangRepository>();
 builder.Services.AddScoped<IDonHangService, DonHangService>();
 
 
+
 if (builder.Environment.IsProduction())
 {
     builder.WebHost.UseUrls("http://*:82");
@@ -173,8 +174,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-if (app.Environment.IsProduction())
-{
+if (app.Environment.IsProduction()){
     app.Urls.Add("http://*:82");
 }
 
