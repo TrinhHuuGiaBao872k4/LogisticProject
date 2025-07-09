@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Cybersoft.net\\DuAnCuoiKhoa\\LogisticProject\\LogisticBlazorWebApp\\LogisticBlazorWebApp.csproj": {}
+    "d:\\Cybersoft.net\\LogisticProject\\LogisticBlazorWebApp\\LogisticBlazorWebApp.csproj": {}
   },
   "projects": {
-    "D:\\Cybersoft.net\\DuAnCuoiKhoa\\LogisticProject\\LogisticBlazorWebApp\\LogisticBlazorWebApp.csproj": {
+    "d:\\Cybersoft.net\\LogisticProject\\LogisticBlazorWebApp\\LogisticBlazorWebApp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Cybersoft.net\\DuAnCuoiKhoa\\LogisticProject\\LogisticBlazorWebApp\\LogisticBlazorWebApp.csproj",
+        "projectUniqueName": "d:\\Cybersoft.net\\LogisticProject\\LogisticBlazorWebApp\\LogisticBlazorWebApp.csproj",
         "projectName": "LogisticBlazorWebApp",
-        "projectPath": "D:\\Cybersoft.net\\DuAnCuoiKhoa\\LogisticProject\\LogisticBlazorWebApp\\LogisticBlazorWebApp.csproj",
+        "projectPath": "d:\\Cybersoft.net\\LogisticProject\\LogisticBlazorWebApp\\LogisticBlazorWebApp.csproj",
         "packagesPath": "C:\\Users\\hoang\\.nuget\\packages\\",
-        "outputPath": "D:\\Cybersoft.net\\DuAnCuoiKhoa\\LogisticProject\\LogisticBlazorWebApp\\obj\\",
+        "outputPath": "d:\\Cybersoft.net\\LogisticProject\\LogisticBlazorWebApp\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

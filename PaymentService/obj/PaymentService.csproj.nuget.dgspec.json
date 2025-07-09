@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Cybersoft.net\\DuAnCuoiKhoa\\LogisticProject\\PaymentService\\PaymentService.csproj": {}
+    "d:\\Cybersoft.net\\LogisticProject\\PaymentService\\PaymentService.csproj": {}
   },
   "projects": {
-    "D:\\Cybersoft.net\\DuAnCuoiKhoa\\LogisticProject\\PaymentService\\PaymentService.csproj": {
+    "d:\\Cybersoft.net\\LogisticProject\\PaymentService\\PaymentService.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Cybersoft.net\\DuAnCuoiKhoa\\LogisticProject\\PaymentService\\PaymentService.csproj",
+        "projectUniqueName": "d:\\Cybersoft.net\\LogisticProject\\PaymentService\\PaymentService.csproj",
         "projectName": "PaymentService",
-        "projectPath": "D:\\Cybersoft.net\\DuAnCuoiKhoa\\LogisticProject\\PaymentService\\PaymentService.csproj",
+        "projectPath": "d:\\Cybersoft.net\\LogisticProject\\PaymentService\\PaymentService.csproj",
         "packagesPath": "C:\\Users\\hoang\\.nuget\\packages\\",
-        "outputPath": "D:\\Cybersoft.net\\DuAnCuoiKhoa\\LogisticProject\\PaymentService\\obj\\",
+        "outputPath": "d:\\Cybersoft.net\\LogisticProject\\PaymentService\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

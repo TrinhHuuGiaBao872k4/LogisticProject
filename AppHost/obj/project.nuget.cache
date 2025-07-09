@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "SiDchxzQm5Y=",
+  "dgSpecHash": "Ax+AmPAo4LY=",
   "success": true,
-  "projectFilePath": "D:\\Cybersoft.net\\DuAnCuoiKhoa\\LogisticProject\\AppHost\\AppHost.csproj",
+  "projectFilePath": "d:\\Cybersoft.net\\LogisticProject\\AppHost\\AppHost.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\hoang\\.nuget\\packages\\aspire.dashboard.sdk.win-x64\\8.2.2\\aspire.dashboard.sdk.win-x64.8.2.2.nupkg.sha512",
     "C:\\Users\\hoang\\.nuget\\packages\\aspire.hosting\\8.2.2\\aspire.hosting.8.2.2.nupkg.sha512",

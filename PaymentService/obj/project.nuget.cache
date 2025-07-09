@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "+i5fCqavYDI=",
+  "dgSpecHash": "24Feud8Gj8c=",
   "success": true,
-  "projectFilePath": "D:\\Cybersoft.net\\DuAnCuoiKhoa\\LogisticProject\\PaymentService\\PaymentService.csproj",
+  "projectFilePath": "d:\\Cybersoft.net\\LogisticProject\\PaymentService\\PaymentService.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\hoang\\.nuget\\packages\\azure.core\\1.25.0\\azure.core.1.25.0.nupkg.sha512",
     "C:\\Users\\hoang\\.nuget\\packages\\azure.identity\\1.7.0\\azure.identity.1.7.0.nupkg.sha512",
