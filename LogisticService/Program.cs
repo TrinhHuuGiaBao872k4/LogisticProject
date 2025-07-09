@@ -6,13 +6,25 @@ using System.Text;
 using System.Reflection;
 using System.Threading.Tasks;
 using StackExchange.Redis;
+using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "LogisticService API",
+        Version = "v1"
+        
+    });
+});
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -81,7 +93,11 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+  app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+    c.RoutePrefix = "swagger"; // nếu bạn muốn swagger ở root: /
+}); 
 }
 
 
@@ -89,7 +105,7 @@ app.UseCors("allow_all");
 app.MapControllers();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 
 app.Run();
