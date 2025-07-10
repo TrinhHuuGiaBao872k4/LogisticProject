@@ -1,0 +1,23 @@
+@inject CartService cartService
+
+<a class="nav-link position-relative" href="/cart">
+  🛒 Giỏ hàng
+  @if (cartService.GetTongSoLuong() > 0)
+  {
+    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+      @cartService.GetTongSoLuong()
+    </span>
+  }
+</a>
+
+@code {
+    protected override void OnInitialized()
+    {
+        cartService.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        cartService.OnChange -= StateHasChanged;
+    }
+}

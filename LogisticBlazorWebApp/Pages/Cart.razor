@@ -1,0 +1,82 @@
+@page "/cart"
+@inject CartService cartService
+
+<h3 class="text-center my-4">🛒 Giỏ hàng của bạn</h3>
+
+@if (!cartService.Items.Any())
+{
+    <p class="text-center text-muted">Giỏ hàng hiện đang trống...</p>
+}
+else
+{
+    <div class="container">
+        <table class="table table-bordered text-center align-middle">
+            <thead class="table-primary">
+                <tr>
+                    <th>Ảnh</th>
+                    <th>Tên sản phẩm</th>
+                    <th>Đơn giá</th>
+                    <th>Số lượng</th>
+                    <th>Thành tiền</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in cartService.Items)
+                {
+                    <tr>
+                        <td>
+                            @if (!string.IsNullOrEmpty(item.HinhAnh))
+                            {
+                                <img src="@item.HinhAnh" style="width:60px; height:60px; object-fit:cover" />
+                            }
+                        </td>
+                        <td>@item.TenHangHoa</td>
+                        <td>@item.DonGia VNĐ</td>
+                        <td style="width: 160px;">
+                            <div class="input-group input-group-sm">
+                                <button class="btn btn-outline-secondary" @onclick="@(() => cartService.UpdateSoLuong(item.MaHangHoa, item.SoLuong - 1))">−</button>
+                                <input class="form-control text-center"
+                                       type="number"
+                                       value="@item.SoLuong"
+                                       @oninput="(e) => OnInputChanged(e, item.MaHangHoa)" />
+                                <button class="btn btn-outline-secondary" @onclick="@(() => cartService.UpdateSoLuong(item.MaHangHoa, item.SoLuong + 1))">+</button>
+                            </div>
+                        </td>
+                        <td>@(item.DonGia * item.SoLuong) VNĐ</td>
+                        <td>
+                            <button class="btn btn-sm btn-danger" @onclick="@(() => cartService.RemoveItem(item.MaHangHoa))">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="text-end mt-3">
+            <h5>Tổng tiền: <strong class="text-danger">@cartService.GetTongTien() VNĐ</strong></h5>
+            <button class="btn btn-success mt-2">Tiến hành đặt hàng</button>
+        </div>
+    </div>
+}
+
+@code {
+    private void OnInputChanged(ChangeEventArgs e, string maHangHoa)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int newQuantity))
+        {
+            cartService.UpdateSoLuong(maHangHoa, newQuantity);
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        cartService.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        cartService.OnChange -= StateHasChanged;
+    }
+}

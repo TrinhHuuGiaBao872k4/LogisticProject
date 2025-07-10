@@ -28,12 +28,16 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWJvdXRVcy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Cybersoft.net/LogisticProject/LogisticBlazorWebApp/Pages/Components/HeaderHome.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ29tcG9uZW50c1xIZWFkZXJIb21lLnJhem9y
+[D:/Cybersoft.net/LogisticProject/LogisticBlazorWebApp/Pages/Cart.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2FydC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Cybersoft.net/LogisticProject/LogisticBlazorWebApp/Pages/Components/Product.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ29tcG9uZW50c1xQcm9kdWN0LnJhem9y
+[D:/Cybersoft.net/LogisticProject/LogisticBlazorWebApp/Pages/Components/CartIcon.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ29tcG9uZW50c1xDYXJ0SWNvbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Cybersoft.net/LogisticProject/LogisticBlazorWebApp/Pages/Components/HeaderHome.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ29tcG9uZW50c1xIZWFkZXJIb21lLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/Cybersoft.net/LogisticProject/LogisticBlazorWebApp/Pages/Index.razor]
@@ -42,6 +46,14 @@ build_metadata.AdditionalFiles.CssScope =
 
 [D:/Cybersoft.net/LogisticProject/LogisticBlazorWebApp/Pages/Login.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9naW4ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Cybersoft.net/LogisticProject/LogisticBlazorWebApp/Pages/Product.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Cybersoft.net/LogisticProject/LogisticBlazorWebApp/Pages/ProductDetail.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdERldGFpbC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/Cybersoft.net/LogisticProject/LogisticBlazorWebApp/Pages/Register.razor]

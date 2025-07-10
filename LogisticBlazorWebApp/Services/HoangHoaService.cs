@@ -1,20 +1,28 @@
 using System.Net.Http;
 using System.Net.Http.Json;
 
-public class ProductStateService(HttpClient http)
+public class HangHoaService
 {
-    private string _message = "Hello";
-    public string Message => _message;
-
-    public event Action? OnChange;
-
-    private void NotifyStateChanged() => OnChange?.Invoke();
-
-    public void SetMessage(string message)
+    public List<HangHoaVM> lstHangHoa = new List<HangHoaVM>();
+    public HttpClient _httpClient;
+    public HangHoaService(HttpClient http)
     {
-        _message = message;
-        NotifyStateChanged();
+        _httpClient = http;
     }
+    public async Task GetAllHangHoaApi()
+    {
+        var url = "http://localhost:5103/api/HangHoa/GetAllHangHoa";
+        var res = await _httpClient.GetFromJsonAsync<HTTPResponse<List<HangHoaVM>>>(url);
+        lstHangHoa = res?.data ?? new List<HangHoaVM>();;
+        SetStateHasChange();
+    }
+    public async Task<HangHoaVM> GetHangHoaById(string id)
+        {
+    var url = $"http://localhost:5103/api/HangHoa/GetHangHoaById/{id}";
 
-    // Place your HTTP methods below
+    var response = await _httpClient.GetFromJsonAsync<HTTPResponse<HangHoaVM>>(url);
+    return response?.data;
+    }
+    public event Action Onchange;
+    public void SetStateHasChange() => Onchange?.Invoke();
 }

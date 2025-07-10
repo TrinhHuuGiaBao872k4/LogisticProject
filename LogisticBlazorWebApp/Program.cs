@@ -11,8 +11,8 @@ builder.Services.AddSingleton<WeatherForecastService>();
 
 //Add service httpclient để gọi api
 builder.Services.AddHttpClient();
-builder.Services.AddScoped<ProductStateService>();
-
+builder.Services.AddScoped<HangHoaService>();
+builder.Services.AddScoped<CartService>();
 //setup middleware 
 //middleware cross
 builder.Services.AddCors(option =>
