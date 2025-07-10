@@ -2,7 +2,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using LogisticService.Models;
-
 using Microsoft.IdentityModel.Tokens;
 
 public static class JwtTokenGenerator
@@ -11,8 +10,9 @@ public static class JwtTokenGenerator
     {
         var claims = new[]
         {
-            new Claim(ClaimTypes.Name, user.TenDanhNhap),
-            new Claim(ClaimTypes.Role, user.MaVaiTro)
+            new Claim(ClaimTypes.Name,user.TenDanhNhap),
+            new Claim("MaNguoiDung", user.MaNguoiDung),
+            new Claim(ClaimTypes.Role,user.MaVaiTro?.Trim())
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]));

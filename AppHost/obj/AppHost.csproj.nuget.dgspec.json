@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "d:\\Cybersoft.net\\LogisticProject\\AppHost\\AppHost.csproj": {}
+    "D:\\Cybersoft.net\\LogisticProject\\AppHost\\AppHost.csproj": {}
   },
   "projects": {
-    "d:\\Cybersoft.net\\LogisticProject\\AppHost\\AppHost.csproj": {
+    "D:\\Cybersoft.net\\LogisticProject\\AppHost\\AppHost.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "d:\\Cybersoft.net\\LogisticProject\\AppHost\\AppHost.csproj",
+        "projectUniqueName": "D:\\Cybersoft.net\\LogisticProject\\AppHost\\AppHost.csproj",
         "projectName": "AppHost",
-        "projectPath": "d:\\Cybersoft.net\\LogisticProject\\AppHost\\AppHost.csproj",
+        "projectPath": "D:\\Cybersoft.net\\LogisticProject\\AppHost\\AppHost.csproj",
         "packagesPath": "C:\\Users\\hoang\\.nuget\\packages\\",
-        "outputPath": "d:\\Cybersoft.net\\LogisticProject\\AppHost\\obj\\",
+        "outputPath": "D:\\Cybersoft.net\\LogisticProject\\AppHost\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -64,6 +64,20 @@
               "target": "Package",
               "version": "[8.2.2, )",
               "autoReferenced": true
+            },
+            "Microsoft.EntityFrameworkCore.SqlServer": {
+              "target": "Package",
+              "version": "[8.0.5, )"
+            },
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.5, )"
+            },
+            "Microsoft.Extensions.Caching.StackExchangeRedis": {
+              "target": "Package",
+              "version": "[8.0.0, )"
             }
           },
           "imports": [

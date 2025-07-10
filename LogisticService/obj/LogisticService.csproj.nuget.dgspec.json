@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "d:\\Cybersoft.net\\LogisticProject\\LogisticService\\LogisticService.csproj": {}
+    "D:\\Cybersoft.net\\LogisticProject\\LogisticService\\LogisticService.csproj": {}
   },
   "projects": {
-    "d:\\Cybersoft.net\\LogisticProject\\LogisticService\\LogisticService.csproj": {
+    "D:\\Cybersoft.net\\LogisticProject\\LogisticService\\LogisticService.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "d:\\Cybersoft.net\\LogisticProject\\LogisticService\\LogisticService.csproj",
+        "projectUniqueName": "D:\\Cybersoft.net\\LogisticProject\\LogisticService\\LogisticService.csproj",
         "projectName": "LogisticService",
-        "projectPath": "d:\\Cybersoft.net\\LogisticProject\\LogisticService\\LogisticService.csproj",
+        "projectPath": "D:\\Cybersoft.net\\LogisticProject\\LogisticService\\LogisticService.csproj",
         "packagesPath": "C:\\Users\\hoang\\.nuget\\packages\\",
-        "outputPath": "d:\\Cybersoft.net\\LogisticProject\\LogisticService\\obj\\",
+        "outputPath": "D:\\Cybersoft.net\\LogisticProject\\LogisticService\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -63,6 +63,10 @@
               "target": "Package",
               "version": "[8.0.0, )"
             },
+            "Microsoft.AspNetCore.OpenApi": {
+              "target": "Package",
+              "version": "[8.0.11, )"
+            },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
               "version": "[8.0.0, )"
@@ -81,13 +85,19 @@
               "target": "Package",
               "version": "[8.0.0, )"
             },
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
             "Microsoft.Extensions.Caching.StackExchangeRedis": {
               "target": "Package",
-              "version": "[9.0.2, )"
+              "version": "[9.0.5, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
-              "version": "[8.1.1, )"
+              "version": "[6.6.2, )"
             }
           },
           "imports": [

@@ -1,9 +1,96 @@
 ﻿@page "/"
+@inject IJSRuntime JS
+<div class="container mt-3">
+    <!-- Banner Welcome -->
+    <div class="text-center mb-4" data-aos="fade-down">
+    <h1 class="text-primary fw-bold">Chào mừng bạn đến với CyberLogistic</h1>
+    <p class="text-muted fs-5">Nền tảng quản lý logistics hiện đại, tối ưu hiệu quả vận hành cho doanh nghiệp của bạn</p>
+</div>
 
-<PageTitle>Index</PageTitle>
 
-<h1>Hello, world!</h1>
+    <!-- Banner hình ảnh -->
+    <div class="text-center mb-5" data-aos="zoom-in">
+    <img src="images/banner-2.jpeg" alt="Banner" class="img-fluid rounded-3 shadow-sm" />
+</div>
 
-Welcome to your new app.
+    <!-- Tính năng chính -->
+    <div class="mb-5">
+        <h3 class="text-center text-primary mb-4">Tính năng nổi bật</h3>
+        <div class="row text-center" data-aos="fade-up">
+            <div class="col-md-4 mb-3">
+                <div class="p-4 border rounded-3 shadow-sm h-100">
+                    <i class="fas fa-boxes fa-2x text-info mb-3"></i>
+                    <h5>Quản lý kho hàng</h5>
+                    <p class="text-muted">Kiểm soát xuất nhập tồn, phân loại hàng hóa linh hoạt</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="p-4 border rounded-3 shadow-sm h-100">
+                    <i class="fas fa-route fa-2x text-success mb-3"></i>
+                    <h5>Quản lý vận chuyển</h5>
+                    <p class="text-muted">Theo dõi lộ trình giao hàng và tối ưu tuyến đường vận chuyển</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="p-4 border rounded-3 shadow-sm h-100">
+                    <i class="fas fa-chart-line fa-2x text-warning mb-3"></i>
+                    <h5>Thống kê & báo cáo</h5>
+                    <p class="text-muted">Báo cáo real-time, trực quan giúp ra quyết định nhanh chóng</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+    <!-- Lợi ích -->
+    <div class="mb-5 p-4 bg-light border rounded-3 shadow-sm" data-aos="fade-right">
+        <h3 class="text-center text-success mb-3">Tại sao chọn CyberLogistic?</h3>
+        <ul class="fs-5 text-muted" style="max-width: 700px; margin: 0 auto;">
+            <li>🌐 Giao diện dễ dùng, phù hợp với mọi thiết bị</li>
+            <li>🔒 Bảo mật cao, dữ liệu an toàn tuyệt đối</li>
+            <li>📊 Quản lý tập trung toàn bộ chuỗi cung ứng</li>
+            <li>⏱️ Tăng hiệu suất, giảm thiểu thời gian vận hành</li>
+        </ul>
+    </div>
+
+    <!-- Thống kê nhanh -->
+
+<div class="row text-center mb-5" data-aos="zoom-in-up">
+    <div class="col-md-3">
+        <h2 class="text-primary" id="counter1">0</h2>
+        <p class="text-muted">Đối tác sử dụng</p>
+    </div>
+    <div class="col-md-3">
+        <h2 class="text-success" id="counter2">0</h2>
+        <p class="text-muted">Đơn hàng xử lý</p>
+    </div>
+    <div class="col-md-3">
+        <h2 class="text-warning" id="counter3">0%</h2>
+        <p class="text-muted">Độ tin cậy hệ thống</p>
+    </div>
+    <div class="col-md-3">
+        <h2 class="text-info" id="counter4">0/7</h2>
+        <p class="text-muted">Hỗ trợ kỹ thuật</p>
+    </div>
+</div>
+
+    <!-- Liên hệ -->
+    <div class="text-center mb-5">
+        <h4 class="text-primary">Bạn cần tư vấn hoặc hỗ trợ?</h4>
+        <p class="text-muted">Liên hệ với chúng tôi qua email <a href="mailto:support@cyberlogistic.vn">support@cyberlogistic.vn</a> hoặc hotline <strong>1800-123-456</strong></p>
+    </div>
+
+    <!-- Footer -->
+    <div class="text-center text-muted mt-4 py-3 border-top">
+        © 2025 CyberLogistic. All rights reserved.
+    </div>
+</div>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("startCounter");
+        }
+    }
+}

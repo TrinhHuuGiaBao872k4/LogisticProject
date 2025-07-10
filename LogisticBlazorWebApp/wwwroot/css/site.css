@@ -62,3 +62,27 @@ a, .btn-link {
     .blazor-error-boundary::after {
         content: "An error has occurred."
     }
+.bg-gradient-custom {
+  background: linear-gradient(to right, #6a11cb, #2575fc);
+}
+.navbar-brand img {
+  margin-right: 8px;
+}
+.nav-link.active_link {
+  font-weight: bold;
+  border-bottom: 2px solid #fff;
+}
+.active_link {
+    position: relative;
+    font-weight: 600;
+}
+
+.active_link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 10%;
+    width: 60%;
+    height: 2px;
+    border-radius: 4px;
+}

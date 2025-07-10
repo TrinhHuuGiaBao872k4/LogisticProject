@@ -1,0 +1,52 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-gradient-custom shadow-sm">
+  <div class="container-fluid">
+    <!-- Logo -->
+    <a class="navbar-brand fw-bold fs-4" href="/">
+      <i class="fa-solid fa-truck"></i>
+      LogisticCyber
+    </a>
+
+    <!-- Toggle button for mobile -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+      aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Navbar content -->
+    <div class="collapse navbar-collapse" id="navbarContent">
+      <!-- Left Menu -->
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <NavLink class="nav-link" href="/" Match="NavLinkMatch.All" ActiveClass="active_link">Trang Chủ</NavLink>
+        </li>
+        <li class="nav-item">
+         <NavLink class="nav-link" href="/Product-list" ActiveClass="active_link">Sản Phẩm</NavLink>
+        </li>
+        <li class="nav-item">
+       <NavLink class="nav-link" href="/Aboutus" ActiveClass="active_link">Về Chúng Tôi</NavLink>
+        </li>
+      </ul>
+
+      <!-- Right: Cart + Auth -->
+      <ul class="navbar-nav mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link position-relative"  href="/cart">
+            🛒 Giỏ hàng
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+              3
+            </span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <NavLink class="nav-link" href="/login" ActiveClass="active_link">Đăng Nhập</NavLink>
+        </li>
+        <li class="nav-item">
+       <NavLink class="nav-link" href="/register" ActiveClass="active_link">Đăng Ký</NavLink>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Search bar below navbar -->
+
