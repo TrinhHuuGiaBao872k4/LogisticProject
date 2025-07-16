@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "67e6NOrlSbZ6mxvW67IFpoR/geAfqEIJqTIo1anSSTw=",
+  "Hash": "/lmbTz1C5HqSwOtlZm2dQJYaPf2hIkFbgOb9tgGGGKU=",
   "Source": "LogisticBlazorWebApp",
   "BasePath": "_content/LogisticBlazorWebApp",
   "Mode": "Default",
@@ -377,7 +377,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Wed, 09 Jul 2025 13:39:39 GMT"
+          "Value": "Wed, 16 Jul 2025 14:35:51 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -422,7 +422,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Wed, 09 Jul 2025 13:39:39 GMT"
+          "Value": "Wed, 16 Jul 2025 14:35:51 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -1361,7 +1361,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Wed, 09 Jul 2025 13:47:30 GMT"
+          "Value": "Wed, 16 Jul 2025 14:35:51 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -1398,7 +1398,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Wed, 09 Jul 2025 13:47:30 GMT"
+          "Value": "Wed, 16 Jul 2025 14:35:51 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -1525,7 +1525,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Wed, 09 Jul 2025 13:17:45 GMT"
+          "Value": "Wed, 16 Jul 2025 14:35:51 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -1562,7 +1562,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Wed, 09 Jul 2025 13:17:45 GMT"
+          "Value": "Wed, 16 Jul 2025 14:35:51 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -1607,7 +1607,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Wed, 09 Jul 2025 13:24:19 GMT"
+          "Value": "Wed, 16 Jul 2025 14:35:51 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -1644,7 +1644,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Wed, 09 Jul 2025 13:24:19 GMT"
+          "Value": "Wed, 16 Jul 2025 14:35:51 GMT"
         },
         {
           "Name": "Cache-Control",

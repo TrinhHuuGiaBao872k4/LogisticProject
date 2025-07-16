@@ -1,0 +1,69 @@
+@page "/Login"
+@inject LoginService loginService
+@inject NavigationManager nav
+@inject IJSRuntime js
+@inject UserStateService userState
+<EditForm Model="loginModel" OnValidSubmit="HandleLogin">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="d-flex justify-content-center align-items-center vh-100 bg-light">
+        <div class="card p-4 shadow rounded-4" style="width: 350px;">
+            <h3 class="text-center mb-4">Đăng nhập</h3>
+
+            <InputText @bind-Value="loginModel.TenDangNhap" class="form-control mb-1 rounded-3" placeholder="Tên Đăng Nhập" />
+            <ValidationMessage For="@(() => loginModel.TenDangNhap)" />
+
+            <InputText @bind-Value="loginModel.MatKhau" type="password" class="form-control mb-1 rounded-3" placeholder="Mật Khẩu" />
+            <ValidationMessage For="@(() => loginModel.MatKhau)" />
+
+            <button type="submit" class="btn btn-primary w-100 mt-3 rounded-3">Đăng nhập</button>
+
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="alert alert-danger mt-3">@errorMessage</div>
+            }
+
+            <div class="text-center mt-2">
+                <p class="mb-1">
+                    <a href="/register" class="text-decoration-none text-primary">Chưa có tài khoản? Đăng ký ngay</a>
+                </p>
+                <p>
+                    <a href="/forgot-password" class="text-decoration-none text-danger">Quên mật khẩu?</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    private LoginViewModel loginModel = new();
+    private string errorMessage = "";
+
+    private async Task HandleLogin()
+    {
+      
+        try
+        {
+            var result = await loginService.Login(loginModel);
+
+            if (result != null && result.statusCode == 200)
+            {
+                await js.InvokeVoidAsync("localStorage.setItem", "accessToken", result.data.AccessToken);
+                 
+                userState.SetUser(result.data.TenDanhNhap);
+                nav.NavigateTo("/");
+            }
+            else
+            {
+                errorMessage = "Sai tên đăng nhập hoặc mật khẩu.";
+                Console.WriteLine("Login thất bại, kết quả trả về null hoặc không thành công.");
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Lỗi khi đăng nhập!";
+            Console.WriteLine($"Exception: {ex.Message}");
+        }
+    }
+}

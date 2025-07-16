@@ -1,0 +1,45 @@
+@page "/profile"
+@inject ProfileService profileService
+@inject IJSRuntime js
+@inject NavigationManager nav
+@inject UserStateService userState
+
+<div class="d-flex justify-content-center align-items-center vh-100 bg-light">
+    @if (profile == null)
+    {
+        <p>Đang tải thông tin...</p>
+    }
+    else
+    {
+        <div class="card p-4 shadow rounded-4 text-center" style="width: 400px;">
+            <h4 class="mb-4 text-primary">Thông Tin Cá Nhân</h4>
+
+            <p><strong>👤 Họ Tên:</strong> @profile.HoTen</p>
+            <p><strong>🎂 Ngày Sinh:</strong> @profile.NgaySinh.ToString("dd/MM/yyyy")</p>
+            <p><strong>🪪 CCCD:</strong> @profile.Cccd</p>
+            <p><strong>📍 Địa Chỉ:</strong> @profile.DiaChi</p>
+            <p><strong>📞 Số Điện Thoại:</strong> @profile.Sdt</p>
+            <p><strong>🎖️ Mã Vai Trò:</strong> @profile.MaVaiTro?.Trim()</p>
+
+            <button class="btn btn-danger w-100 mt-4" @onclick="Logout">
+                <i class="fa-solid fa-right-from-bracket me-2"></i>Đăng Xuất
+            </button>
+        </div>
+    }
+</div>
+
+@code {
+    private UserProfileViewModel? profile;
+
+    protected override async Task OnInitializedAsync()
+    {
+        profile = await profileService.GetProfileAsync();
+    }
+
+    private async Task Logout()
+    {
+        await js.InvokeVoidAsync("localStorage.removeItem", "accessToken");
+        userState.Logout();
+        nav.NavigateTo("/");
+    }
+}

@@ -1,0 +1,78 @@
+@page "/register"
+@inject RegisterService registerService
+@inject NavigationManager nav
+
+<EditForm Model="registerModel" OnValidSubmit="HandleRegister">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="d-flex justify-content-center align-items-center vh-100 bg-light">
+        <div class="card p-4 shadow rounded-4" style="width: 450px;">
+            <h4 class="mb-4 text-center text-success">Đăng Ký Tài Khoản</h4>
+
+            <InputText @bind-Value="registerModel.HoTen" class="form-control mb-2" placeholder="Họ tên" />
+            <ValidationMessage For="@(() => registerModel.HoTen)" />
+
+            <InputDate @bind-Value="registerModel.NgaySinh" class="form-control mb-2" />
+            <ValidationMessage For="@(() => registerModel.NgaySinh)" />
+
+            <InputText @bind-Value="registerModel.CCCD" class="form-control mb-2" placeholder="CCCD" />
+            <ValidationMessage For="@(() => registerModel.CCCD)" />
+
+            <InputText @bind-Value="registerModel.DiaChi" class="form-control mb-2" placeholder="Địa chỉ" />
+            <ValidationMessage For="@(() => registerModel.DiaChi)" />
+
+            <InputText @bind-Value="registerModel.SDT" class="form-control mb-2" placeholder="Số điện thoại" />
+            <ValidationMessage For="@(() => registerModel.SDT)" />
+
+            <InputText @bind-Value="registerModel.TenDanhNhap" class="form-control mb-2" placeholder="Tên đăng nhập" />
+            <ValidationMessage For="@(() => registerModel.TenDanhNhap)" />
+
+            <InputText @bind-Value="registerModel.MatKhau" type="password" class="form-control mb-3" placeholder="Mật khẩu" />
+            <ValidationMessage For="@(() => registerModel.MatKhau)" />
+
+            <button type="submit" class="btn btn-success w-100">Đăng ký</button>
+
+            @if (!string.IsNullOrEmpty(message))
+            {
+                <div class="alert alert-info mt-3">@message</div>
+            }
+
+            <p class="text-center mt-3">
+                <a href="/login" class="text-decoration-none">Đã có tài khoản? Đăng nhập</a>
+            </p>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    private UserRegisterViewModel registerModel = new();
+    private string message = "";
+
+    private async Task HandleRegister()
+    {
+        try
+        {
+            Console.WriteLine("🚀 Đang gửi đăng ký với dữ liệu:");
+            Console.WriteLine($"Tên: {registerModel.HoTen} | Ngày sinh: {registerModel.NgaySinh:yyyy-MM-dd}");
+
+            var result = await registerService.Register(registerModel);
+
+            if (result != null && result.statusCode == 200)
+            {
+                message = "🎉 Đăng ký thành công! Chuyển sang đăng nhập...";
+                await Task.Delay(2000);
+                nav.NavigateTo("/login");
+            }
+            else
+            {
+                message = "❌ Đăng ký thất bại. Vui lòng kiểm tra lại.";
+            }
+        }
+        catch (Exception ex)
+        {
+            message = $"🔥 Lỗi khi đăng ký: {ex.Message}";
+            Console.WriteLine($"❌ Exception: {ex}");
+        }
+    }
+}

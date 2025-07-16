@@ -1,0 +1,43 @@
+@page "/product-detail/{MaHangHoa}"
+@inject HangHoaService hanghoaService
+@inject NavigationManager nav
+@inject CartService cartService
+
+<h3 class="text-center my-4">Chi tiết sản phẩm</h3>
+@if (product == null)
+{
+    <p class="text-center">Đang tải dữ liệu...</p>
+}
+else
+{
+    <div class="container d-flex justify-content-center">
+        <div class="card" style="width: 30rem;">
+            @if (!string.IsNullOrEmpty(product.HinhAnh))
+            {
+                <img src="@product.HinhAnh" class="card-img-top" alt="@product.TenHangHoa" />
+            }
+
+            <div class="card-body">
+                <h5 class="card-title">@product.TenHangHoa</h5>
+                <p class="card-text fw-bold text-danger">@product.GiaHangHoa VNĐ</p>
+                <p class="card-text"><strong>Loại:</strong> @product.TenHangHoa</p>
+                <button class="btn btn-primary mt-2" @onclick="@(() => cartService.AddToCart(product))"></button>
+  <i class="fa fa-cart-plus me-1"></i> Thêm vào giỏ hàng
+              <button class="btn btn-secondary" @onclick="@(() => nav.NavigateTo("/Product-list"))">Quay lại</button>
+            </div>
+            </div>
+        </div>
+}
+
+@code {
+    [Parameter]
+    public string MaHangHoa { get; set; }
+
+    public HangHoaVM product;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Gọi API lấy chi tiết sản phẩm
+        product = await hanghoaService.GetHangHoaById(MaHangHoa);
+    }
+}

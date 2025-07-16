@@ -1,0 +1,117 @@
+@page "/Product-list"
+@inject HangHoaService hanghoaService;
+@inject NavigationManager nav
+@inject CartService cartService
+<div class="container mt-4">
+  <h3 class="text-center mb-4">Danh sách sản phẩm</h3>
+
+  <!-- Form tìm kiếm -->
+  <form class="d-flex justify-content-center mb-3" role="search" style="max-width: 600px; margin: 0 auto;"
+    @onsubmit="Search">
+    <input class="form-control me-2" type="search" placeholder="Tìm kiếm sản phẩm..." @bind="keyword">
+    <button class="btn btn-outline-primary" type="submit">Tìm</button>
+  </form>
+
+  <!-- Gợi ý sản phẩm tìm được -->
+  @if (isSearching && filteredProducts.Count > 0)
+  {
+    <div class="alert alert-info text-center">
+      Đã tìm thấy @filteredProducts.Count sản phẩm khớp với từ khóa "<strong>@keyword</strong>"
+    </div>
+  }
+
+  <!-- Dropdown lọc danh mục -->
+  <div class="mb-4 text-center">
+    <label class="me-2 fw-bold">Danh mục:</label>
+    <select class="form-select d-inline w-auto" @onchange="OnCategoryChanged">
+      <option value="">Tất cả</option>
+      @foreach (var loai in distinctLoaiHang)
+      {
+        <option value="@loai">@loai</option>
+      }
+    </select>
+  </div>
+
+  <!-- Grid sản phẩm -->
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+    @foreach (var prod in filteredProducts)
+    {
+      <div class="col">
+        <div class="card h-100 shadow-sm">
+          @if (!string.IsNullOrEmpty(prod.HinhAnh))
+          {
+            <img src="@prod.HinhAnh" class="card-img-top" alt="@prod.TenHangHoa"
+              style="height: 200px; object-fit: cover;" />
+          }
+          else
+          {
+            <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 200px;">
+              <span class="text-muted">Không có ảnh</span>
+            </div>
+          }
+
+          <div class="card-body text-center">
+            <h5 class="card-title">@prod.TenHangHoa</h5>
+            <p class="card-text text-danger fw-bold">@prod.GiaHangHoa VNĐ</p>
+          </div>
+
+          <div class="card-footer d-flex justify-content-between">
+            <button class="btn btn-sm btn-outline-primary w-50 me-1" @onclick="@(() => cartService.AddToCart(prod))">
+              <i class="fa fa-shopping-cart me-1"></i> Giỏ hàng
+            </button>
+            <button class="btn btn-sm btn-outline-secondary w-50"
+              @onclick="@(() => nav.NavigateTo($"/product-detail/{prod.MaHangHoa}"))">
+              <i class="fa fa-eye me-1"></i> Xem Chi Tiết
+            </button>
+
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
+@code {
+  private string keyword = "";
+  private string selectedCategory = "";
+  private bool isSearching = false;
+
+  private List<HangHoaVM> filteredProducts = new();
+
+  // 👇 Đây là danh sách danh mục sản phẩm
+  private List<string> distinctLoaiHang => hanghoaService.lstHangHoa
+  .Where(h => !string.IsNullOrEmpty(h.TenHangHoa))
+  .Select(h => h.TenHangHoa)
+  .Distinct()
+  .ToList();
+
+  protected override async Task OnInitializedAsync()
+  {
+    await hanghoaService.GetAllHangHoaApi();
+    filteredProducts = hanghoaService.lstHangHoa;
+  }
+
+  private void OnCategoryChanged(ChangeEventArgs e)
+  {
+    selectedCategory = e.Value?.ToString() ?? "";
+    keyword = ""; // reset tìm kiếm khi lọc danh mục
+    isSearching = false;
+    ApplyFilter();
+  }
+
+  private void Search()
+  {
+    isSearching = true;
+    ApplyFilter();
+  }
+
+  private void ApplyFilter()
+  {
+    filteredProducts = hanghoaService.lstHangHoa
+    .Where(p =>
+    (string.IsNullOrWhiteSpace(keyword) || p.TenHangHoa.Contains(keyword, StringComparison.OrdinalIgnoreCase)) &&
+    (string.IsNullOrWhiteSpace(selectedCategory) || p.TenHangHoa == selectedCategory)
+    )
+    .ToList();
+  }
+}
