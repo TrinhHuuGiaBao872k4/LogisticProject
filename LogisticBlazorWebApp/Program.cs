@@ -13,6 +13,10 @@ builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<HangHoaService>();
 builder.Services.AddScoped<CartService>();
+builder.Services.AddScoped<LoginService>();
+builder.Services.AddSingleton<UserStateService>();
+builder.Services.AddScoped<ProfileService>();
+builder.Services.AddScoped<RegisterService>();
 //setup middleware 
 //middleware cross
 builder.Services.AddCors(option =>

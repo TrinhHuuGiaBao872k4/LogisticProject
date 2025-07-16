@@ -53,7 +53,7 @@ public class NguoiDungController(LogisticDbServiceContext _context, IConfigurati
     // }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register(UserRegisterViewModel dto)
+    public async Task<IActionResult> Register([FromBody]UserRegisterViewModel dto)
     {
         return await _nguoiDungService.RegisterAsync(dto);
     }
@@ -174,7 +174,7 @@ public class NguoiDungController(LogisticDbServiceContext _context, IConfigurati
 
     
 
-    [HttpPost("/NguoiDung/DangNhap")]
+    [HttpPost("DangNhap")]
     public async Task<ActionResult> DangNhap(UserLoginViewModel userLogin)
     {
         var res = await _nguoiDungService.Login(userLogin) as OkObjectResult;

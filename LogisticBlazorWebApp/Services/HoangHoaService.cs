@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 
 public class HangHoaService
 {
+    
     public List<HangHoaVM> lstHangHoa = new List<HangHoaVM>();
     public HttpClient _httpClient;
     public HangHoaService(HttpClient http)

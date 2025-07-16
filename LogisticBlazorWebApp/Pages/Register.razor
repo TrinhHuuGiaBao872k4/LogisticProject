@@ -1,26 +1,78 @@
-@page "/Register"
+@page "/register"
+@inject RegisterService registerService
+@inject NavigationManager nav
 
-<div class="d-flex justify-content-center align-items-center vh-100 bg-light">
-    <div class="card p-4 shadow rounded-4" style="width: 400px;">
-        <h3 class="text-center mb-4">Đăng ký</h3>
+<EditForm Model="registerModel" OnValidSubmit="HandleRegister">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
 
-        <input type="text" class="form-control mb-3 rounded-3" placeholder="Họ và Tên">
-        <input type="date" class="form-control mb-3 rounded-3" placeholder="Ngày Sinh">
-        <input type="number" class="form-control mb-3 rounded-3" placeholder="Căn cước công dân">
-        <input type="text" class="form-control mb-3 rounded-3" placeholder="Địa chỉ">
-        <input type="number" class="form-control mb-3 rounded-3" placeholder="Số điện thoại">
-        <input type="text" class="form-control mb-3 rounded-3" placeholder="Tên đăng nhập">
-        <input type="password" class="form-control mb-3 rounded-3" placeholder="Mật khẩu">
+    <div class="d-flex justify-content-center align-items-center vh-100 bg-light">
+        <div class="card p-4 shadow rounded-4" style="width: 450px;">
+            <h4 class="mb-4 text-center text-success">Đăng Ký Tài Khoản</h4>
 
-        <button class="btn btn-success w-100 mb-3 rounded-3">Đăng ký</button>
+            <InputText @bind-Value="registerModel.HoTen" class="form-control mb-2" placeholder="Họ tên" />
+            <ValidationMessage For="@(() => registerModel.HoTen)" />
 
-        <div class="text-center">
-            <p class="mb-1">
-                <a href="/login" class="text-decoration-none text-primary">Đã có tài khoản? Đăng nhập</a>
-            </p>
-            <p>
-                <a href="/forgot-password" class="text-decoration-none text-danger">Quên mật khẩu?</a>
+            <InputDate @bind-Value="registerModel.NgaySinh" class="form-control mb-2" />
+            <ValidationMessage For="@(() => registerModel.NgaySinh)" />
+
+            <InputText @bind-Value="registerModel.CCCD" class="form-control mb-2" placeholder="CCCD" />
+            <ValidationMessage For="@(() => registerModel.CCCD)" />
+
+            <InputText @bind-Value="registerModel.DiaChi" class="form-control mb-2" placeholder="Địa chỉ" />
+            <ValidationMessage For="@(() => registerModel.DiaChi)" />
+
+            <InputText @bind-Value="registerModel.SDT" class="form-control mb-2" placeholder="Số điện thoại" />
+            <ValidationMessage For="@(() => registerModel.SDT)" />
+
+            <InputText @bind-Value="registerModel.TenDanhNhap" class="form-control mb-2" placeholder="Tên đăng nhập" />
+            <ValidationMessage For="@(() => registerModel.TenDanhNhap)" />
+
+            <InputText @bind-Value="registerModel.MatKhau" type="password" class="form-control mb-3" placeholder="Mật khẩu" />
+            <ValidationMessage For="@(() => registerModel.MatKhau)" />
+
+            <button type="submit" class="btn btn-success w-100">Đăng ký</button>
+
+            @if (!string.IsNullOrEmpty(message))
+            {
+                <div class="alert alert-info mt-3">@message</div>
+            }
+
+            <p class="text-center mt-3">
+                <a href="/login" class="text-decoration-none">Đã có tài khoản? Đăng nhập</a>
             </p>
         </div>
     </div>
-</div>
+</EditForm>
+
+@code {
+    private UserRegisterViewModel registerModel = new();
+    private string message = "";
+
+    private async Task HandleRegister()
+    {
+        try
+        {
+            Console.WriteLine("🚀 Đang gửi đăng ký với dữ liệu:");
+            Console.WriteLine($"Tên: {registerModel.HoTen} | Ngày sinh: {registerModel.NgaySinh:yyyy-MM-dd}");
+
+            var result = await registerService.Register(registerModel);
+
+            if (result != null && result.statusCode == 200)
+            {
+                message = "🎉 Đăng ký thành công! Chuyển sang đăng nhập...";
+                await Task.Delay(2000);
+                nav.NavigateTo("/login");
+            }
+            else
+            {
+                message = "❌ Đăng ký thất bại. Vui lòng kiểm tra lại.";
+            }
+        }
+        catch (Exception ex)
+        {
+            message = $"🔥 Lỗi khi đăng ký: {ex.Message}";
+            Console.WriteLine($"❌ Exception: {ex}");
+        }
+    }
+}
