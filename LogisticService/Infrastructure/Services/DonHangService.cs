@@ -8,26 +8,25 @@ public interface IDonHangService : IServiceBase<DonHang>
     Task<bool> CapNhatTrangThaiAsync(string maDonHang, UpdateTrangThaiRequest req, string userId, string vaiTro);
     Task<OrderTrackingViewModel?> GetOrderTrackingAsync(string maDonHang);
 
+
 }
 public class DonHangService : ServiceBase<DonHang>, IDonHangService
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly JwtAuthService _JwtAuthService;
 
-    public DonHangService(IUnitOfWork unitOfWork) : base(unitOfWork)
+    public DonHangService(IUnitOfWork unitOfWork, JwtAuthService jwtAuthService) : base(unitOfWork)
     {
-        _unitOfWork = unitOfWork;
+        _JwtAuthService = jwtAuthService;
     }
 
     public async Task<string> DatHangAsync(DatHangViewModel model, string userId)
     {
-        var maDonHang = IdHelper.GenerateId("DH", 20);
-        var trangThai = "TT02"; // Mặc định: Đang xử lý
-        bool canGiaoNgay = true;
-
         try
         {
-            await _unitOfWork.BeginTransaction();
-
+            await _uow.BeginTransaction();
+            var maDonHang = IdHelper.GenerateId("DH", 20);
+            var trangThai = "TT02"; // Mặc định: Đang xử lý
+            bool canGiaoNgay = true;
             var donHang = new DonHang
             {
                 MaDonHang = maDonHang,
@@ -38,11 +37,12 @@ public class DonHangService : ServiceBase<DonHang>, IDonHangService
                 MaNguoiDung = userId,
                 TienShip = model.TienShip
             };
-            await _unitOfWork.DonHangRepository.AddAsync(donHang);
+            await _repository.AddAsync(donHang);
+            await _uow.SaveChangesAsync();
 
             foreach (var item in model.DanhSachSanPham)
             {
-                var hangHoa = await _unitOfWork.GetRepository<HangHoa>()
+                var hangHoa = await _uow.GetRepository<HangHoa>()
                     .SingleOrDefaultAsync(h => h.MaHangHoa == item.MaHangHoa);
 
                 if (hangHoa == null)
@@ -52,7 +52,7 @@ public class DonHangService : ServiceBase<DonHang>, IDonHangService
                     throw new Exception($"Hàng hóa {item.MaHangHoa} chưa có giá bán.");
 
                 // ✅ Kiểm tra tồn kho
-                var tonKho = await _unitOfWork.DonHangRepository.GetTonKhoAsync(item.MaHangHoa);
+                var tonKho = await _uow._donHangRepository.GetTonKhoAsync(item.MaHangHoa);
                 if (item.SoLuong > tonKho)
                     throw new Exception($"Số lượng đặt vượt quá tồn kho của hàng hóa {item.MaHangHoa}");
 
@@ -68,16 +68,16 @@ public class DonHangService : ServiceBase<DonHang>, IDonHangService
                     SoLuong = item.SoLuong,
                     DonGia = (int)hangHoa.GiaHangHoa.Value
                 };
-                await _unitOfWork.GetRepository<ChiTietDonHang>().AddAsync(chiTiet);
+                await _uow.GetRepository<ChiTietDonHang>().AddAsync(chiTiet);
 
                 // ✅ Trừ tồn kho
-                await _unitOfWork.DonHangRepository.TruTonKhoAsync(item.MaHangHoa, item.SoLuong);
+                await _uow._donHangRepository.TruTonKhoAsync(item.MaHangHoa, item.SoLuong);
             }
 
             // ✅ Ghi trạng thái
             trangThai = canGiaoNgay ? "TT02" : "TT01"; // TT01 nếu cần xác nhận, TT02 là xử lý luôn
 
-            await _unitOfWork.GetRepository<LichSuTrangThaiDonHang>().AddAsync(new LichSuTrangThaiDonHang
+            await _uow.GetRepository<LichSuTrangThaiDonHang>().AddAsync(new LichSuTrangThaiDonHang
             {
                 MaLichSu = IdHelper.GenerateId("LS", 20),
                 MaDonHang = maDonHang,
@@ -86,7 +86,7 @@ public class DonHangService : ServiceBase<DonHang>, IDonHangService
                 GhiChu = canGiaoNgay ? "Đơn hàng đang xử lý ngay" : "Chờ xác nhận do tồn kho vừa hết"
             });
 
-            await _unitOfWork.GetRepository<TinhTrangDonHangChiTiet>().AddAsync(new TinhTrangDonHangChiTiet
+            await _uow.GetRepository<TinhTrangDonHangChiTiet>().AddAsync(new TinhTrangDonHangChiTiet
             {
                 MaTinhTrangChiTiet = IdHelper.GenerateId("TTCT", 20),
                 MaDonHang = maDonHang,
@@ -95,24 +95,24 @@ public class DonHangService : ServiceBase<DonHang>, IDonHangService
                 GhiChu = "Đơn hàng mới"
             });
 
-            await _unitOfWork.SaveChangesAsync();
-            await _unitOfWork.CommitTransaction();
+            await _uow.SaveChangesAsync();
+            await _uow.CommitTransaction();
 
             return maDonHang;
         }
         catch
         {
-            await _unitOfWork.RollBack();
+            await _uow.RollBack();
             throw;
         }
     }
     public async Task<bool> CapNhatTrangThaiAsync(string maDonHang, UpdateTrangThaiRequest req, string userId, string vaiTro)
     {
-        var donHang = await _unitOfWork.DonHangRepository.GetByIdAsync(maDonHang);
+        var donHang = await _uow._donHangRepository.GetByIdAsync(maDonHang);
         if (donHang == null) return false;
 
         var maLichSu = IdHelper.GenerateId("LS", 20);
-        await _unitOfWork.GetRepository<LichSuTrangThaiDonHang>().AddAsync(new LichSuTrangThaiDonHang
+        await _uow.GetRepository<LichSuTrangThaiDonHang>().AddAsync(new LichSuTrangThaiDonHang
         {
             MaLichSu = maLichSu,
             MaDonHang = maDonHang,
@@ -121,7 +121,7 @@ public class DonHangService : ServiceBase<DonHang>, IDonHangService
             GhiChu = req.GhiChu ?? $"{vaiTro} ({userId}) cập nhật trạng thái"
         });
 
-        await _unitOfWork.GetRepository<TinhTrangDonHangChiTiet>().AddAsync(new TinhTrangDonHangChiTiet
+        await _uow.GetRepository<TinhTrangDonHangChiTiet>().AddAsync(new TinhTrangDonHangChiTiet
         {
             MaTinhTrangChiTiet = IdHelper.GenerateId("TTCT", 20),
             MaDonHang = maDonHang,
@@ -130,20 +130,20 @@ public class DonHangService : ServiceBase<DonHang>, IDonHangService
             GhiChu = req.GhiChu
         });
 
-        await _unitOfWork.SaveChangesAsync();
+        await _uow.SaveChangesAsync();
         return true;
     }
     public async Task<OrderTrackingViewModel?> GetOrderTrackingAsync(string maDonHang)
     {
-        var donHang = await _unitOfWork.DonHangRepository.GetByIdAsync(maDonHang);
+        var donHang = await _uow._donHangRepository.GetByIdAsync(maDonHang);
         if (donHang == null) return null;
 
         // ✅ Lấy lịch sử đúng đơn hàng từ DB, không load tất cả
-        var lichSu = await _unitOfWork
+        var lichSu = await _uow
             .GetRepository<LichSuTrangThaiDonHang>()
             .WhereAsync(l => l.MaDonHang == maDonHang);
 
-        var tinhTrang = await _unitOfWork
+        var tinhTrang = await _uow
             .GetRepository<TinhTrangDonHangChiTiet>()
             .WhereAsync(t => t.MaDonHang == maDonHang);
 
