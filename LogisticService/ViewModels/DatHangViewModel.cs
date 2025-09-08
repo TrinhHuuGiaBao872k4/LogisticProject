@@ -1,6 +1,6 @@
 public class DatHangViewModel
 {
-    public string MaNguoiDung { get; set; }
+    // public string MaNguoiDung { get; set; }
     public List<ChiTietDatHangViewModel> DanhSachSanPham { get; set; }
     public int TienShip { get; set; }
 }

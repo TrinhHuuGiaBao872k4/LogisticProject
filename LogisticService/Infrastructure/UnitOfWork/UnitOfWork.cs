@@ -6,6 +6,8 @@ public interface IUnitOfWork : IAsyncDisposable
     public IDonHangRepository DonHangRepository { get; }
     public IHangHoaRepository _hangHoaRepository { get; }
     public INguoiDungRepository _nguoiDungRepository { get; }
+    public ILichSuTrangThaiDonHangRepository _lichSuTrangThaiDonHangRepository {get; }
+    public ITinhTrangDonHangChiTietRepository _tinhTrangDonHangChiTietRepository {get; }
 
     Task BeginTransaction();
     IRepository<T> GetRepository<T>() where T : class;
@@ -19,15 +21,20 @@ public class UnitOfWork : IUnitOfWork
     public IDonHangRepository DonHangRepository { get; }
     public IHangHoaRepository _hangHoaRepository { get; }
     public INguoiDungRepository _nguoiDungRepository { get; }
+    public ILichSuTrangThaiDonHangRepository _lichSuTrangThaiDonHangRepository {get; }
+    public ITinhTrangDonHangChiTietRepository _tinhTrangDonHangChiTietRepository {get; }
+
 
     private readonly LogisticDbServiceContext _context;
 
-    public UnitOfWork(LogisticDbServiceContext context, IHangHoaRepository hangHoaRepository, IDonHangRepository donHangRepository, INguoiDungRepository nguoiDungRepository)
+    public UnitOfWork(LogisticDbServiceContext context, IHangHoaRepository hangHoaRepository, IDonHangRepository donHangRepository, INguoiDungRepository nguoiDungRepository, ILichSuTrangThaiDonHangRepository lichSuTrangThaiDonHangRepository, ITinhTrangDonHangChiTietRepository tinhTrangDonHangChiTietRepository)
     {
         _context = context;
         _hangHoaRepository = hangHoaRepository;
         DonHangRepository = donHangRepository;
         _nguoiDungRepository = nguoiDungRepository;
+        _lichSuTrangThaiDonHangRepository = lichSuTrangThaiDonHangRepository;
+        _tinhTrangDonHangChiTietRepository = tinhTrangDonHangChiTietRepository;
     }
 
     public IRepository<T> GetRepository<T>() where T : class
@@ -51,6 +58,14 @@ public class UnitOfWork : IUnitOfWork
         if (typeof(T) == typeof(NguoiDung))
         {
             return (IRepository<T>)_nguoiDungRepository;
+        }
+        if (typeof(T) == typeof(LichSuTrangThaiDonHang))
+        {
+            return (IRepository<T>)_lichSuTrangThaiDonHangRepository;
+        }
+        if (typeof(T) == typeof(TinhTrangDonHangChiTiet))
+        {
+            return (IRepository<T>)_tinhTrangDonHangChiTietRepository;
         }
         return new Repository<T>(_context);
         throw new NotSupportedException($"No repository found for type {typeof(T).Name}");
