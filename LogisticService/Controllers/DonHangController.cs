@@ -3,29 +3,49 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using Microsoft.AspNetCore.SignalR;
+using LogisticService.Controllers;
 [Route("api/[controller]")]
 [ApiController]
-public class DonHangController : ControllerBase
+public class DonHangController : BaseController
 {
     private readonly IDonHangService _donHangService;
+    private readonly JwtAuthService _jwtAuthService;
     private readonly IUnitOfWork _unitOfWork;
-    public DonHangController(IDonHangService service, IUnitOfWork unitOfWork)
+    private readonly IHubContext<DonHangHub> _hubContext;
+    public DonHangController(IDonHangService service, IUnitOfWork unitOfWork, IHubContext<DonHangHub> hubContext, JwtAuthService jwtAuthService)
     {
         _donHangService = service;
         _unitOfWork = unitOfWork;
+        _hubContext = hubContext;
+        _jwtAuthService = jwtAuthService;
     }
 
     [HttpPost("dat-hang")]
-    public async Task<IActionResult> DatHang([FromBody] DatHangViewModel model)
+    public async Task<ActionResult<HTTPResponseClient<object>>> DatHang([FromBody] DatHangViewModel model)
     {
         try
         {
-            var maDon = await _donHangService.DatHangAsync(model);
-            return Ok(new { success = true, maDonHang = maDon });
+            // Lấy token từ header
+            var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Substring(7);
+            if (string.IsNullOrEmpty(token))
+                return Fail<object>("Token không hợp lệ", 401);
+
+            // Decode token
+            var userInfo = _jwtAuthService.DecodePayloadTokenInfo(token);
+            if (userInfo == null)
+                return Fail<object>("Decode Token thất bại", 401);
+
+            // Truyền userId vào service
+            var maDon = await _donHangService.DatHangAsync(model, userInfo.Id);
+
+            // return Ok(new { success = true, maDonHang = maDon });
+            return Success<object>(maDon, "Đặt hàng thành công");
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = ex.Message });
+            // return BadRequest(new { success = false, message = ex.Message });
+            return Fail<object>(ex.Message);
         }
     }
     [Authorize(Roles = "VT000")]
@@ -106,5 +126,71 @@ public class DonHangController : ControllerBase
 
         return Ok(new { success = true, message = "Đơn hàng đã được chuyển sang trạng thái 'Đã hủy'" });
     }
+
+
+    [HttpPut("Seller/UpdateTrangThai/{maDonHang}")]
+    [Authorize]
+    public async Task<ActionResult<HTTPResponseClient<object>>> UpdateTrangThaiBySeller(string maDonHang, [FromBody] UpdateTrangThaiRequest req)
+    {
+        var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Substring(7);
+        if (string.IsNullOrEmpty(token)) return Fail<object>("Token không hợp lệ", 401);
+
+        var res = _jwtAuthService.DecodePayloadTokenInfo(token);
+        if (res == null || res.Role != "Seller")
+            return Fail<object>("Người dùng không phải Seller", 403);
+
+        var updated = await _donHangService.CapNhatTrangThaiAsync(maDonHang, req, res.Id, "Seller");
+        if (!updated) return Fail<object>("Không tìm thấy đơn hàng", 404);
+
+        await _hubContext.Clients.Group($"order-{maDonHang}")
+            .SendAsync("OrderStatusUpdated", new OrderStatusNotificationVM
+            {
+                MaDonHang = maDonHang,
+                MaTrangThai = req.MaTrangThai,
+                NoiDung = req.NoiDungChiTiet,
+                ThoiGian = DateTime.Now,
+                GhiChu = req.GhiChu
+            });
+
+        return Success<object>(null, "Seller cập nhật thành công");
+    }
+
+    [HttpPut("Shipper/UpdateTrangThai/{maDonHang}")]
+    [Authorize]
+    public async Task<ActionResult<HTTPResponseClient<object>>> UpdateTrangThaiByShipper(string maDonHang, [FromBody] UpdateTrangThaiRequest req)
+    {
+        var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Substring(7);
+        if (string.IsNullOrEmpty(token)) return Fail<object>("Token không hợp lệ", 401);
+
+        var res = _jwtAuthService.DecodePayloadTokenInfo(token);
+        if (res == null || res.Role != "Shipper")
+            return Fail<object>("Người dùng không phải Shipper",403);
+
+        var updated = await _donHangService.CapNhatTrangThaiAsync(maDonHang, req, res.Id, "Shipper");
+        if (!updated) return Fail<object>("Không tìm thấy đơn hàng", 404);
+
+        await _hubContext.Clients.Group($"order-{maDonHang}")
+            .SendAsync("OrderStatusUpdated", new OrderStatusNotificationVM
+            {
+                MaDonHang = maDonHang,
+                MaTrangThai = req.MaTrangThai,
+                NoiDung = req.NoiDungChiTiet,
+                ThoiGian = DateTime.Now,
+                GhiChu = req.GhiChu
+            });
+
+        return Success<object>(null,"Shipper cập nhật thành công" );
+    }
+    [HttpGet("tracking/{maDonHang}")]
+    [Authorize] // chỉ user đã login mới theo dõi được
+    public async Task<ActionResult<HTTPResponseClient<OrderTrackingViewModel>>> GetOrderTracking(string maDonHang)
+    {
+        var result = await _donHangService.GetOrderTrackingAsync(maDonHang);
+        if (result == null)
+            return Fail<OrderTrackingViewModel>("Không tìm thấy đơn hàng", 404);
+
+        return Success(result, "Lấy trạng thái đơn hàng thành công");
+    }
+
 
 }
