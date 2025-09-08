@@ -156,7 +156,11 @@ builder.Services.AddScoped<ILichSuTrangThaiDonHangService, LichSuTrangThaiDonHan
 
 //TinhTrangDonHangChiTiet
 builder.Services.AddScoped<ITinhTrangDonHangChiTietRepository, TinhTrangDonHangChiTietRepository>();
-builder.Services.AddScoped<ITinhTrangDonHangChiTietService,TinhTrangDonHangChiTietService>();
+builder.Services.AddScoped<ITinhTrangDonHangChiTietService, TinhTrangDonHangChiTietService>();
+
+//ChiTietDonHang
+builder.Services.AddScoped<IChiTietDonHangRepository, ChiTietDonHangRepository>();
+builder.Services.AddScoped<IChiTietDonHangService, ChiTietDonHangService>();
 
 
 if (builder.Environment.IsProduction())
