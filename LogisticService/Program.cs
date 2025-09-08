@@ -150,18 +150,24 @@ builder.Services.AddScoped<INguoiDungService, NguoiDungService>();
 builder.Services.AddScoped<IDonHangRepository, DonHangRepository>();
 builder.Services.AddScoped<IDonHangService, DonHangService>();
 
+
+
+if (builder.Environment.IsProduction())
+{
+    builder.WebHost.UseUrls("http://*:82");
+}
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+
     app.UseSwagger();
   app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
     c.RoutePrefix = "swagger"; // nếu bạn muốn swagger ở root: /
 }); 
-}
+
 
 app.UseCors("allow_all");
 // app.UseMiddleware<JwtMiddleware>();
@@ -173,6 +179,9 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
+if (app.Environment.IsProduction()){
+    app.Urls.Add("http://*:82");
+}
 
 app.Run();
 

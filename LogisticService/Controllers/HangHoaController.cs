@@ -60,7 +60,7 @@ namespace LogisticService.Controllers
                 return BadRequest("Id không được để trống");  // Trả về 400 nếu Id rỗng
             }
 
-            var hangHoa = await _hangHoaService.GetHangHoaByIdAsync(Id);
+            var hangHoa = await _hangHoaService.GetHangHoaById(Id);
 
             if (hangHoa == null)
             {

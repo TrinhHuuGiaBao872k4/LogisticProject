@@ -1,4 +1,5 @@
 using LogisticService.Models;
+using LogisticService.ViewModels;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,9 +7,10 @@ public interface IHangHoaService : IServiceBase<HangHoa>
 {
     // Task<dynamic> GetAllHangHoa();
     // Task<HangHoa> GetHangHoaById(string id);
-   
-    Task<HTTPResponseClient<IEnumerable<HangHoa>>> GetAllHangHoaAsync();
+    Task<HTTPResponseClient<IEnumerable<HangHoaReturnResult>>> GetAllHangHoaAsync();
     Task<HTTPResponseClient<HangHoa?>> GetHangHoaByIdAsync(string id);
+    Task<HTTPResponseClient<HangHoaReturnResult?>> GetHangHoaById(string id);
+
     Task<IEnumerable<HangHoa>> GetAllWithNavigationPropertiesAsync();
     Task<string> GenerateMaHangHoaAsync();
     Task<int> CountByDateAsync(DateTime date);
@@ -24,13 +26,23 @@ public class HangHoaService : ServiceBase<HangHoa>, IHangHoaService
     {
         _context = context;
     }
-    public async Task<HTTPResponseClient<IEnumerable<HangHoa>>> GetAllHangHoaAsync()
+    public async Task<HTTPResponseClient<IEnumerable<HangHoaReturnResult>>> GetAllHangHoaAsync()
     {
         var res = await _repository.GetAllAsync();
-        HTTPResponseClient<IEnumerable<HangHoa>> data = new HTTPResponseClient<IEnumerable<HangHoa>>()
+        HTTPResponseClient<IEnumerable<HangHoaReturnResult>> data = new HTTPResponseClient<IEnumerable<HangHoaReturnResult>>()
         {
             StatusCode = 200,
-            Data = res.ToList().Skip(0).Take(10),
+            Data = res.ToList().Skip(0).Take(10).Select(n => new HangHoaReturnResult
+            {
+                MaHangHoa = n.MaHangHoa,
+                MaLoaiHangHoa = n.MaLoaiHangHoa,
+                TenHangHoa = n.TenHangHoa,
+                NgaySanXuat = n.NgaySanXuat,
+                HinhAnh = n.HinhAnh,
+                GiaHangHoa = n.GiaHangHoa,
+                MaNguoiDung = n.MaNguoiDung,
+                SoLuongTonKho = n.TonKhos.Sum(tk => tk.SoLuongTon)??0
+            }).ToList(),
             DateTime = DateTime.Now,
             Message = "Successfully"
         };
@@ -39,10 +51,33 @@ public class HangHoaService : ServiceBase<HangHoa>, IHangHoaService
     public async Task<HTTPResponseClient<HangHoa?>> GetHangHoaByIdAsync(string id)
     {
         var res = await _repository.GetByIdAsync(id);
-        HTTPResponseClient<HangHoa?> data = new HTTPResponseClient<HangHoa?>()
+        HTTPResponseClient<HangHoa> data = new HTTPResponseClient<HangHoa>()
         {
             StatusCode = 200,
             Data = res,
+            DateTime = DateTime.Now,
+            Message = "Successfully"
+        };
+        return data;
+    }
+    public async Task<HTTPResponseClient<HangHoaReturnResult?>> GetHangHoaById(string id)
+    {
+        var res = await _repository.GetByIdAsync(id);
+        HangHoaReturnResult result = new HangHoaReturnResult()
+        { 
+            MaHangHoa = res.MaHangHoa,
+            MaLoaiHangHoa = res.MaLoaiHangHoa,
+            TenHangHoa = res.TenHangHoa,
+            NgaySanXuat = res.NgaySanXuat,
+            HinhAnh = res.HinhAnh,
+            GiaHangHoa = res.GiaHangHoa,
+            MaNguoiDung = res.MaNguoiDung,
+            SoLuongTonKho = res.TonKhos.Sum(tk => tk.SoLuongTon)??0
+        };
+        HTTPResponseClient<HangHoaReturnResult> data = new HTTPResponseClient<HangHoaReturnResult>()
+        {
+            StatusCode = 200,
+            Data = result,
             DateTime = DateTime.Now,
             Message = "Successfully"
         };
