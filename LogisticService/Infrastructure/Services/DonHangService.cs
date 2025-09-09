@@ -1,30 +1,32 @@
+using LogisticService.Helpers;
 using LogisticService.Models;
 
 public interface IDonHangService : IServiceBase<DonHang>
 {
 
-    Task<string> DatHangAsync(DatHangViewModel model);
-    
+    Task<string> DatHangAsync(DatHangViewModel model, string userId);
+    Task<bool> CapNhatTrangThaiAsync(string maDonHang, UpdateTrangThaiRequest req, string userId, string vaiTro);
+    Task<OrderTrackingViewModel?> GetOrderTrackingAsync(string maDonHang);
+
+
 }
 public class DonHangService : ServiceBase<DonHang>, IDonHangService
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly JwtAuthService _JwtAuthService;
 
-    public DonHangService(IUnitOfWork unitOfWork) : base(unitOfWork)
+    public DonHangService(IUnitOfWork unitOfWork, JwtAuthService jwtAuthService) : base(unitOfWork)
     {
-        _unitOfWork = unitOfWork;
+        _JwtAuthService = jwtAuthService;
     }
 
-    public async Task<string> DatHangAsync(DatHangViewModel model)
+    public async Task<string> DatHangAsync(DatHangViewModel model, string userId)
     {
-        var maDonHang = "DH" + DateTime.Now.Ticks;
-        var trangThai = "TT02"; // Mặc định: Đang xử lý
-        bool canGiaoNgay = true;
-
         try
         {
-            await _unitOfWork.BeginTransaction();
-
+            await _uow.BeginTransaction();
+            var maDonHang = IdHelper.GenerateId("DH", 20);
+            var trangThai = "TT02"; // Mặc định: Đang xử lý
+            bool canGiaoNgay = true;
             var donHang = new DonHang
             {
                 MaDonHang = maDonHang,
@@ -32,14 +34,15 @@ public class DonHangService : ServiceBase<DonHang>, IDonHangService
                 NgayKhoiTao = DateTime.Now,
                 NgayVanChuyen = DateTime.Now.AddDays(1),
                 NgayDenDuKien = DateTime.Now.AddDays(2),
-                MaNguoiDung = model.MaNguoiDung,
+                MaNguoiDung = userId,
                 TienShip = model.TienShip
             };
-            await _unitOfWork.DonHangRepository.AddAsync(donHang);
+            await _repository.AddAsync(donHang);
+            await _uow.SaveChangesAsync();
 
             foreach (var item in model.DanhSachSanPham)
             {
-                var hangHoa = await _unitOfWork.GetRepository<HangHoa>()
+                var hangHoa = await _uow.GetRepository<HangHoa>()
                     .SingleOrDefaultAsync(h => h.MaHangHoa == item.MaHangHoa);
 
                 if (hangHoa == null)
@@ -49,7 +52,7 @@ public class DonHangService : ServiceBase<DonHang>, IDonHangService
                     throw new Exception($"Hàng hóa {item.MaHangHoa} chưa có giá bán.");
 
                 // ✅ Kiểm tra tồn kho
-                var tonKho = await _unitOfWork.DonHangRepository.GetTonKhoAsync(item.MaHangHoa);
+                var tonKho = await _uow._donHangRepository.GetTonKhoAsync(item.MaHangHoa);
                 if (item.SoLuong > tonKho)
                     throw new Exception($"Số lượng đặt vượt quá tồn kho của hàng hóa {item.MaHangHoa}");
 
@@ -59,47 +62,116 @@ public class DonHangService : ServiceBase<DonHang>, IDonHangService
 
                 var chiTiet = new ChiTietDonHang
                 {
+                    MaChiTietDonHang = IdHelper.GenerateId("CTDH", 20),
                     MaDonHang = maDonHang,
                     MaHangHoa = item.MaHangHoa,
                     SoLuong = item.SoLuong,
                     DonGia = (int)hangHoa.GiaHangHoa.Value
                 };
-                await _unitOfWork.GetRepository<ChiTietDonHang>().AddAsync(chiTiet);
+                await _uow.GetRepository<ChiTietDonHang>().AddAsync(chiTiet);
 
                 // ✅ Trừ tồn kho
-                await _unitOfWork.DonHangRepository.TruTonKhoAsync(item.MaHangHoa, item.SoLuong);
+                await _uow._donHangRepository.TruTonKhoAsync(item.MaHangHoa, item.SoLuong);
             }
 
             // ✅ Ghi trạng thái
             trangThai = canGiaoNgay ? "TT02" : "TT01"; // TT01 nếu cần xác nhận, TT02 là xử lý luôn
 
-            await _unitOfWork.GetRepository<LichSuTrangThaiDonHang>().AddAsync(new LichSuTrangThaiDonHang
+            await _uow.GetRepository<LichSuTrangThaiDonHang>().AddAsync(new LichSuTrangThaiDonHang
             {
-                MaLichSu = "LS" + DateTime.Now.Ticks,
+                MaLichSu = IdHelper.GenerateId("LS", 20),
                 MaDonHang = maDonHang,
                 MaTrangThai = trangThai,
                 NgayCapNhat = DateTime.Now,
                 GhiChu = canGiaoNgay ? "Đơn hàng đang xử lý ngay" : "Chờ xác nhận do tồn kho vừa hết"
             });
 
-            await _unitOfWork.GetRepository<TinhTrangDonHangChiTiet>().AddAsync(new TinhTrangDonHangChiTiet
+            await _uow.GetRepository<TinhTrangDonHangChiTiet>().AddAsync(new TinhTrangDonHangChiTiet
             {
-                MaTinhTrangChiTiet = "TTCT" + DateTime.Now.Ticks,
+                MaTinhTrangChiTiet = IdHelper.GenerateId("TTCT", 20),
                 MaDonHang = maDonHang,
                 NoiDung = canGiaoNgay ? "Đủ hàng, xử lý ngay" : "Cần xác nhận vì hết tồn",
                 ThoiGian = DateTime.Now,
                 GhiChu = "Đơn hàng mới"
             });
 
-            await _unitOfWork.SaveChangesAsync();
-            await _unitOfWork.CommitTransaction();
+            await _uow.SaveChangesAsync();
+            await _uow.CommitTransaction();
 
             return maDonHang;
         }
         catch
         {
-            await _unitOfWork.RollBack();
+            await _uow.RollBack();
             throw;
         }
     }
+    public async Task<bool> CapNhatTrangThaiAsync(string maDonHang, UpdateTrangThaiRequest req, string userId, string vaiTro)
+    {
+        var donHang = await _uow._donHangRepository.GetByIdAsync(maDonHang);
+        if (donHang == null) return false;
+
+        var maLichSu = IdHelper.GenerateId("LS", 20);
+        await _uow.GetRepository<LichSuTrangThaiDonHang>().AddAsync(new LichSuTrangThaiDonHang
+        {
+            MaLichSu = maLichSu,
+            MaDonHang = maDonHang,
+            MaTrangThai = req.MaTrangThai,
+            NgayCapNhat = req.ThoiGian ?? DateTime.Now,
+            GhiChu = req.GhiChu ?? $"{vaiTro} ({userId}) cập nhật trạng thái"
+        });
+
+        await _uow.GetRepository<TinhTrangDonHangChiTiet>().AddAsync(new TinhTrangDonHangChiTiet
+        {
+            MaTinhTrangChiTiet = IdHelper.GenerateId("TTCT", 20),
+            MaDonHang = maDonHang,
+            NoiDung = req.NoiDungChiTiet ?? $"{vaiTro} cập nhật {req.MaTrangThai}",
+            ThoiGian = req.ThoiGian ?? DateTime.Now,
+            GhiChu = req.GhiChu
+        });
+
+        await _uow.SaveChangesAsync();
+        return true;
+    }
+    public async Task<OrderTrackingViewModel?> GetOrderTrackingAsync(string maDonHang)
+    {
+        var donHang = await _uow._donHangRepository.GetByIdAsync(maDonHang);
+        if (donHang == null) return null;
+
+        // ✅ Lấy lịch sử đúng đơn hàng từ DB, không load tất cả
+        var lichSu = await _uow
+            .GetRepository<LichSuTrangThaiDonHang>()
+            .WhereAsync(l => l.MaDonHang == maDonHang);
+
+        var tinhTrang = await _uow
+            .GetRepository<TinhTrangDonHangChiTiet>()
+            .WhereAsync(t => t.MaDonHang == maDonHang);
+
+        // ✅ Trạng thái hiện tại = bản ghi có NgayCapNhat mới nhất
+        var trangThaiHienTai = lichSu
+            .OrderBy(l => l.NgayCapNhat)
+            .FirstOrDefault()?.MaTrangThai?.Trim();
+
+        return new OrderTrackingViewModel
+        {
+            MaDonHang = donHang.MaDonHang,
+            TenDonHang = donHang.TenDonHang,
+            NgayKhoiTao = donHang.NgayKhoiTao,
+            TrangThaiHienTai = trangThaiHienTai,
+            LichSuTrangThai = lichSu.OrderByDescending(l => l.NgayCapNhat).Select(l => new OrderStatusVM
+            {
+                MaTrangThai = l.MaTrangThai.Trim(),
+                NgayCapNhat = l.NgayCapNhat,
+                GhiChu = l.GhiChu
+            }).ToList(),
+            ChiTietTinhTrang = tinhTrang.OrderByDescending(t => t.ThoiGian).Select(t => new OrderDetailStatusVM
+            {
+                NoiDung = t.NoiDung,
+                ThoiGian = t.ThoiGian,
+                GhiChu = t.GhiChu
+            }).ToList()
+        };
+    }
+
+
 }

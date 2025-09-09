@@ -1,8 +1,35 @@
-<<<<<<< HEAD
-# Ignore build folders
+# Build outputs
 bin/
 obj/
-=======
-/bin
-/obj
->>>>>>> master
+out/
+publish/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# VS / VSCode / Rider settings
+.vs/
+.vscode/
+.idea/
+
+# Logs
+*.log
+logs/
+
+# Docker / Compose
+docker-compose.override.yml
+*.db
+*.pid
+*.seed
+*.tar
+*.bak
+
+# Local configs / secrets
+appsettings.Development.json
+appsettings.Local.json
+appsettings.*.json
+.env
+secrets.json

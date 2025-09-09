@@ -3,9 +3,12 @@ using LogisticService.Models;
 
 public interface IUnitOfWork : IAsyncDisposable
 {
-    public IDonHangRepository DonHangRepository { get; }
+    public IDonHangRepository _donHangRepository { get; }
     public IHangHoaRepository _hangHoaRepository { get; }
     public INguoiDungRepository _nguoiDungRepository { get; }
+    public ILichSuTrangThaiDonHangRepository _lichSuTrangThaiDonHangRepository {get; }
+    public ITinhTrangDonHangChiTietRepository _tinhTrangDonHangChiTietRepository {get; }
+    public IChiTietDonHangRepository _chiTietDonHangRepository { get;  }
 
     Task BeginTransaction();
     IRepository<T> GetRepository<T>() where T : class;
@@ -16,18 +19,25 @@ public interface IUnitOfWork : IAsyncDisposable
 
 public class UnitOfWork : IUnitOfWork
 {
-    public IDonHangRepository DonHangRepository { get; }
+    public IDonHangRepository _donHangRepository { get; }
     public IHangHoaRepository _hangHoaRepository { get; }
     public INguoiDungRepository _nguoiDungRepository { get; }
+    public ILichSuTrangThaiDonHangRepository _lichSuTrangThaiDonHangRepository {get; }
+    public ITinhTrangDonHangChiTietRepository _tinhTrangDonHangChiTietRepository {get; }
+    public IChiTietDonHangRepository _chiTietDonHangRepository { get; }
+
 
     private readonly LogisticDbServiceContext _context;
 
-    public UnitOfWork(LogisticDbServiceContext context, IHangHoaRepository hangHoaRepository, IDonHangRepository donHangRepository, INguoiDungRepository nguoiDungRepository)
+    public UnitOfWork(LogisticDbServiceContext context, IHangHoaRepository hangHoaRepository, IDonHangRepository donHangRepository, INguoiDungRepository nguoiDungRepository, ILichSuTrangThaiDonHangRepository lichSuTrangThaiDonHangRepository, ITinhTrangDonHangChiTietRepository tinhTrangDonHangChiTietRepository, IChiTietDonHangRepository chiTietDonHangRepository)
     {
         _context = context;
         _hangHoaRepository = hangHoaRepository;
-        DonHangRepository = donHangRepository;
+        _donHangRepository = donHangRepository;
         _nguoiDungRepository = nguoiDungRepository;
+        _lichSuTrangThaiDonHangRepository = lichSuTrangThaiDonHangRepository;
+        _tinhTrangDonHangChiTietRepository = tinhTrangDonHangChiTietRepository;
+        _chiTietDonHangRepository = chiTietDonHangRepository;
     }
 
     public IRepository<T> GetRepository<T>() where T : class
@@ -36,23 +46,26 @@ public class UnitOfWork : IUnitOfWork
         {
             return (IRepository<T>)_hangHoaRepository;
         }
-        if (typeof(T) == typeof(ChiTietDonHang))
+        if (typeof(T) == typeof(DonHang))
         {
-            return new Repository<T>(_context);
-        }
-        if (typeof(T) == typeof(LichSuTrangThaiDonHang))
-        {
-            return new Repository<T>(_context);
-        }
-        if (typeof(T) == typeof(TinhTrangDonHangChiTiet))
-        {
-            return new Repository<T>(_context);
+            return (IRepository<T>)_donHangRepository;
         }
         if (typeof(T) == typeof(NguoiDung))
         {
             return (IRepository<T>)_nguoiDungRepository;
         }
-        return new Repository<T>(_context);
+        if (typeof(T) == typeof(LichSuTrangThaiDonHang))
+        {
+            return (IRepository<T>)_lichSuTrangThaiDonHangRepository;
+        }
+        if (typeof(T) == typeof(TinhTrangDonHangChiTiet))
+        {
+            return (IRepository<T>)_tinhTrangDonHangChiTietRepository;
+        }
+        if (typeof(T) == typeof(ChiTietDonHang))
+        {
+            return (IRepository<T>)_chiTietDonHangRepository;
+        }
         throw new NotSupportedException($"No repository found for type {typeof(T).Name}");
 
     }

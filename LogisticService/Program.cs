@@ -108,7 +108,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 builder.Services.AddScoped<JwtAuthService>();
 // Thêm dịch vụ Authorization để hỗ trợ phân quyền người dùng
 builder.Services.AddAuthorization();
-
+builder.Services.AddSignalR();
 
 //bật cors 
 builder.Services.AddCors(options =>
@@ -150,6 +150,17 @@ builder.Services.AddScoped<INguoiDungService, NguoiDungService>();
 builder.Services.AddScoped<IDonHangRepository, DonHangRepository>();
 builder.Services.AddScoped<IDonHangService, DonHangService>();
 
+//LichSuTrangThaiDonHang
+builder.Services.AddScoped<ILichSuTrangThaiDonHangRepository, LichSuTrangThaiDonHangRepository>();
+builder.Services.AddScoped<ILichSuTrangThaiDonHangService, LichSuTrangThaiDonHangService>();
+
+//TinhTrangDonHangChiTiet
+builder.Services.AddScoped<ITinhTrangDonHangChiTietRepository, TinhTrangDonHangChiTietRepository>();
+builder.Services.AddScoped<ITinhTrangDonHangChiTietService, TinhTrangDonHangChiTietService>();
+
+//ChiTietDonHang
+builder.Services.AddScoped<IChiTietDonHangRepository, ChiTietDonHangRepository>();
+builder.Services.AddScoped<IChiTietDonHangService, ChiTietDonHangService>();
 
 
 if (builder.Environment.IsProduction())
@@ -178,6 +189,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapHub<DonHangHub>("/hubs/donhang");
 
 if (app.Environment.IsProduction()){
     app.Urls.Add("http://*:82");
