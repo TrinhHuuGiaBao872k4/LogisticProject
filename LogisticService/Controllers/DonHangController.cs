@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Microsoft.AspNetCore.SignalR;
 using LogisticService.Controllers;
+using LogisticService.Helpers;
+using LogisticService.ViewModels;
 [Route("api/[controller]")]
 [ApiController]
 public class DonHangController : BaseController
@@ -51,83 +53,102 @@ public class DonHangController : BaseController
             return Fail<object>($"Lỗi: {ex.Message} | StackTrace: {ex.StackTrace}");
         }
     }
-    [Authorize(Roles = "VT000")]
+
     [HttpPut("ChinhSuaDonHang/{maDonHang}")]
-    public async Task<IActionResult> CapNhatDonHang(string maDonHang, [FromBody] UpdateDonHangViewModel model)
+    [Authorize]
+    public async Task<ActionResult<HTTPResponseClient<object>>> CapNhatDonHang(string maDonHang, [FromBody] UpdateDonHangViewModel model)
     {
-        var role = User.FindFirstValue(ClaimTypes.Role);
-        var user = await _unitOfWork.GetRepository<NguoiDung>().SingleOrDefaultAsync(u => u.MaVaiTro == role);
-
-        if (user == null || user.MaVaiTro.Trim() != "VT000")
-            return Unauthorized(new { success = false, message = "Chỉ SuperAdmin mới được cập nhật đơn hàng" });
-
-        var donHang = await _unitOfWork._donHangRepository.GetByIdAsync(maDonHang);
-        if (donHang == null)
-            return NotFound("Không tìm thấy đơn hàng");
-        // 🔎 Kiểm tra ngày hợp lệ
-        if (model.NgayVanChuyen == default || model.NgayDenDuKien == default)
-            return BadRequest("Ngày vận chuyển và ngày đến dự kiến không được để trống hoặc sai định dạng");
-
-        if (model.NgayDenDuKien > model.NgayVanChuyen)
-            return BadRequest("Ngày đến dự kiến không được lớn hơn ngày vận chuyển");
-
-        var minValidDate = DateTime.Now.AddYears(-5);
-        var maxValidDate = DateTime.Now.AddYears(10);
-        if (model.NgayVanChuyen < minValidDate || model.NgayVanChuyen > maxValidDate ||
-            model.NgayDenDuKien < minValidDate || model.NgayDenDuKien > maxValidDate)
+        try
         {
-            return BadRequest("Ngày vận chuyển và ngày đến dự kiến phải nằm trong khoảng hợp lệ");
+            var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Substring(7);
+            if (string.IsNullOrEmpty(token))
+                return Fail<object>("Token không hợp lệ", 401);
+
+            var userInfo = _jwtAuthService.DecodePayloadTokenInfo(token);
+            if (userInfo == null || userInfo.Role != "VT000")
+                return Fail<object>("Chỉ SuperAdmin mới được cập nhật đơn hàng", 403);
+
+            var donHang = await _unitOfWork._donHangRepository.GetByIdAsync(maDonHang);
+            if (donHang == null)
+                return Fail<object>("Không tìm thấy đơn hàng", 404);
+            // 🔎 Kiểm tra ngày hợp lệ
+            if (model.NgayVanChuyen == default || model.NgayDenDuKien == default)
+                return Fail<object>("Ngày vận chuyển và ngày đến dự kiến không được để trống hoặc sai định dạng", 400);
+
+            if (model.NgayDenDuKien > model.NgayVanChuyen)
+                return Fail<object>("Ngày đến dự kiến không được lớn hơn ngày vận chuyển", 400);
+
+            var minValidDate = DateTime.Now.AddYears(-5);
+            var maxValidDate = DateTime.Now.AddYears(10);
+            if (model.NgayVanChuyen < minValidDate || model.NgayVanChuyen > maxValidDate ||
+                model.NgayDenDuKien < minValidDate || model.NgayDenDuKien > maxValidDate)
+            {
+                return Fail<object>("Ngày vận chuyển và ngày đến dự kiến phải nằm trong khoảng hợp lệ", 400);
+            }
+            donHang.NgayVanChuyen = model.NgayVanChuyen;
+            donHang.NgayDenDuKien = model.NgayDenDuKien;
+            donHang.TienShip = model.TienShip;
+
+            _unitOfWork._donHangRepository.Update(donHang);
+            await _unitOfWork.SaveChangesAsync();
+
+            return Success<object>(donHang, "Cập nhật đơn hàng thành công");
         }
-        donHang.NgayVanChuyen = model.NgayVanChuyen;
-        donHang.NgayDenDuKien = model.NgayDenDuKien;
-        donHang.TienShip = model.TienShip;
-
-        _unitOfWork._donHangRepository.Update(donHang);
-        await _unitOfWork.SaveChangesAsync();
-
-        return Ok(new { success = true, message = "Cập nhật đơn hàng thành công" });
+        catch (Exception ex)
+        {
+            return Fail<object>($"Lỗi: {ex.Message} | StackTrace: {ex.StackTrace}");
+        }
     }
-    [Authorize(Roles = "VT000")]
+
     [HttpPut("HuyDonHang/{maDonHang}")]
-    public async Task<IActionResult> XoaDonHang(string maDonHang)
+    [Authorize]
+    public async Task<ActionResult<HTTPResponseClient<object>>> XoaDonHang(string maDonHang)
     {
-        var role = User.FindFirstValue(ClaimTypes.Role);
-        var user = await _unitOfWork.GetRepository<NguoiDung>().SingleOrDefaultAsync(u => u.MaVaiTro == role);
-
-        if (user == null || user.MaVaiTro.Trim() != "VT000")
-            return Unauthorized(new { success = false, message = "Chỉ SuperAdmin mới được cập nhật đơn hàng" });
-
-        var donHang = await _unitOfWork._donHangRepository.GetByIdAsync(maDonHang);
-        if (donHang == null)
-            return NotFound("Không tìm thấy đơn hàng");
-
-        // ✅ Ghi trạng thái mới vào LichSuTrangThaiDonHang
-        var maTrangThai = "TT05"; // Mã trạng thái 'Đã hủy'
-
-        var lichSu = new LichSuTrangThaiDonHang
+        try
         {
-            MaLichSu = "LS" + DateTime.Now.Ticks,
-            MaDonHang = maDonHang,
-            MaTrangThai = maTrangThai,
-            NgayCapNhat = DateTime.Now,
-            GhiChu = "Đơn hàng bị hủy bởi Admin"
-        };
-        await _unitOfWork.GetRepository<LichSuTrangThaiDonHang>().AddAsync(lichSu);
+            var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Substring(7);
+            if (string.IsNullOrEmpty(token))
+                return Fail<object>("Token không hợp lệ", 401);
 
-        // ✅ Ghi tình trạng chi tiết
-        var tinhTrang = new TinhTrangDonHangChiTiet
+            var userInfo = _jwtAuthService.DecodePayloadTokenInfo(token);
+            if (userInfo == null || userInfo.Role != "VT000")
+                return Fail<object>("Chỉ SuperAdmin mới được hủy đơn hàng", 403);
+
+            var donHang = await _unitOfWork._donHangRepository.GetByIdAsync(maDonHang);
+            if (donHang == null)
+                return Fail<object>("Không tìm thấy đơn hàng", 404);
+
+            // ✅ Ghi trạng thái mới vào LichSuTrangThaiDonHang
+            var maTrangThai = "TT05"; // Mã trạng thái 'Đã hủy'
+            var lichSu = new LichSuTrangThaiDonHang
+            {
+                MaLichSu = IdHelper.GenerateId("LS", 20),
+                MaDonHang = maDonHang,
+                MaTrangThai = maTrangThai,
+                NgayCapNhat = DateTime.Now,
+                GhiChu = "Đơn hàng bị hủy bởi Admin"
+            };
+            await _unitOfWork.GetRepository<LichSuTrangThaiDonHang>().AddAsync(lichSu);
+
+            // ✅ Ghi tình trạng chi tiết
+            var tinhTrang = new TinhTrangDonHangChiTiet
+            {
+                MaTinhTrangChiTiet = IdHelper.GenerateId("TTCT", 20),
+                MaDonHang = maDonHang,
+                NoiDung = "Đơn hàng đã bị hủy",
+                ThoiGian = DateTime.Now,
+                GhiChu = "Admin xử lý hủy"
+            };
+            await _unitOfWork.GetRepository<TinhTrangDonHangChiTiet>().AddAsync(tinhTrang);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return Success<object>(null, "Đơn hàng đã được chuyển sang trạng thái 'Đã hủy'");
+        }
+        catch (Exception ex)
         {
-            MaTinhTrangChiTiet = "TTCT" + DateTime.Now.Ticks,
-            MaDonHang = maDonHang,
-            NoiDung = "Đơn hàng đã bị hủy",
-            ThoiGian = DateTime.Now,
-            GhiChu = "Admin xử lý hủy"
-        };
-        await _unitOfWork.GetRepository<TinhTrangDonHangChiTiet>().AddAsync(tinhTrang);
-
-        await _unitOfWork.SaveChangesAsync();
-
-        return Ok(new { success = true, message = "Đơn hàng đã được chuyển sang trạng thái 'Đã hủy'" });
+            return Fail<object>($"Lỗi: {ex.Message} | StackTrace: {ex.StackTrace}");
+        }
     }
 
 
@@ -197,15 +218,15 @@ public class DonHangController : BaseController
 
     [HttpGet("{maDonHang}/chi-tiet")]
     [Authorize]
-    public async Task<ActionResult<HTTPResponseClient<IEnumerable<ChiTietDonHang>>>> GetChiTietDonHang(string maDonHang)
+    public async Task<ActionResult<HTTPResponseClient<IEnumerable<ChiTietDonHangVM>>>> GetChiTietDonHang(string maDonHang)
     {
         var chiTiet = await _chiTietDonHangService.GetByDonHangAsync(maDonHang);
         if (chiTiet == null || !chiTiet.Any())
-            return Fail<IEnumerable<ChiTietDonHang>>("Không tìm thấy chi tiết đơn hàng", 404);
+            return Fail<IEnumerable<ChiTietDonHangVM>>("Không tìm thấy chi tiết đơn hàng", 404);
 
         return Success(chiTiet, "Lấy chi tiết đơn hàng thành công");
     }
-    [HttpGet("lich-su")]
+    [HttpGet("LichSu")]
     [Authorize]
     public async Task<ActionResult<HTTPResponseClient<IEnumerable<DonHang>>>> GetLichSuDonHang()
     {
@@ -224,6 +245,44 @@ public class DonHangController : BaseController
             return Fail<IEnumerable<DonHang>>("Khách hàng chưa có đơn hàng nào");
 
         return Success(lichSu, "Lấy lịch sử đơn hàng thành công");
+    }
+
+    [HttpGet("GetAllDonHangOffUser")]
+    [Authorize]
+    public async Task<ActionResult<HTTPResponseClient<IEnumerable<DonHangUserVM>>>> GetAllDonHangOfUser()
+    {
+        // Lấy token từ header
+        var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Substring(7);
+        if (string.IsNullOrEmpty(token))
+            return Fail<IEnumerable<DonHangUserVM>>("Token không hợp lệ", 401);
+
+        // Decode token
+        var userInfo = _jwtAuthService.DecodePayloadTokenInfo(token);
+        if (userInfo == null)
+            return Fail<IEnumerable<DonHangUserVM>>("Decode Token thất bại", 401);
+
+        var donHangRepo = _unitOfWork.GetRepository<DonHang>();
+        var donHangs = await donHangRepo.WhereAsync(dh => dh.MaNguoiDung == userInfo.Id);
+
+        if (donHangs == null || !donHangs.Any())
+            return Fail<IEnumerable<DonHangUserVM>>("Khách hàng chưa có đơn hàng nào");
+
+        // Chỉ map các thông tin cơ bản
+        var donHangVMs = donHangs.Select(dh => new DonHangUserVM
+        {
+            MaDonHang = dh.MaDonHang,
+            NgayDat = dh.NgayKhoiTao,
+            NgayVanChuyen = dh.NgayVanChuyen,
+            NgayDenDuKien = dh.NgayDenDuKien,
+            TienShip = dh.TienShip ?? 0,             
+            TrangThai = dh.LichSuTrangThaiDonHangs
+                 .OrderByDescending(ls => ls.NgayCapNhat)
+                 .Select(ls => ls.MaTrangThai)
+                 .FirstOrDefault() ?? "Chưa xác định"
+        }).ToList();
+
+
+        return Success(donHangVMs.AsEnumerable(), "Lấy lịch sử đơn hàng thành công");
     }
 
 }
