@@ -1,0 +1,34 @@
+@using Microsoft.AspNetCore.Components.Routing
+
+<aside class="admin-sidebar border-end bg-body-tertiary">
+    <div class="sidebar-brand d-flex align-items-center gap-2 px-3 py-3 border-bottom">
+        <button class="btn btn-sm btn-outline-secondary d-lg-none" @onclick="OnToggleSidebar">
+            <i class="bi bi-list"></i>
+        </button>
+        <i class="bi bi-shop fs-4 text-primary"></i>
+        <strong>Seller Center</strong>
+    </div>
+
+    <div class="sidebar-content overflow-auto">
+        <div class="px-3 mt-3 mb-2 text-uppercase fw-semibold small text-secondary">Workspace</div>
+        <ul class="nav flex-column">
+            <li class="nav-item"><NavLink class="nav-link" title="Dashboard" data-bs-toggle="tooltip" data-bs-placement="right" href="/seller/dashboard" Match="NavLinkMatch.All"><i class="bi bi-speedometer2 me-2"></i>Dashboard</NavLink></li>
+            <li class="nav-item"><NavLink class="nav-link" title="My Products" data-bs-toggle="tooltip" data-bs-placement="right" href="/seller/products"><i class="bi bi-bag me-2"></i>My Products</NavLink></li>
+            <li class="nav-item"><NavLink class="nav-link" title="Orders" data-bs-toggle="tooltip" data-bs-placement="right" href="/seller/orders"><i class="bi bi-receipt me-2"></i>Orders</NavLink></li>
+            <li class="nav-item"><NavLink class="nav-link" title="Shipments" data-bs-toggle="tooltip" data-bs-placement="right" href="/seller/shipments"><i class="bi bi-truck me-2"></i>Shipments</NavLink></li>
+            <li class="nav-item"><NavLink class="nav-link" title="Inventory" data-bs-toggle="tooltip" data-bs-placement="right" href="/seller/inventory"><i class="bi bi-boxes me-2"></i>Inventory</NavLink></li>
+        </ul>
+
+        <div class="px-3 mt-4 mb-2 text-uppercase fw-semibold small text-secondary">Business</div>
+        <ul class="nav flex-column mb-4">
+            <li class="nav-item"><NavLink class="nav-link" href="/seller/analytics"><i class="bi bi-graph-up me-2"></i>Analytics</NavLink></li>
+            <li class="nav-item"><NavLink class="nav-link" href="/seller/payouts"><i class="bi bi-cash-coin me-2"></i>Payouts</NavLink></li>
+            <li class="nav-item"><NavLink class="nav-link" href="/seller/messages"><i class="bi bi-chat-dots me-2"></i>Messages</NavLink></li>
+            <li class="nav-item"><NavLink class="nav-link" href="/seller/settings"><i class="bi bi-gear me-2"></i>Settings</NavLink></li>
+        </ul>
+    </div>
+</aside>
+
+@code {
+    [Parameter] public EventCallback OnToggleSidebar { get; set; }
+}

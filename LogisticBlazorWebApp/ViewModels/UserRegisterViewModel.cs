@@ -8,7 +8,7 @@ public class UserRegisterViewModel
     public string HoTen { get; set; }
 
     [Required(ErrorMessage = "Ngày sinh không được để trống")]
-    public DateTime NgaySinh { get; set; }
+    public DateTime? NgaySinh { get; set; }
 
     [Required(ErrorMessage = "CCCD Không được để trống")]
     [StringLength(12, MinimumLength = 12, ErrorMessage = "Căn cước công dân phải có 12 số")]
@@ -33,7 +33,7 @@ public class UserRegisterResultVM
 {
     public string MaNguoiDung { get; set; }
     public string HoTen { get; set; }
-    public DateTime NgaySinh { get; set; }
+    public DateTime? NgaySinh { get; set; }
     public string Cccd { get; set; }
     public string DiaChi { get; set; }
     public string Sdt { get; set; }

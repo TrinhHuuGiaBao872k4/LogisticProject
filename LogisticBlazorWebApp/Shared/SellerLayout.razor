@@ -1,0 +1,40 @@
+@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Authorization
+
+<div class="@RootCss">
+    <SellerSidebar OnToggleSidebar="ToggleSidebar" />
+    <main class="flex-grow-1 min-vh-100 d-flex flex-column">
+        <SellerTopbar OnToggleSidebar="ToggleSidebar" OnToggleTheme="ToggleTheme" />
+        <div class="container-fluid py-4">
+            @Body
+        </div>
+        <footer class="border-top small text-muted py-3 mt-auto">
+            <div class="container-fluid d-flex justify-content-between">
+                <span>© @DateTime.Now.Year · CyberLogistic Seller</span>
+                <span class="d-none d-md-inline">v1.0</span>
+            </div>
+        </footer>
+    </main>
+</div>
+
+@code {
+    private bool _sidebarCollapsed;
+    private bool _sidebarOpenMobile;
+
+    private string RootCss =>
+        $"{(_sidebarCollapsed ? "sidebar-collapsed" : "")} {(_sidebarOpenMobile ? "sidebar-open" : "")} d-flex";
+
+    void ToggleSidebar()
+    {
+        if (MediaIsLgUp) _sidebarCollapsed = !_sidebarCollapsed;
+        else _sidebarOpenMobile = !_sidebarOpenMobile;
+    }
+
+    private bool MediaIsLgUp => true; // muốn responsive thật, có thể dùng JS interop matchMedia
+
+    [Inject] IJSRuntime JS { get; set; } = default!;
+    Task ToggleTheme() => JS.InvokeVoidAsync("admin.toggleTheme").AsTask();
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+        => firstRender ? JS.InvokeVoidAsync("admin.restoreTheme").AsTask() : Task.CompletedTask;
+}

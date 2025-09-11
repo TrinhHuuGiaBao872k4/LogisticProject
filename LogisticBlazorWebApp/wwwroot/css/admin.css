@@ -1,0 +1,103 @@
+/* === Brand & tokens === */
+:root{
+  --brand-1:#6a11cb; /* purple */
+  --brand-2:#2575fc; /* blue */
+  --radius:16px;
+  --shadow-1:0 6px 24px rgba(0,0,0,.08);
+  --shadow-2:0 12px 32px rgba(0,0,0,.16);
+}
+
+:root[data-bs-theme="dark"]{
+  --shadow-1:0 0 0 1px rgba(255,255,255,.08);
+  --shadow-2:0 0 0 1px rgba(255,255,255,.16);
+}
+
+/* === Layout === */
+:root { --sidebar-width: 280px; }
+.admin-sidebar{ width:var(--sidebar-width); min-height:100vh; position:sticky; top:0;
+  background:linear-gradient(180deg, color-mix(in srgb, var(--bs-primary) 14%, transparent), transparent);
+}
+.admin-topbar{ backdrop-filter: saturate(160%) blur(6px); box-shadow: 0 1px 0 rgba(0,0,0,.06); }
+
+/* === Sidebar links === */
+.admin-sidebar .nav-link{
+  position:relative; display:flex; align-items:center; gap:.55rem;
+  color:var(--bs-body-color); border-radius:12px; margin:.2rem .6rem; padding:.55rem .8rem;
+  transition: color .18s ease, transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+.admin-sidebar .nav-link i{ font-size:1.05rem; opacity:.9; transition: transform .2s ease, opacity .2s ease; }
+
+.admin-sidebar .nav-link:hover{
+  background:linear-gradient(90deg, color-mix(in srgb, var(--brand-2) 12%, transparent),
+                                   color-mix(in srgb, var(--brand-1) 10%, transparent));
+  transform: translateX(4px);
+  box-shadow: 0 8px 18px rgba(37,117,252,.15);
+  color:var(--bs-primary);
+}
+.admin-sidebar .nav-link:hover i{ transform: translateY(-1px) scale(1.06); opacity:1; }
+
+.admin-sidebar .nav-link.active{
+  background:linear-gradient(135deg, var(--brand-1), var(--brand-2));
+  color:#fff !important; box-shadow: 0 10px 22px rgba(37,117,252,.35);
+}
+.admin-sidebar .nav-link.active i{ color:#fff; }
+.admin-sidebar .nav-link.active::after{
+  content:""; position:absolute; left:-8px; top:20%; width:4px; height:60%;
+  border-radius:8px; background:rgba(255,255,255,.9);
+}
+
+/* collapsed (desktop) */
+.sidebar-collapsed .admin-sidebar{ width:78px; }
+.sidebar-collapsed .admin-sidebar .nav-link{ text-indent:-9999px; }
+.sidebar-collapsed .admin-sidebar .nav-link i{ text-indent:0; margin-right:0!important; }
+.sidebar-collapsed .sidebar-brand strong{ display:none; }
+
+/* mobile off-canvas */
+@media (max-width: 991.98px){
+  .admin-sidebar{ position:fixed; z-index:1040; transform: translateX(-100%); transition: transform .25s ease; }
+  .sidebar-open .admin-sidebar{ transform: translateX(0); }
+}
+
+/* === Cards & tables === */
+.card{ border-radius:var(--radius); }
+.card-stat{
+  border:1px solid rgba(0,0,0,.06); border-radius:var(--radius);
+  background:linear-gradient(180deg, color-mix(in srgb, var(--bs-body-bg) 92%, #fff 8%), var(--bs-body-bg));
+  box-shadow:var(--shadow-1);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.card-stat .icon{ font-size:1.75rem; opacity:.85 }
+
+.hover-lift:hover{ transform: translateY(-4px); box-shadow: var(--shadow-2); }
+
+.table-hover tbody tr{
+  transition: background .18s ease, transform .18s ease;
+}
+.table-hover tbody tr:hover{
+  background: color-mix(in srgb, var(--bs-primary) 6%, transparent) !important;
+  transform: translateY(-1px);
+}
+
+/* === Buttons === */
+.btn-elevated{ border-radius:12px; box-shadow:var(--shadow-1); transition: transform .15s ease, box-shadow .15s ease, filter .15s ease; }
+.btn-elevated:hover{ transform: translateY(-1px); box-shadow:var(--shadow-2); }
+
+.btn-primary{
+  background:linear-gradient(135deg, var(--brand-2), var(--brand-1));
+  border:0;
+}
+.btn-primary:hover{ filter:brightness(1.06); }
+
+/* === Inputs focus glow === */
+.form-control:focus, .form-select:focus{
+  box-shadow:0 0 0 .2rem color-mix(in srgb, var(--brand-2) 22%, transparent);
+  border-color: color-mix(in srgb, var(--brand-2) 60%, transparent);
+}
+
+/* === Breadcrumb finesse === */
+.breadcrumb{ --bs-breadcrumb-divider-color: var(--bs-secondary-color); }
+.breadcrumb .breadcrumb-item a{ text-decoration:none; }
+.breadcrumb .breadcrumb-item a:hover{ text-decoration:underline; }
+
+/* Dark tweaks */
+:root[data-bs-theme="dark"] .card-stat{ border-color: rgba(255,255,255,.1); box-shadow:none; }

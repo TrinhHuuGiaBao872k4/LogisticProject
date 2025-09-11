@@ -53,12 +53,24 @@
     {
         try
         {
-            Console.WriteLine("🚀 Đang gửi đăng ký với dữ liệu:");
-            Console.WriteLine($"Tên: {registerModel.HoTen} | Ngày sinh: {registerModel.NgaySinh:yyyy-MM-dd}");
+            if (registerModel.NgaySinh == null || registerModel.NgaySinh == DateTime.MinValue)
+            {
+                message = "⛔ Ngày sinh không được để trống hoặc không hợp lệ.";
+                return;
+            }
+
+            Console.WriteLine("🚀 Gửi đăng ký với:");
+            Console.WriteLine($"Tên: {registerModel.HoTen}, Ngày sinh: {registerModel.NgaySinh:yyyy-MM-dd}");
 
             var result = await registerService.Register(registerModel);
 
-            if (result != null && result.statusCode == 200)
+            if (result == null)
+            {
+                message = "❌ Không thể kết nối đến máy chủ.";
+                return;
+            }
+
+            if (result.statusCode == 200)
             {
                 message = "🎉 Đăng ký thành công! Chuyển sang đăng nhập...";
                 await Task.Delay(2000);
@@ -66,7 +78,7 @@
             }
             else
             {
-                message = "❌ Đăng ký thất bại. Vui lòng kiểm tra lại.";
+                message = $"❌ Đăng ký thất bại: {result.messsage}";
             }
         }
         catch (Exception ex)
