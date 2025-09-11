@@ -1,0 +1,51 @@
+@inherits LayoutComponentBase
+
+<div class="@RootCss">
+    <AdminSidebar OnToggleSidebar="ToggleSidebar" />
+    <main class="flex-grow-1 min-vh-100 d-flex flex-column">
+        <AdminTopbar OnToggleSidebar="ToggleSidebar" OnToggleTheme="ToggleTheme" />
+        <div class="container-fluid py-4">
+            @Body
+        </div>
+        <footer class="border-top small text-muted py-3 mt-auto">
+            <div class="container-fluid d-flex justify-content-between">
+                <span>© @DateTime.Now.Year · CyberLogistic Admin</span>
+                <span class="d-none d-md-inline">v1.0</span>
+            </div>
+        </footer>
+    </main>
+</div>
+
+@code {
+    private bool _sidebarCollapsed;
+    private bool _sidebarOpenMobile;
+
+    private string RootCss =>
+        $"{(_sidebarCollapsed ? "sidebar-collapsed" : "")} {(_sidebarOpenMobile ? "sidebar-open" : "")} d-flex";
+
+    void ToggleSidebar()
+    {
+        // desktop: collapse; mobile: open/close off-canvas
+        if (MediaIsLgUp)
+            _sidebarCollapsed = !_sidebarCollapsed;
+        else
+            _sidebarOpenMobile = !_sidebarOpenMobile;
+    }
+
+    // bạn có thể thay bằng check JS matchMedia; để đơn giản đặt cứng:
+    private bool MediaIsLgUp => true; // TODO: nếu cần responsive thật, dùng JS interop
+
+    async Task ToggleTheme()
+    {
+        // gọi JS để đổi data-bs-theme + lưu localStorage
+        await JS.InvokeVoidAsync("admin.toggleTheme");
+    }
+
+    [Inject] IJSRuntime JS { get; set; } = default!;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+            await JS.InvokeVoidAsync("admin.restoreTheme");
+    }
+}

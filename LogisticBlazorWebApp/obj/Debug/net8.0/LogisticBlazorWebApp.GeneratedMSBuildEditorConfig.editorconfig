@@ -68,8 +68,36 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVnaXN0ZXIucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/Cybersoft.net/LogisticProject/LogisticBlazorWebApp/Pages/Seller/SellerPage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2VsbGVyXFNlbGxlclBhZ2UucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Cybersoft.net/LogisticProject/LogisticBlazorWebApp/Shared/AdminLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXEFkbWluTGF5b3V0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Cybersoft.net/LogisticProject/LogisticBlazorWebApp/Shared/AdminSidebar.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXEFkbWluU2lkZWJhci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Cybersoft.net/LogisticProject/LogisticBlazorWebApp/Shared/AdminTopbar.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXEFkbWluVG9wYmFyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/Cybersoft.net/LogisticProject/LogisticBlazorWebApp/Shared/HomeMasterPage.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXEhvbWVNYXN0ZXJQYWdlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Cybersoft.net/LogisticProject/LogisticBlazorWebApp/Shared/SellerLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXFNlbGxlckxheW91dC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Cybersoft.net/LogisticProject/LogisticBlazorWebApp/Shared/SellerSidebar.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXFNlbGxlclNpZGViYXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Cybersoft.net/LogisticProject/LogisticBlazorWebApp/Shared/SellerTopbar.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXFNlbGxlclRvcGJhci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/Cybersoft.net/LogisticProject/LogisticBlazorWebApp/_Imports.razor]

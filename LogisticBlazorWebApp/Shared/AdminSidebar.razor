@@ -1,0 +1,33 @@
+@using Microsoft.AspNetCore.Components.Routing
+
+<aside class="admin-sidebar border-end bg-body-tertiary">
+    <div class="sidebar-brand d-flex align-items-center gap-2 px-3 py-3 border-bottom">
+        <button class="btn btn-sm btn-outline-secondary d-lg-none" @onclick="OnToggleSidebar">
+            <i class="bi bi-list"></i>
+        </button>
+        <i class="bi bi-box-seam fs-4 text-primary"></i>
+        <strong>Logistic Admin</strong>
+    </div>
+
+    <div class="sidebar-content overflow-auto">
+        <div class="px-3 mt-3 mb-2 text-uppercase fw-semibold small text-secondary">Overview</div>
+        <ul class="nav flex-column">
+            <li class="nav-item"><NavLink class="nav-link" href="/admin/dashboard" Match="NavLinkMatch.All"><i class="bi bi-speedometer2 me-2"></i>Dashboard</NavLink></li>
+            <li class="nav-item"><NavLink class="nav-link" href="/admin/orders"><i class="bi bi-receipt me-2"></i>Orders</NavLink></li>
+            <li class="nav-item"><NavLink class="nav-link" href="/admin/warehouses"><i class="bi bi-building-gear me-2"></i>Warehouses</NavLink></li>
+            <li class="nav-item"><NavLink class="nav-link" href="/admin/inventory"><i class="bi bi-boxes me-2"></i>Inventory</NavLink></li>
+            <li class="nav-item"><NavLink class="nav-link" href="/admin/shipments"><i class="bi bi-truck me-2"></i>Shipments</NavLink></li>
+        </ul>
+
+        <div class="px-3 mt-4 mb-2 text-uppercase fw-semibold small text-secondary">Configuration</div>
+        <ul class="nav flex-column mb-4">
+            <li class="nav-item"><NavLink class="nav-link" href="/admin/products"><i class="bi bi-bag me-2"></i>Products</NavLink></li>
+            <li class="nav-item"><NavLink class="nav-link" href="/admin/partners"><i class="bi bi-people me-2"></i>Partners</NavLink></li>
+            <li class="nav-item"><NavLink class="nav-link" href="/admin/settings"><i class="bi bi-gear me-2"></i>Settings</NavLink></li>
+        </ul>
+    </div>
+</aside>
+
+@code {
+    [Parameter] public EventCallback OnToggleSidebar { get; set; }
+}
