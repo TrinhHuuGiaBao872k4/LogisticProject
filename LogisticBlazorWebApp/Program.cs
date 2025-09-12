@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using LogisticBlazorWebApp.Data;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton<WeatherForecastService>();
+
 
 // 🔹 Lấy base URL từ ENV hoặc appsettings
 var logisticApiBaseUrl = builder.Configuration["LOGISTIC_API_BASE_URL"]
