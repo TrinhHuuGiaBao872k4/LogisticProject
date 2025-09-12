@@ -9,8 +9,20 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 
-//Add service httpclient để gọi api
-builder.Services.AddHttpClient();
+// 🔹 Lấy base URL từ ENV hoặc appsettings
+var logisticApiBaseUrl = builder.Configuration["LOGISTIC_API_BASE_URL"]
+                         ?? builder.Configuration["ApiSettings:LogisticApiBaseUrl"]
+                         ?? "http://localhost:5103/";
+
+var paymentApiBaseUrl = builder.Configuration["PAYMENT_API_BASE_URL"]
+                         ?? builder.Configuration["ApiSettings:PaymentApiBaseUrl"]
+                         ?? "http://localhost:5203/";
+
+// Đăng ký HttpClient chung cho Logistic API
+builder.Services.AddHttpClient("LogisticApi", client =>
+{
+    client.BaseAddress = new Uri(logisticApiBaseUrl);
+});
 
 //deploy cài đặt lắng nghe port 80
 
@@ -30,10 +42,13 @@ builder.Services.AddCors(option =>
     option.AddPolicy("allow_origin", policy =>
     {
         //policy.AllowAnyOrigin : cho phép tất cả các client đều có thể gửi dữ liệu đến server
-        policy.WithOrigins("http://localhost:5103")
-        .AllowAnyHeader()//cho phép rq tất cả header
-        .AllowAnyMethod()//cho phep rq tất cả method(get,post,put,delete)
-        .AllowCredentials();/// cho phép tất cả cookie
+        // policy.WithOrigins("http://localhost:5103")
+        // .AllowAnyHeader()//cho phép rq tất cả header
+        // .AllowAnyMethod()//cho phep rq tất cả method(get,post,put,delete)
+        // .AllowCredentials();/// cho phép tất cả cookie
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
     });
 });
 
