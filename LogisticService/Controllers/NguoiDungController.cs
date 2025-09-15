@@ -19,7 +19,7 @@ public class NguoiDungController(LogisticDbServiceContext _context, IConfigurati
     // }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody]UserRegisterViewModel dto)
+    public async Task<IActionResult> Register([FromBody] UserRegisterViewModel dto)
     {
         return await _nguoiDungService.RegisterAsync(dto);
     }
@@ -57,12 +57,12 @@ public class NguoiDungController(LogisticDbServiceContext _context, IConfigurati
         else
         {
             return Ok(new HTTPResponseClient<NguoiDung>
-                {
-                    StatusCode = 200,
-                    Data = nguoiDung,
-                    DateTime = DateTime.Now,
-                    Message = "Successfully"
-                });
+            {
+                StatusCode = 200,
+                Data = nguoiDung,
+                DateTime = DateTime.Now,
+                Message = "Successfully"
+            });
         }
     }
     [Authorize]
@@ -107,22 +107,42 @@ public class NguoiDungController(LogisticDbServiceContext _context, IConfigurati
     }
 
 
-    
 
+
+    // [HttpPost("DangNhap")]
+    // public async Task<ActionResult> DangNhap(UserLoginViewModel userLogin)
+    // {
+    //     var res = await _nguoiDungService.Login(userLogin) as OkObjectResult;
+    //     var userResult = res?.Value as HTTPResponseClient<UserLoginResultVM>;
+    //     //Tạo cookie từ server 
+    //     // var cookieOption =  new CookieOptions(){
+    //     //     HttpOnly = true,
+    //     //     Secure = true,
+    //     //     Expires = DateTime.Now.AddDays(1)
+    //     // };
+    //     // HttpContext.Response.Cookies.Append("accessToken",userResult.Data.AccessToken,cookieOption );
+    //     // Console.WriteLine(@$"token :{ userResult.Data.AccessToken}");
+    //     return res;
+    // }
     [HttpPost("DangNhap")]
-    public async Task<ActionResult> DangNhap(UserLoginViewModel userLogin)
+    public async Task<ActionResult<HTTPResponseClient<UserLoginResultVM>>> DangNhap([FromBody] UserLoginViewModel userLogin)
     {
-        var res = await _nguoiDungService.Login(userLogin) as OkObjectResult;
-        var userResult = res?.Value as HTTPResponseClient<UserLoginResultVM>;
-        //Tạo cookie từ server 
-        // var cookieOption =  new CookieOptions(){
-        //     HttpOnly = true,
-        //     Secure = true,
-        //     Expires = DateTime.Now.AddDays(1)
-        // };
-        // HttpContext.Response.Cookies.Append("accessToken",userResult.Data.AccessToken,cookieOption );
-        // Console.WriteLine(@$"token :{ userResult.Data.AccessToken}");
-        return res;
+        var response = await _nguoiDungService.Login(userLogin);
+
+        // // Nếu đăng nhập thành công thì tạo cookie
+        // if (response.StatusCode == 200 && response.Data?.AccessToken != null)
+        // {
+        //     var cookieOption = new CookieOptions
+        //     {
+        //         HttpOnly = true,
+        //         Secure = true, // bật khi dùng HTTPS
+        //         Expires = DateTime.Now.AddDays(1)
+        //     };
+        //     HttpContext.Response.Cookies.Append("accessToken", response.Data.AccessToken, cookieOption);
+        // }
+
+        // Trả về API response chuẩn
+        return StatusCode(response.StatusCode, response);
     }
 
 }

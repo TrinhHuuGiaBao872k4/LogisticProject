@@ -6,9 +6,9 @@ public class ProfileService
     private readonly HttpClient _httpClient;
     private readonly IJSRuntime _js;
 
-    public ProfileService(HttpClient httpClient, IJSRuntime js)
+    public ProfileService(IHttpClientFactory httpFactory, JSRuntime js)
     {
-        _httpClient = httpClient;
+        _httpClient = httpFactory.CreateClient("LogisticApi");
         _js = js;
     }
 
@@ -21,7 +21,7 @@ public class ProfileService
 
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        var res = await _httpClient.GetAsync("http://localhost:5103/api/NguoiDung/profile");
+        var res = await _httpClient.GetAsync("api/NguoiDung/profile");
 
         if (res.IsSuccessStatusCode)
         {
