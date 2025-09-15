@@ -2,9 +2,12 @@
 @layout SellerLayout
 @page "/seller/dashboard"
 
+@inject HangHoaService HangHoaSvc
+
 <h3 class="mb-4">Seller Dashboard</h3>
 
-<div class="row g-4">
+<!-- Card thống kê -->
+<div class="row g-4 mb-4">
     <div class="col-12 col-md-6 col-xl-3">
         <div class="card card-stat p-3 hover-lift">
             <div class="d-flex align-items-center">
@@ -50,3 +53,139 @@
         </div>
     </div>
 </div>
+
+<!-- Hàng hóa -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">Danh sách hàng hóa</h5>
+    <button class="btn btn-primary" @onclick="()=> showCreateModal = true">
+        <i class="bi bi-plus-circle me-1"></i> Thêm hàng hóa
+    </button>
+</div>
+
+@if (HangHoaSvc.lstHangHoa is null || !HangHoaSvc.lstHangHoa.Any())
+{
+    <div class="alert alert-info">Chưa có hàng hóa nào.</div>
+}
+else
+{
+    <table class="table table-striped table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Mã HH</th>
+                <th>Tên hàng hóa</th>
+                <th>Loại</th>
+                <th>Ngày SX</th>
+                <th>Giá</th>
+                <th>Hình ảnh</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var hh in HangHoaSvc.lstHangHoa)
+        {
+            <tr>
+                <td>@hh.MaHangHoa</td>
+                <td>@hh.TenHangHoa</td>
+                <td>@hh.MaLoaiHangHoa</td>
+                <td>@hh.NgaySanXuat</td>
+                <td>@hh.GiaHangHoa đ</td>
+                <td>
+                    @if (!string.IsNullOrWhiteSpace(hh.HinhAnh))
+                    {
+                        <img src="@hh.HinhAnh" alt="img" style="height:50px; width:auto" class="rounded" />
+                    }
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+<!-- Modal tạo hàng hóa -->
+@if (showCreateModal)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background:rgba(0,0,0,0.5)">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Tạo hàng hóa</h5>
+                    <button type="button" class="btn-close" @onclick="()=> showCreateModal=false"></button>
+                </div>
+                <div class="modal-body">
+                    <EditForm Model="createModel" OnValidSubmit="HandleCreate">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+
+                        <div class="mb-3">
+                            <label class="form-label">Mã loại hàng hóa</label>
+                            <InputText class="form-control" @bind-Value="createModel.MaLoaiHangHoa" />
+                            <ValidationMessage For="()=>createModel.MaLoaiHangHoa" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Tên hàng hóa</label>
+                            <InputText class="form-control" @bind-Value="createModel.TenHangHoa" />
+                            <ValidationMessage For="()=>createModel.TenHangHoa" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Ngày sản xuất</label>
+                            <InputDate class="form-control" @bind-Value="createModel.NgaySanXuat" />
+                            <ValidationMessage For="()=>createModel.NgaySanXuat" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Giá (VND)</label>
+                            <InputNumber class="form-control" @bind-Value="createModel.GiaHangHoa" />
+                            <ValidationMessage For="()=>createModel.GiaHangHoa" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Hình ảnh (URL)</label>
+                            <InputText class="form-control" @bind-Value="createModel.HinhAnh" />
+                            <ValidationMessage For="()=>createModel.HinhAnh" />
+                            @if (!string.IsNullOrWhiteSpace(createModel.HinhAnh))
+                            {
+                                <img src="@createModel.HinhAnh" class="img-thumbnail mt-2" style="max-height:150px" />
+                            }
+                        </div>
+
+                        <button type="submit" class="btn btn-success" disabled="@submitting">
+                            @if (submitting)
+                            {
+                                <span class="spinner-border spinner-border-sm me-2"></span>
+                            }
+                            Lưu
+                        </button>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private bool showCreateModal = false;
+    private HangHoaCreateVM createModel = new();
+    private bool submitting = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await HangHoaSvc.GetAllHangHoaApi();
+    }
+
+    private async Task HandleCreate()
+    {
+        submitting = true;
+        var (ok, message) = await HangHoaSvc.CreateHangHoaAsync(createModel);
+        submitting = false;
+
+        if (ok)
+        {
+            showCreateModal = false;
+            createModel = new HangHoaCreateVM();
+        }
+
+        // Hiển thị thông báo (toast hoặc alert)
+        Console.WriteLine(message);
+    }
+}

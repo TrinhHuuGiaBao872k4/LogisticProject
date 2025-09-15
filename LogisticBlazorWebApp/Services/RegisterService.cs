@@ -5,9 +5,9 @@ public class RegisterService
 {
     private readonly HttpClient _httpClient;
 
-    public RegisterService(HttpClient httpClient)
+    public RegisterService(IHttpClientFactory httpFactory)
     {
-        _httpClient = httpClient;
+        _httpClient = httpFactory.CreateClient("LogisticApi");
     }
 
     public async Task<HTTPResponse<UserRegisterResultVM>?> Register(UserRegisterViewModel model)
@@ -29,7 +29,8 @@ public class RegisterService
             Console.WriteLine("📦 Payload gửi đi:");
             Console.WriteLine(JsonSerializer.Serialize(payload));
 
-            var response = await _httpClient.PostAsJsonAsync("http://localhost:5103/api/NguoiDung/register", payload);
+        var response = await _httpClient.PostAsJsonAsync("api/NguoiDung/register", payload);
+
 
             if (response.IsSuccessStatusCode)
             {

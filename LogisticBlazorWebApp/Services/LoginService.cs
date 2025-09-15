@@ -2,14 +2,13 @@ public class LoginService
 {
     public HttpClient _httpClient;
     
-    public LoginService(HttpClient http)
+    public LoginService(IHttpClientFactory httpFactory)
     {
-        _httpClient = http;
+        _httpClient = httpFactory.CreateClient("LogisticApi");
     }
     public async Task<HTTPResponse<LoginResultViewModel>> Login(LoginViewModel model)
     {
-        var url = "http://localhost:5103/api/NguoiDung/DangNhap";
-        var res = await _httpClient.PostAsJsonAsync(url, model);
+        var res = await _httpClient.PostAsJsonAsync("api/NguoiDung/DangNhap", model);
 
         if (res.IsSuccessStatusCode)
         {

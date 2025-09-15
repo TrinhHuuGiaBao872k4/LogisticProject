@@ -121,16 +121,17 @@ builder.Services.AddCors(options =>
     });
 });
 
+var redisConnection = builder.Configuration.GetValue<string>("REDIS_CONNECTION") ?? "localhost:6379";
 //cache-redis
 builder.Services.AddStackExchangeRedisCache(options =>
 {
-    options.Configuration = "localhost:6379"; // hoặc connection string từ Cloud
+    options.Configuration = redisConnection; // hoặc connection string từ Cloud
     options.InstanceName = "Logistic:";
 });
 //Làm việc với nhiều db redis
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
-    return ConnectionMultiplexer.Connect("localhost:6379");
+    return ConnectionMultiplexer.Connect(redisConnection);
 });
 builder.Services.AddSingleton<RedisHelper>();
 
