@@ -1,12 +1,32 @@
-﻿<Router AppAssembly="@typeof(App).Assembly">
-    <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(HomeMasterPage)" />
-        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
-    </Found>
-    <NotFound>
-        <PageTitle>Not found</PageTitle>
-        <LayoutView Layout="@typeof(HomeMasterPage)">
-            <p role="alert">Sorry, there's nothing at this address.</p>
-        </LayoutView>
-    </NotFound>
-</Router>
+﻿@using Microsoft.AspNetCore.Components.Authorization
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(HomeMasterPage)">
+                <NotAuthorized>
+                    <LayoutView Layout="@typeof(HomeMasterPage)">
+                        <div class="alert alert-warning my-4">
+                            Bạn chưa có quyền hoặc cần đăng nhập.
+                            <div class="mt-2">
+                                <a class="btn btn-sm btn-primary me-2" href="/login-seller-admin">Đăng nhập Seller/Admin</a>
+                                <a class="btn btn-sm btn-outline-secondary" href="/login-user">Đăng nhập User</a>
+                            </div>
+                        </div>
+                    </LayoutView>
+                </NotAuthorized>
+                <Authorizing>
+                    <LayoutView Layout="@typeof(HomeMasterPage)">
+                        <p>Đang kiểm tra phiên đăng nhập...</p>
+                    </LayoutView>
+                </Authorizing>
+            </AuthorizeRouteView>
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <PageTitle>Not found</PageTitle>
+            <LayoutView Layout="@typeof(HomeMasterPage)">
+                <p role="alert">Xin lỗi, không tìm thấy trang này.</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>

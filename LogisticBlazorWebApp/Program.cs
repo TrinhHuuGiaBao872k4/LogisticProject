@@ -32,6 +32,7 @@ if (builder.Environment.IsProduction()) {
 builder.Services.AddScoped<HangHoaService>();
 builder.Services.AddScoped<CartService>();
 builder.Services.AddScoped<LoginService>();
+builder.Services.AddScoped<TokenState>();
 builder.Services.AddSingleton<UserStateService>();
 builder.Services.AddScoped<ProfileService>();
 builder.Services.AddScoped<RegisterService>();

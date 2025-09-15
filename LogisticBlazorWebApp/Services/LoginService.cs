@@ -1,24 +1,30 @@
-public class LoginService
+using System.Net.Http;
+using System.Net.Http.Json;
+
+public sealed class LoginService
 {
-    public HttpClient _httpClient;
-    
+    private readonly HttpClient _httpClient;
     public LoginService(IHttpClientFactory httpFactory)
     {
         _httpClient = httpFactory.CreateClient("LogisticApi");
     }
-    public async Task<HTTPResponse<LoginResultViewModel>> Login(LoginViewModel model)
+
+    public async Task<(bool ok, HTTPResponse<LoginResultViewModel>? data, string message)> LoginAsync(LoginViewModel model, CancellationToken ct = default)
     {
-        var res = await _httpClient.PostAsJsonAsync("api/NguoiDung/DangNhap", model);
-
-        if (res.IsSuccessStatusCode)
+        try
         {
-            var result = await res.Content.ReadFromJsonAsync<HTTPResponse<LoginResultViewModel>>();
-            return result!;
+            var res = await _httpClient.PostAsJsonAsync("api/NguoiDung/DangNhap", model, ct);
+            if (!res.IsSuccessStatusCode)
+            {
+                var body = await res.Content.ReadAsStringAsync(ct);
+                return (false, null, string.IsNullOrWhiteSpace(body) ? $"Đăng nhập thất bại ({(int)res.StatusCode})" : body);
+            }
+            var result = await res.Content.ReadFromJsonAsync<HTTPResponse<LoginResultViewModel>>(cancellationToken: ct);
+            return (true, result, result?.messsage ?? "OK");
         }
-        var errorBody = await res.Content.ReadAsStringAsync();
-        Console.WriteLine($"Đăng nhập lỗi: {(int)res.StatusCode} - {errorBody}");
-        return null!;
+        catch (Exception ex)
+        {
+            return (false, null, ex.Message);
+        }
     }
-
-    
 }

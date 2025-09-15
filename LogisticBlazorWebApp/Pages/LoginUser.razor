@@ -1,0 +1,86 @@
+@page "/login"
+@inject LoginService LoginSvc
+@inject TokenState TokenState
+@inject NavigationManager Nav
+@inject UserStateService userState
+@inject IJSRuntime js
+
+<EditForm Model="_model" OnValidSubmit="HandleLogin">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="d-flex justify-content-center align-items-center vh-100 bg-light">
+        <div class="card p-4 shadow rounded-4" style="width:360px">
+            <h3 class="text-center mb-3">Đăng nhập User</h3>
+
+            <InputText @bind-Value="_model.TenDangNhap" class="form-control mb-2" placeholder="Tên đăng nhập" />
+            <InputText @bind-Value="_model.MatKhau" type="password" class="form-control mb-2" placeholder="Mật khẩu" />
+
+            <button class="btn btn-primary w-100 mt-1" disabled="@_submitting">
+                @if (_submitting) { <span class="spinner-border spinner-border-sm me-2"></span> }
+                Đăng nhập
+            </button>
+
+            @if(!string.IsNullOrEmpty(_error))
+            {
+                <div class="alert alert-danger mt-3">@_error</div>
+            }
+
+            <div class="text-center mt-2">
+                <a href="/login-seller-admin">Đăng nhập Seller/Admin</a>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code{
+    private LoginViewModel _model = new();
+    private bool _submitting;
+    private string _error = "";
+
+    private async Task HandleLogin()
+    {
+        _error = ""; 
+        _submitting = true;
+
+        var (ok, resp, msg) = await LoginSvc.LoginAsync(_model);
+        _submitting = false;
+
+        if (!ok || resp?.data is null)
+        {
+            _error = string.IsNullOrWhiteSpace(msg) ? "Đăng nhập thất bại." : msg;
+            return;
+        }
+
+        var token = resp.data.AccessToken;
+        var roles = JwtHelper.GetRoles(token);
+
+        // Chỉ chấp nhận Customer cho luồng này
+        if (!roles.Any(r => r.Equals("Customer", StringComparison.OrdinalIgnoreCase)))
+        {
+            _error = "Tài khoản này không phải User (Customer).";
+            return;
+        }
+
+        // 1) Lấy tên hiển thị
+        //   - Ưu tiên từ payload API (tên field của bạn là TenDanhNhap theo Swagger)
+        //   - Fallback: claim trong JWT ("unique_name", "name", "preferred_username")
+        //   - Cuối cùng: lấy từ input
+        var username = resp.data.TenDanhNhap
+                       ?? JwtHelper.GetClaim(token, "unique_name")
+                       ?? JwtHelper.GetClaim(token, "name")
+                       ?? JwtHelper.GetClaim(token, "preferred_username")
+                       ?? _model.TenDangNhap;
+
+        // 2) Set vào state để Header hiện “Xin chào …”
+        userState.SetUser(username);
+
+        // 3) (Tuỳ chọn) Lưu token để sau refresh khôi phục
+        await js.InvokeVoidAsync("localStorage.setItem", "accessToken", token);
+
+        // Gắn header Authorization cho HttpClient để gọi API
+        TokenState.SetToken(token);
+
+        // Điều hướng sang trang redirect (Customer sẽ về Home)
+        Nav.NavigateTo("/auth-redirect", true);
+    }
+}
