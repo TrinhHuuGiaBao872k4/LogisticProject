@@ -11,6 +11,7 @@ using System.Text.Json.Serialization;
 using LogisticService.Models;
 using StackExchange.Redis;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Mvc;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -162,6 +163,29 @@ builder.Services.AddScoped<ITinhTrangDonHangChiTietService, TinhTrangDonHangChiT
 //ChiTietDonHang
 builder.Services.AddScoped<IChiTietDonHangRepository, ChiTietDonHangRepository>();
 builder.Services.AddScoped<IChiTietDonHangService, ChiTietDonHangService>();
+
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        var errors = context.ModelState
+            .Where(e => e.Value?.Errors.Count > 0)
+            .ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value!.Errors.Select(err => err.ErrorMessage).ToArray()
+            );
+
+        var response = new HTTPResponseClient<object>
+        {
+            StatusCode = StatusCodes.Status400BadRequest,
+            Message = "Dữ liệu không hợp lệ",
+            DateTime = DateTime.Now,
+            Data = errors
+        };
+
+        return new BadRequestObjectResult(response);
+    };
+});
 
 
 if (builder.Environment.IsProduction())
