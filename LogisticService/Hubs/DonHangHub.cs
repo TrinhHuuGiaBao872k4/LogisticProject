@@ -10,8 +10,8 @@ public class DonHangHub : Hub
     public override async Task OnConnectedAsync()
     {
         // assume JWT contains NameIdentifier claim or custom "MaNguoiDung"
-        var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                     ?? Context.User?.FindFirst("MaNguoiDung")?.Value;
+        var userId = Context.User?.FindFirst("MaNguoiDung")?.Value;
+
 
         if (!string.IsNullOrEmpty(userId))
         {
@@ -23,8 +23,8 @@ public class DonHangHub : Hub
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                     ?? Context.User?.FindFirst("MaNguoiDung")?.Value;
+        var userId = Context.User?.FindFirst("MaNguoiDung")?.Value;
+
 
         if (!string.IsNullOrEmpty(userId))
         {

@@ -1,10 +1,12 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using LogisticService.Models;
+using Microsoft.EntityFrameworkCore.Query;
 
 public interface IRepository<T> where T : class
 {
-    Task<IEnumerable<T>> GetAllAsync();
+    Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null,
+        Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null);
     Task<T?> GetByIdAsync(string id);
     Task AddAsync(T entity);
     void Update(T entity);
@@ -26,9 +28,22 @@ public class Repository<T> : IRepository<T> where T : class
         _dbSet = _context.Set<T>();
     }
 
-    public async Task<IEnumerable<T>> GetAllAsync()
+    public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null,
+        Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null)
     {
-        return _dbSet.AsNoTracking();
+        IQueryable<T> query = _dbSet.AsNoTracking();
+
+        if (filter != null)
+        {
+            query = query.Where(filter);
+        }
+
+        if (include != null)
+        {
+            query = include(query);
+        }
+
+        return await query.ToListAsync();
     }
 
 

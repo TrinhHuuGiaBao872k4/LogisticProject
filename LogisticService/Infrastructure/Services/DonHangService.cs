@@ -1,5 +1,8 @@
 using LogisticService.Helpers;
 using LogisticService.Models;
+using LogisticService.ViewModels;
+using Microsoft.EntityFrameworkCore;
+
 
 public interface IDonHangService : IServiceBase<DonHang>
 {
@@ -8,7 +11,7 @@ public interface IDonHangService : IServiceBase<DonHang>
     Task<bool> CapNhatTrangThaiAsync(string maDonHang, UpdateTrangThaiRequest req, string userId, string vaiTro);
     Task<OrderTrackingViewModel?> GetOrderTrackingAsync(string maDonHang);
 
-
+    Task<IEnumerable<DonHangUserVM>> GetAllDonHangOfUserAsync(string userId);
 }
 public class DonHangService : ServiceBase<DonHang>, IDonHangService
 {
@@ -149,7 +152,7 @@ public class DonHangService : ServiceBase<DonHang>, IDonHangService
 
         // ✅ Trạng thái hiện tại = bản ghi có NgayCapNhat mới nhất
         var trangThaiHienTai = lichSu
-            .OrderBy(l => l.NgayCapNhat)
+            .OrderByDescending(l => l.NgayCapNhat)
             .FirstOrDefault()?.MaTrangThai?.Trim();
 
         return new OrderTrackingViewModel
@@ -173,5 +176,32 @@ public class DonHangService : ServiceBase<DonHang>, IDonHangService
         };
     }
 
+    public async Task<IEnumerable<DonHangUserVM>> GetAllDonHangOfUserAsync(string userId)
+    {
+        // Lấy danh sách đơn hàng của user, include lịch sử trạng thái + trạng thái
+        var donHangs = await _uow._donHangRepository.GetAllAsync(
+            filter: dh => dh.MaNguoiDung == userId,
+            include: q => q.Include(dh => dh.LichSuTrangThaiDonHangs)
+                           .ThenInclude(ls => ls.MaTrangThaiNavigation)
+        );
+
+        if (donHangs == null || !donHangs.Any())
+            return Enumerable.Empty<DonHangUserVM>();
+
+        var donHangVMs = donHangs.Select(dh => new DonHangUserVM
+        {
+            MaDonHang = dh.MaDonHang,
+            NgayDat = dh.NgayKhoiTao,
+            NgayVanChuyen = dh.NgayVanChuyen,
+            NgayDenDuKien = dh.NgayDenDuKien,
+            TienShip = dh.TienShip ?? 0,
+            TrangThai = dh.LichSuTrangThaiDonHangs
+                         .OrderByDescending(ls => ls.NgayCapNhat)
+                         .Select(ls => ls.MaTrangThaiNavigation.TenTrangThai)
+                         .FirstOrDefault() ?? "Chưa xác định"
+        }).ToList();
+
+        return donHangVMs;
+    }
 
 }

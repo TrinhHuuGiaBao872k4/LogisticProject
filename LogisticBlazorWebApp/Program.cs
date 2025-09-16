@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Components.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.SetMinimumLevel(LogLevel.Debug);
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
@@ -26,8 +29,9 @@ builder.Services.AddHttpClient("LogisticApi", client =>
 
 //deploy cài đặt lắng nghe port 80
 
-if (builder.Environment.IsProduction()) {
-    builder.WebHost.UseUrls("http://*:80");    
+if (builder.Environment.IsProduction())
+{
+    builder.WebHost.UseUrls("http://*:80");
 }
 builder.Services.AddScoped<HangHoaService>();
 builder.Services.AddScoped<CartService>();
@@ -35,6 +39,12 @@ builder.Services.AddScoped<LoginService>();
 builder.Services.AddSingleton<UserStateService>();
 builder.Services.AddScoped<ProfileService>();
 builder.Services.AddScoped<RegisterService>();
+builder.Services.AddScoped<DonHangService>();
+
+
+builder.Services.AddScoped<DonHangHubService>();
+
+
 //setup middleware 
 //middleware cross
 builder.Services.AddCors(option =>
@@ -46,9 +56,11 @@ builder.Services.AddCors(option =>
         // .AllowAnyHeader()//cho phép rq tất cả header
         // .AllowAnyMethod()//cho phep rq tất cả method(get,post,put,delete)
         // .AllowCredentials();/// cho phép tất cả cookie
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        policy.WithOrigins("https://localhost:7163","http://localhost:5103")
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials();
+
     });
 });
 
@@ -64,11 +76,8 @@ if (!app.Environment.IsDevelopment())
 }
 app.UseCors("allow_origin");
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 
