@@ -7,14 +7,16 @@ using System.Net.Http.Json;
 public class DonHangHubService : IAsyncDisposable
 {
     private readonly IJSRuntime _js;
+    private readonly IConfiguration _config;
     private HubConnection? _hubConnection;
 
 
     public event Action<string, string>? OnTrangThaiUpdated;
 
-    public DonHangHubService(IJSRuntime js)
+    public DonHangHubService(IJSRuntime js, IConfiguration config)
     {
         _js = js;
+        _config = config;
     }
 
     public async Task ConnectAsync()
@@ -22,8 +24,12 @@ public class DonHangHubService : IAsyncDisposable
         if (_hubConnection != null)
             return;
 
+        var hubUrl = _config["SignalR:HubUrl"];
+        if (string.IsNullOrEmpty(hubUrl))
+            throw new InvalidOperationException("SignalR Hub URL chưa được cấu hình.");
+
         _hubConnection = new HubConnectionBuilder()
-            .WithUrl("http://localhost:5103/donhanghub", options =>
+            .WithUrl(hubUrl, options =>
             {
                 // Lấy token từ localStorage mỗi lần SignalR cần
                 options.AccessTokenProvider = async () =>

@@ -61,6 +61,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - LOGISTIC_API_BASE_URL=http://logistic_service:82
       - PAYMENT_API_BASE_URL=http://payment_service:81
+      - SignalR__HubUrl=http://logistic_service:82/donhanghub
     depends_on:
       - logisticservice
       - paymentservice
