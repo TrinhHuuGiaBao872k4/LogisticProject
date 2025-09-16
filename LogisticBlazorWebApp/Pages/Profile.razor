@@ -1,39 +1,143 @@
 @page "/profile"
 @inject ProfileService profileService
+@inject DonHangService donHangService
+@inject DonHangHubService donHangHub
 @inject IJSRuntime js
 @inject NavigationManager nav
 @inject UserStateService userState
 
-<div class="d-flex justify-content-center align-items-center vh-100 bg-light">
-    @if (profile == null)
-    {
-        <p>Đang tải thông tin...</p>
-    }
-    else
-    {
-        <div class="card p-4 shadow rounded-4 text-center" style="width: 400px;">
-            <h4 class="mb-4 text-primary">Thông Tin Cá Nhân</h4>
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            @if (profile == null)
+            {
+                <div class="card p-4 shadow text-center">
+                    <p>Đang tải thông tin...</p>
+                </div>
+            }
+            else
+            {
+                <div class="card p-4 shadow rounded-4 text-center mb-4">
+                    <h4 class="mb-4 text-primary">Thông Tin Cá Nhân</h4>
 
-            <p><strong>👤 Họ Tên:</strong> @profile.HoTen</p>
-            <p><strong>🎂 Ngày Sinh:</strong> @profile.NgaySinh.ToString("dd/MM/yyyy")</p>
-            <p><strong>🪪 CCCD:</strong> @profile.Cccd</p>
-            <p><strong>📍 Địa Chỉ:</strong> @profile.DiaChi</p>
-            <p><strong>📞 Số Điện Thoại:</strong> @profile.Sdt</p>
-            <p><strong>🎖️ Mã Vai Trò:</strong> @profile.MaVaiTro?.Trim()</p>
+                    <p><strong>👤 Họ Tên:</strong> @profile.HoTen</p>
+                    <p><strong>🎂 Ngày Sinh:</strong> @profile.NgaySinh.ToString("dd/MM/yyyy")</p>
+                    <p><strong>🪪 CCCD:</strong> @profile.Cccd</p>
+                    <p><strong>📍 Địa Chỉ:</strong> @profile.DiaChi</p>
+                    <p><strong>📞 Số Điện Thoại:</strong> @profile.Sdt</p>
+                    <p><strong>🎖️ Mã Vai Trò:</strong> @profile.MaVaiTro?.Trim()</p>
 
-            <button class="btn btn-danger w-100 mt-4" @onclick="Logout">
-                <i class="fa-solid fa-right-from-bracket me-2"></i>Đăng Xuất
-            </button>
+                    <button class="btn btn-danger w-100 mt-4" @onclick="Logout">
+                        <i class="fa-solid fa-right-from-bracket me-2"></i>Đăng Xuất
+                    </button>
+                </div>
+
+                <!-- Danh sách đơn -->
+                <div class="card p-4 shadow rounded-4">
+                    <h5 class="mb-3 text-success">Danh Sách Đơn Hàng 🚚</h5>
+
+                    @if (donHangs == null)
+                    {
+                        <p>Đang tải đơn hàng...</p>
+                    }
+                    else if (donHangs.Count == 0)
+                    {
+                        <p>Bạn chưa có đơn hàng nào.</p>
+                    }
+                    else
+                    {
+                        <ul class="list-group">
+                            @foreach (var dh in donHangs)
+                            {
+
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>Mã:</strong> @dh.MaDonHang <br />
+                                        <strong>Trạng thái:</strong>
+                                        <span class="@GetStatusClass(dh.TrangThai)">@dh.TrangThai</span>
+                                    </div>
+                                    <small>@dh.NgayDatDisplay</small>
+                                </li>
+                            }
+                        </ul>
+                    }
+                </div>
+            }
         </div>
-    }
+    </div>
 </div>
 
 @code {
     private UserProfileViewModel? profile;
+    private List<DonHangViewModel>? donHangs;
 
-    protected override async Task OnInitializedAsync()
+    @* protected override async Task OnInitializedAsync()
     {
-        profile = await profileService.GetProfileAsync();
+
+        donHangs = await donHangService.GetAllDonHangOfUserAsync();
+
+
+        await donHangHub.ConnectAsync();
+
+        donHangHub.OnTrangThaiUpdated += CapNhatTrangThaiDon;
+
+        if (donHangs != null)
+        {
+            foreach (var dh in donHangs)
+            {
+                await donHangHub.JoinOrderGroup(dh.MaDonHang);
+            }
+        }
+    } *@
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Lấy profile từ localStorage
+            profile = await profileService.GetProfileAsync();
+
+            // Lấy danh sách đơn hàng từ API (có token từ localStorage)
+            donHangs = await donHangService.GetAllDonHangOfUserAsync();
+
+            // Kết nối SignalR
+            await donHangHub.ConnectAsync();
+
+            // Lắng nghe cập nhật từ Hub
+            donHangHub.OnTrangThaiUpdated += CapNhatTrangThaiDon;
+
+            // Sau khi có danh sách đơn -> join từng đơn hàng
+            if (donHangs != null)
+            {
+                foreach (var dh in donHangs)
+                {
+                    await donHangHub.JoinOrderGroup(dh.MaDonHang);
+                }
+            }
+
+            StateHasChanged();
+        }
+    }
+
+    private void CapNhatTrangThaiDon(string maDonHang, string trangThaiMoi)
+    {
+        var don = donHangs?.FirstOrDefault(x => x.MaDonHang == maDonHang);
+        if (don != null)
+        {
+            don.TrangThai = MapTrangThai(trangThaiMoi);
+            InvokeAsync(StateHasChanged);
+        }
+    }
+    private string MapTrangThai(string maTrangThai)
+    {
+        return maTrangThai switch
+        {
+            "TT01" => "Chờ xác nhận",
+            "TT02" => "Đang chuẩn bị",
+            "TT03" => "Đang giao",
+            "TT04" => "Hoàn tất",
+            "TT05" => "Đã hủy",
+            _ => maTrangThai // fallback: hiển thị mã nếu chưa có mapping
+        };
     }
 
     private async Task Logout()
@@ -41,5 +145,16 @@
         await js.InvokeVoidAsync("localStorage.removeItem", "accessToken");
         userState.Logout();
         nav.NavigateTo("/");
+    }
+
+    private string GetStatusClass(string trangThai)
+    {
+        return trangThai switch
+        {
+            "Đang giao" => "text-warning fw-bold",
+            "Hoàn tất" => "text-success fw-bold",
+            "Đã hủy" => "text-danger fw-bold",
+            _ => "text-secondary"
+        };
     }
 }

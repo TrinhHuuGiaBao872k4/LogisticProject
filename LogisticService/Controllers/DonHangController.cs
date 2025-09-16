@@ -261,28 +261,35 @@ public class DonHangController : BaseController
         if (userInfo == null)
             return Fail<IEnumerable<DonHangUserVM>>("Decode Token thất bại", 401);
 
-        var donHangRepo = _unitOfWork.GetRepository<DonHang>();
-        var donHangs = await donHangRepo.WhereAsync(dh => dh.MaNguoiDung == userInfo.Id);
+        // var donHangRepo = _unitOfWork.GetRepository<DonHang>();
+        // var donHangs = await donHangRepo.WhereAsync(dh => dh.MaNguoiDung == userInfo.Id);
 
-        if (donHangs == null || !donHangs.Any())
+        // if (donHangs == null || !donHangs.Any())
+        //     return Fail<IEnumerable<DonHangUserVM>>("Khách hàng chưa có đơn hàng nào");
+
+        // // Chỉ map các thông tin cơ bản
+
+        // var donHangVMs = donHangs.Select(dh => new DonHangUserVM
+        // {
+        //     MaDonHang = dh.MaDonHang,
+        //     NgayDat = dh.NgayKhoiTao,
+        //     NgayVanChuyen = dh.NgayVanChuyen,
+        //     NgayDenDuKien = dh.NgayDenDuKien,
+        //     TienShip = dh.TienShip ?? 0,             
+        //     TrangThai = dh.LichSuTrangThaiDonHangs
+        //          .OrderByDescending(ls => ls.NgayCapNhat)
+        //          .Select(ls => ls.MaTrangThaiNavigation.TenTrangThai)
+        //          .FirstOrDefault() ?? "Chưa xác định"
+        // }).ToList();
+
+
+        // return Success(donHangVMs.AsEnumerable(), "Lấy lịch sử đơn hàng thành công");
+        var donHangVMs = await _donHangService.GetAllDonHangOfUserAsync(userInfo.Id);
+
+        if (!donHangVMs.Any())
             return Fail<IEnumerable<DonHangUserVM>>("Khách hàng chưa có đơn hàng nào");
 
-        // Chỉ map các thông tin cơ bản
-        var donHangVMs = donHangs.Select(dh => new DonHangUserVM
-        {
-            MaDonHang = dh.MaDonHang,
-            NgayDat = dh.NgayKhoiTao,
-            NgayVanChuyen = dh.NgayVanChuyen,
-            NgayDenDuKien = dh.NgayDenDuKien,
-            TienShip = dh.TienShip ?? 0,             
-            TrangThai = dh.LichSuTrangThaiDonHangs
-                 .OrderByDescending(ls => ls.NgayCapNhat)
-                 .Select(ls => ls.MaTrangThai)
-                 .FirstOrDefault() ?? "Chưa xác định"
-        }).ToList();
-
-
-        return Success(donHangVMs.AsEnumerable(), "Lấy lịch sử đơn hàng thành công");
+        return Success(donHangVMs, "Lấy lịch sử đơn hàng thành công");
     }
 
 }
