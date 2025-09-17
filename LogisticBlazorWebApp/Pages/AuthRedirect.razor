@@ -2,30 +2,33 @@
 @inject TokenState TokenState
 @inject NavigationManager Nav
 
-@code{
-    //điều hướng dựa trên role
-    protected override Task OnInitializedAsync()
+@code {
+    private bool _navigated; // chặn chạy lặp
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (!firstRender || _navigated) return;
+
+        // JS interop (localStorage) CHỈ được gọi ở đây khi có prerender
+        await TokenState.LoadFromStorageAsync();
+
         var token = TokenState.AccessToken;
-        if (string.IsNullOrWhiteSpace(token))
+        if (string.IsNullOrWhiteSpace(token) || JwtHelper.IsExpired(token))
         {
-            Nav.NavigateTo("/", true);
-            return Task.CompletedTask;
+            await TokenState.SetTokenAsync(null); // clear storage + header
+            _navigated = true;
+            Nav.NavigateTo("/login-seller-admin");
+            return;
         }
 
         var roles = JwtHelper.GetRoles(token);
+        _navigated = true;
+
         if (roles.Any(r => r.Equals("Admin", StringComparison.OrdinalIgnoreCase)))
-        {
-            Nav.NavigateTo("/admin/dashboard", true);
-        }
+            Nav.NavigateTo("/admin/dashboard");
         else if (roles.Any(r => r.Equals("Seller", StringComparison.OrdinalIgnoreCase)))
-        {
-            Nav.NavigateTo("/seller/dashboard", true);
-        }
+            Nav.NavigateTo("/seller/dashboard");
         else
-        {
-            Nav.NavigateTo("/", true); // Customer về Home
-        }
-        return Task.CompletedTask;
+            Nav.NavigateTo("/");
     }
 }

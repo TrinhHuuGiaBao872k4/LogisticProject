@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 public interface INguoiDungService : IServiceBase<NguoiDung>
 {
-    Task<ActionResult> Login(UserLoginViewModel userLogin);
+    Task<HTTPResponseClient<UserLoginResultVM>> Login(UserLoginViewModel userLogin);
     Task<string> GenerateMaNguoiDungAsync();
     Task<ActionResult> RegisterAsync(UserRegisterViewModel dto);
     Task<ActionResult> UpdateProfileAsync(string userId, UpdateUserViewModel dto);
@@ -18,36 +18,69 @@ public class NguoiDungService : ServiceBase<NguoiDung>, INguoiDungService
     {
         _JwtAuthService = jwtAuthService;
     }
-    public async Task<ActionResult> Login(UserLoginViewModel userLogin)
+    public async Task<HTTPResponseClient<UserLoginResultVM>> Login(UserLoginViewModel userLogin)
     {
-        //Kiểm tra user trong database
-        NguoiDung? userDB = await _repository.SingleOrDefaultAsync(n => n.TenDanhNhap == userLogin.TenDanhNhap);
-        if (userDB != null && PasswordHelper.VerifyPassword(userLogin.MatKhau, userDB.MatKhau))
+        var response = new HTTPResponseClient<UserLoginResultVM>
         {
-            // Đăng nhập thành công
-            //Tạo token trả vào userLoginResult
-            UserLoginResultVM usResult = new UserLoginResultVM();
-            usResult.TenDanhNhap = userLogin.TenDanhNhap;
-            usResult.AccessToken = _JwtAuthService.GenerateToken(userDB);
-            var resOb = new HTTPResponseClient<UserLoginResultVM>()
+            DateTime = System.DateTime.Now
+        };
+
+        try
+        {
+            // 1. Kiểm tra input
+            if (string.IsNullOrWhiteSpace(userLogin.TenDanhNhap) || string.IsNullOrWhiteSpace(userLogin.MatKhau))
             {
-                StatusCode = 200,
-                Message = "Successfully",
-                DateTime = DateTime.Now,
-                Data = usResult
+                response.StatusCode = 400;
+                response.Message = "Tên đăng nhập và mật khẩu không được để trống";
+                return response;
+            }
+
+            // 2. Tìm user trong DB
+            NguoiDung? userDB = await _repository.SingleOrDefaultAsync(n => n.TenDanhNhap == userLogin.TenDanhNhap);
+            if (userDB == null)
+            {
+                response.StatusCode = 404;
+                response.Message = "Người dùng không tồn tại";
+                return response;
+            }
+
+            // 3. Kiểm tra mật khẩu
+            if (!PasswordHelper.VerifyPassword(userLogin.MatKhau, userDB.MatKhau))
+            {
+                response.StatusCode = 401;
+                response.Message = "Sai mật khẩu";
+                return response;
+            }
+
+            // 4. Tạo token
+            string token = _JwtAuthService.GenerateToken(userDB);
+            if (string.IsNullOrEmpty(token))
+            {
+                response.StatusCode = 500;
+                response.Message = "Không tạo được token đăng nhập";
+                return response;
+            }
+
+            // 5. Thành công
+            response.StatusCode = 200;
+            response.Message = "Đăng nhập thành công";
+            response.Data = new UserLoginResultVM
+            {
+                TenDanhNhap = userLogin.TenDanhNhap,
+                AccessToken = token
             };
 
-            return new OkObjectResult(resOb);
+            return response;
         }
-        var failOb = new HTTPResponseClient<UserLoginResultVM>()
+        catch (Exception ex)
         {
-            StatusCode = 400,
-            Message = "Login fail",
-            DateTime = DateTime.Now,
-            Data = null
-        };
-        return new BadRequestObjectResult(failOb);
+            response.StatusCode = 500;
+            response.Message = $"Lỗi hệ thống: {ex.Message}";
+            return response;
+        }
     }
+
+
     public async Task<string> GenerateMaNguoiDungAsync()
     {
         string prefix = "ND";

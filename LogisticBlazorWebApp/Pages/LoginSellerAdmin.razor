@@ -57,7 +57,7 @@
             return;
         }
 
-        TokenState.SetToken(token);
-        Nav.NavigateTo("/auth-redirect", true);
+       await TokenState.SetTokenAsync(token);   // persist token vào localStorage + gắn header
+        Nav.NavigateTo("/auth-redirect"); 
     }
 }

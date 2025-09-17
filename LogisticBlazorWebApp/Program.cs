@@ -29,6 +29,12 @@ builder.Services.AddHttpClient("LogisticApi", client =>
 if (builder.Environment.IsProduction()) {
     builder.WebHost.UseUrls("http://*:80");    
 }
+builder.Services.AddAuthenticationCore(); // Blazor Server
+builder.Services.AddAuthorizationCore(options =>
+{
+    // có thể thêm policy nếu cần
+    // options.AddPolicy("IsAdmin", p => p.RequireRole("Admin"));
+});
 builder.Services.AddScoped<HangHoaService>();
 builder.Services.AddScoped<CartService>();
 builder.Services.AddScoped<LoginService>();
@@ -36,6 +42,8 @@ builder.Services.AddScoped<TokenState>();
 builder.Services.AddSingleton<UserStateService>();
 builder.Services.AddScoped<ProfileService>();
 builder.Services.AddScoped<RegisterService>();
+
+
 //setup middleware 
 //middleware cross
 builder.Services.AddCors(option =>

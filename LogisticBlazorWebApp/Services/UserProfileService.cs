@@ -1,7 +1,8 @@
 using System.Net.Http.Headers;
-using System.Text.Json;
+using System.Net.Http.Json;            // cần cho ReadFromJsonAsync
 using Microsoft.JSInterop;
-public class ProfileService
+
+public sealed class ProfileService
 {
     private readonly HttpClient _httpClient;
     private readonly IJSRuntime _js;
@@ -14,21 +15,26 @@ public class ProfileService
 
     public async Task<UserProfileViewModel?> GetProfileAsync()
     {
-        var token = await _js.InvokeAsync<string>("localStorage.getItem", "accessToken");
-
-        if (string.IsNullOrEmpty(token))
-            return null;
-
-        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-        var res = await _httpClient.GetAsync("api/NguoiDung/profile");
-
-        if (res.IsSuccessStatusCode)
+        try
         {
+            // Nếu ở /auth-redirect bạn dùng sessionStorage thì đổi "localStorage" -> "sessionStorage"
+            var token = await _js.InvokeAsync<string?>("localStorage.getItem", "accessToken");
+            if (string.IsNullOrWhiteSpace(token))
+                return null;
+
+            // Gắn header cho request hiện tại (không để DefaultRequestHeaders dính về sau)
+            using var req = new HttpRequestMessage(HttpMethod.Get, "api/NguoiDung/profile");
+            req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            using var res = await _httpClient.SendAsync(req);
+            if (!res.IsSuccessStatusCode) return null;
+
             var result = await res.Content.ReadFromJsonAsync<HTTPResponse<UserProfileViewModel>>();
             return result?.data;
         }
-
-        return null;
+        catch
+        {
+            return null; // có thể log nếu bạn có logger
+        }
     }
 }
