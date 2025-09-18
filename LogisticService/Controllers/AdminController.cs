@@ -4,17 +4,22 @@ using Microsoft.EntityFrameworkCore;
 using LogisticService.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using LogisticService.Controllers;
+
 [Route("api/[controller]")]
 [ApiController]
-public class AdminController : ControllerBase
+public class AdminController : BaseController
 {
     private readonly LogisticDbServiceContext _context;
     private readonly IConfiguration _config;
+    private readonly JwtAuthService _jwtAuthService;
 
-    public AdminController(LogisticDbServiceContext context, IConfiguration config)
+
+    public AdminController(LogisticDbServiceContext context, IConfiguration config, JwtAuthService jwtAuthService)
     {
         _context = context;
         _config = config;
+        _jwtAuthService = jwtAuthService;
     }
 
     [HttpPost("login")]
@@ -44,10 +49,18 @@ public class AdminController : ControllerBase
         });
 
     }
-    [Authorize(Roles = "VT000,VT001")] // Chỉ SuperAdmin hoặc Admin được cấp quyền
-    [HttpPost("cap-quyen/{maNguoiDung}/{maVaiTro}")]
-    public async Task<IActionResult> CapQuyenTheoVaiTro(string maNguoiDung, string maVaiTro)
+    [HttpPut("cap-quyen/{maNguoiDung}/{maVaiTro}")]
+    [Authorize] // Chỉ SuperAdmin hoặc Admin được cấp quyền
+    public async Task<ActionResult<HTTPResponseClient<object>>> CapQuyenTheoVaiTro(string maNguoiDung, string maVaiTro)
     {
+        var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Substring(7);
+        if (string.IsNullOrEmpty(token))
+            return Fail<object>("Token không hợp lệ", 401);
+
+        // 🧾 Giải mã token
+        var userInfo = _jwtAuthService.DecodePayloadTokenInfo(token);
+        if (userInfo == null || userInfo.Role != "SuperAdmin")
+            return Fail<object>("Chỉ SuperAdmin mới được cấp quyền", 403);
         // Kiểm tra người dùng tồn tại
         var user = await _context.NguoiDungs.FirstOrDefaultAsync(u => u.MaNguoiDung == maNguoiDung);
         if (user == null)
