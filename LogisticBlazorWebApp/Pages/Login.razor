@@ -7,7 +7,7 @@
     <DataAnnotationsValidator />
     <ValidationSummary />
 
-    <div class="d-flex justify-content-center align-items-center vh-100 bg-light">
+    <div class="d-flex justify-content-center align-items-center bg-light" style="height: 800px">
         <div class="card p-4 shadow rounded-4" style="width: 350px;">
             <h3 class="text-center mb-4">Đăng nhập</h3>
 
@@ -46,14 +46,33 @@
         try
         {
             var result = await loginService.Login(loginModel);
-
             if (result != null && result.statusCode == 200)
             {
-                await js.InvokeVoidAsync("localStorage.setItem", "accessToken", result.data.AccessToken);
-                 
-                userState.SetUser(result.data.TenDanhNhap);
-                nav.NavigateTo("/");
-            }
+                var token = result.data.AccessToken;
+
+                await js.InvokeVoidAsync("localStorage.setItem", "accessToken", token);
+                // Giải mã token
+                var handler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(token);
+
+                string userId = jwtToken.Claims.FirstOrDefault(c => c.Type == "MaNguoiDung")?.Value ?? "";
+                string username = jwtToken.Claims.FirstOrDefault(c => c.Type == "TenDanhNhap")?.Value ?? "";
+                string role = jwtToken.Claims.FirstOrDefault(c => c.Type == "role")?.Value ?? "";
+
+                userState.SetUser(username);
+                switch (role)
+                {
+                    case "Admin":
+                        nav.NavigateTo("/admin/dashboard");
+                        break;
+                    case "Customer":
+                        nav.NavigateTo("/");
+                        break;
+                    default:
+                        nav.NavigateTo("/");
+                        break;
+                }
+            }                                                                   
             else
             {
                 errorMessage = "Sai tên đăng nhập hoặc mật khẩu.";
