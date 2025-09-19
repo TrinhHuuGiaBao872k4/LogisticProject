@@ -37,4 +37,24 @@ public sealed class ProfileService
             return null; // có thể log nếu bạn có logger
         }
     }
+    public async Task<bool> UpdateProfileAsync(UserProfileUpdateModel model)
+    {
+        try
+        {
+            var token = await _js.InvokeAsync<string?>("localStorage.getItem", "accessToken");
+            if (string.IsNullOrWhiteSpace(token))
+                return false;
+
+            using var req = new HttpRequestMessage(HttpMethod.Put, "api/NguoiDung/update-profile");
+            req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            req.Content = JsonContent.Create(model);
+
+            using var res = await _httpClient.SendAsync(req);
+            return res.IsSuccessStatusCode;
+        }
+        catch
+        {
+            return false; // có thể log nếu bạn có logger
+        }
+    }
 }

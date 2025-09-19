@@ -79,8 +79,6 @@ public class NguoiDungService : ServiceBase<NguoiDung>, INguoiDungService
             return response;
         }
     }
-
-
     public async Task<string> GenerateMaNguoiDungAsync()
     {
         string prefix = "ND";

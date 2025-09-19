@@ -1,5 +1,6 @@
 @page "/seller/orders"
 @layout SellerLayout
+@attribute [Authorize(Roles = "Seller")]
 @inject DonHangService DonHangService
 
 <h3 class="mb-4">

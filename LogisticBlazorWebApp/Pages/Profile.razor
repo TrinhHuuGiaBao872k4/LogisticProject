@@ -1,4 +1,5 @@
 @page "/profile"
+@attribute [Authorize(Roles = "Seller,SuperAdmin,Admin,Customer,Shipper,WarehouseStaff,Accountant")]
 @inject ProfileService profileService
 @inject DonHangService donHangService
 @inject DonHangHubService donHangHub
@@ -20,16 +21,73 @@
                 <div class="card p-4 shadow rounded-4 text-center mb-4">
                     <h4 class="mb-4 text-primary">Thông Tin Cá Nhân</h4>
 
-                    <p><strong>👤 Họ Tên:</strong> @profile.HoTen</p>
-                    <p><strong>🎂 Ngày Sinh:</strong> @profile.NgaySinh.ToString("dd/MM/yyyy")</p>
-                    <p><strong>🪪 CCCD:</strong> @profile.Cccd</p>
-                    <p><strong>📍 Địa Chỉ:</strong> @profile.DiaChi</p>
-                    <p><strong>📞 Số Điện Thoại:</strong> @profile.Sdt</p>
-                    <p><strong>🎖️ Mã Vai Trò:</strong> @profile.MaVaiTro?.Trim()</p>
+                    @if (!isEditing)
+                    {
+                        <p><strong>👤 Họ Tên:</strong> @profile.HoTen</p>
+                        <p><strong>🎂 Ngày Sinh:</strong> @profile.NgaySinh.ToString("dd/MM/yyyy")</p>
+                        <p><strong>🪪 CCCD:</strong> @profile.Cccd</p>
+                        <p><strong>📍 Địa Chỉ:</strong> @profile.DiaChi</p>
+                        <p><strong>📞 Số Điện Thoại:</strong> @profile.Sdt</p>
+                        <p><strong>🎖️ Mã Vai Trò:</strong> @profile.MaVaiTro?.Trim()</p>
 
-                    <button class="btn btn-danger w-100 mt-4" @onclick="Logout">
-                        <i class="fa-solid fa-right-from-bracket me-2"></i>Đăng Xuất
-                    </button>
+                        <div class="d-grid gap-2 mt-3">
+                            <button class="btn btn-outline-primary" @onclick="BeginEdit">
+                                <i class="fa-regular fa-pen-to-square me-2"></i>Chỉnh sửa
+                            </button>
+
+                            <button class="btn btn-danger" @onclick="Logout">
+                                <i class="fa-solid fa-right-from-bracket me-2"></i>Đăng Xuất
+                            </button>
+                        </div>
+                    }
+                    else
+                    {
+                        <EditForm Model="editModel" OnValidSubmit="SaveProfile">
+                            <DataAnnotationsValidator />
+                            <ValidationSummary />
+
+                            <div class="text-start">
+                                <div class="mb-2">
+                                    <label class="form-label">Họ Tên</label>
+                                    <InputText class="form-control" @bind-Value="editModel.HoTen" />
+                                    <ValidationMessage For="@(() => editModel.HoTen)" />
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="form-label">Ngày Sinh</label>
+                                    <InputDate class="form-control" @bind-Value="editModel.NgaySinh" />
+                                    <ValidationMessage For="@(() => editModel.NgaySinh)" />
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="form-label">CCCD</label>
+                                    <InputText class="form-control" @bind-Value="editModel.Cccd" />
+                                    <ValidationMessage For="@(() => editModel.Cccd)" />
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="form-label">Địa Chỉ</label>
+                                    <InputText class="form-control" @bind-Value="editModel.DiaChi" />
+                                    <ValidationMessage For="@(() => editModel.DiaChi)" />
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="form-label">Số Điện Thoại</label>
+                                    <InputText class="form-control" @bind-Value="editModel.Sdt" />
+                                    <ValidationMessage For="@(() => editModel.Sdt)" />
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2 mt-3">
+                                <button type="submit" class="btn btn-success" disabled="@isSaving">
+                                    @(isSaving ? "Đang lưu..." : "Lưu thay đổi")
+                                </button>
+                                <button type="button" class="btn btn-secondary" @onclick="CancelEdit" disabled="@isSaving">
+                                    Hủy
+                                </button>
+                            </div>
+                        </EditForm>
+                    }
                 </div>
 
                 <!-- Danh sách đơn -->
@@ -49,7 +107,6 @@
                         <ul class="list-group">
                             @foreach (var dh in donHangs)
                             {
-
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     <div>
                                         <strong>Mã:</strong> @dh.MaDonHang <br />
@@ -71,41 +128,25 @@
     private UserProfileViewModel? profile;
     private List<DonHangViewModel>? donHangs;
 
-    @* protected override async Task OnInitializedAsync()
-    {
+    // --- Thêm state cho phần cập nhật profile ---
+    private bool isEditing = false;
+    private bool isSaving = false;
+    private UserProfileUpdateModel editModel = new();
 
-        donHangs = await donHangService.GetAllDonHangOfUserAsync();
-
-
-        await donHangHub.ConnectAsync();
-
-        donHangHub.OnTrangThaiUpdated += CapNhatTrangThaiDon;
-
-        if (donHangs != null)
-        {
-            foreach (var dh in donHangs)
-            {
-                await donHangHub.JoinOrderGroup(dh.MaDonHang);
-            }
-        }
-    } *@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            // Lấy profile từ localStorage
+            // Lấy profile từ localStorage / API
             profile = await profileService.GetProfileAsync();
 
-            // Lấy danh sách đơn hàng từ API (có token từ localStorage)
+            // Lấy danh sách đơn hàng
             donHangs = await donHangService.GetAllDonHangOfUserAsync();
 
             // Kết nối SignalR
             await donHangHub.ConnectAsync();
-
-            // Lắng nghe cập nhật từ Hub
             donHangHub.OnTrangThaiUpdated += CapNhatTrangThaiDon;
 
-            // Sau khi có danh sách đơn -> join từng đơn hàng
             if (donHangs != null)
             {
                 foreach (var dh in donHangs)
@@ -118,6 +159,50 @@
         }
     }
 
+    private void BeginEdit()
+    {
+        if (profile == null) return;
+
+        // Map từ profile sang editModel (đúng tên field UpdateModel của bạn)
+        editModel = new UserProfileUpdateModel
+        {
+            HoTen = profile.HoTen,
+            NgaySinh = profile.NgaySinh,   // InputDate nhận DateTime hoặc DateOnly tùy bạn định nghĩa
+            Cccd = profile.Cccd,
+            DiaChi = profile.DiaChi,
+            Sdt = profile.Sdt
+        };
+
+        isEditing = true;
+    }
+
+    private void CancelEdit()
+    {
+        isEditing = false;
+    }
+
+    private async Task SaveProfile()
+    {
+        if (isSaving) return;
+        isSaving = true;
+
+        var ok = await profileService.UpdateProfileAsync(editModel);
+        isSaving = false;
+
+        if (ok)
+        {
+            // Refresh lại profile để hiển thị dữ liệu mới
+            profile = await profileService.GetProfileAsync();
+            isEditing = false;
+            await js.InvokeVoidAsync("alert", "Cập nhật thông tin thành công!");
+            StateHasChanged();
+        }
+        else
+        {
+            await js.InvokeVoidAsync("alert", "Cập nhật thất bại. Vui lòng thử lại!");
+        }
+    }
+
     private void CapNhatTrangThaiDon(string maDonHang, string trangThaiMoi)
     {
         var don = donHangs?.FirstOrDefault(x => x.MaDonHang == maDonHang);
@@ -127,6 +212,7 @@
             InvokeAsync(StateHasChanged);
         }
     }
+
     private string MapTrangThai(string maTrangThai)
     {
         return maTrangThai switch
@@ -136,7 +222,7 @@
             "TT03" => "Đang giao",
             "TT04" => "Hoàn tất",
             "TT05" => "Đã hủy",
-            _ => maTrangThai // fallback: hiển thị mã nếu chưa có mapping
+            _ => maTrangThai
         };
     }
 
