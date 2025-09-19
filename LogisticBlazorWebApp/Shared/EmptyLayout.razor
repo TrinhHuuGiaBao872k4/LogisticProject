@@ -1,0 +1,119 @@
+@inherits LayoutComponentBase
+
+<div class="bg-gradient-custom w-100">
+    <!-- Xe tải chạy (trái -> phải) -->
+    <div class="d-flex align-items-center">
+        <div class="truck-icon truck-1"><i class="bi bi-truck"></i></div>
+        <div class="truck-icon truck-2"><i class="bi bi-truck"></i></div>
+
+        <!-- Máy bay chạy cùng chiều (trái -> phải) -->
+        <div class="plane-icon plane-1"><i class="bi bi-airplane"></i></div>
+        <div class="plane-icon plane-2"><i class="bi bi-airplane"></i></div>
+    </div>
+
+    @Body
+</div>
+
+<style>
+    .bg-gradient-custom {
+        min-height: 100vh;
+        width: 100%;
+        background: linear-gradient(-45deg, #0d47a1, #2575fc, #6a11cb, #8e24aa);
+        background-size: 300% 300%;
+        animation: gradientMove 16s ease infinite;
+        overflow: hidden;
+        position: relative;
+    }
+
+    @@keyframes gradientMove {
+        0% {
+            background-position: 0% 50%;
+        }
+
+        50% {
+            background-position: 100% 50%;
+        }
+
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+
+    /* ================== XE TẢI ================== */
+    .truck-icon {
+        position: absolute;
+        font-size: 8rem;
+        color: #fff;
+        opacity: 0.85;
+        animation: moveTruck 12s linear infinite;
+    }
+
+    .truck-1 {
+        top: 10%;
+        animation-delay: -1s;
+    }
+
+    .truck-2 {
+        top: 50%;
+        animation: moveTruck 12s linear infinite;
+        animation-delay: -5s;
+    }
+
+    @@keyframes moveTruck {
+        0% {
+            left: -15%;
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-12px);
+        }
+
+        100% {
+            left: 115%;
+            transform: translateY(0);
+        }
+    }
+
+    /* ================== MÁY BAY (cùng chiều xe tải) ================== */
+    .plane-icon {
+        position: absolute;
+        font-size: 6rem;
+        color: #fff;
+        /* vàng nổi bật */
+        opacity: 0.85;
+        transform: rotate(90deg);
+        /* quay ngang sang phải */
+        animation: movePlane 12s linear infinite;
+    }
+
+    .plane-1 {
+        top: 30%;
+        left: -15%;
+        animation-delay: -3s;
+    }
+
+    .plane-2 {
+        top: 70%;
+        left: -15%;
+        font-size: 7rem;
+        animation: movePlane 12s linear infinite;
+        animation-delay: -7s;
+    }
+
+    @@keyframes movePlane {
+        0% {
+            left: -15%;
+            transform: translateY(0) rotate(90deg);
+        }
+
+        50% {
+            transform: translateY(-20px) rotate(90deg);
+        }
+
+        100% {
+            left: 115%;
+            transform: translateY(0) rotate(90deg);
+        }
+    }
+</style>

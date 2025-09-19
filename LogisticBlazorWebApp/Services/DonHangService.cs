@@ -33,5 +33,25 @@ public class DonHangService
         return new();
     }
     
+    public async Task<List<DonHangViewModel>> GetAllDonHangOfSellerAsync()
+    {
+        var token = await _js.InvokeAsync<string>("localStorage.getItem", "accessToken");
+
+        if (string.IsNullOrEmpty(token))
+            return new();
+
+        _httpClient.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", token);
+
+        var res = await _httpClient.GetAsync("api/DonHang/GetAllDonHangOfSeller");
+
+        if (res.IsSuccessStatusCode)
+        {
+            var result = await res.Content.ReadFromJsonAsync<HTTPResponse<List<DonHangViewModel>>>();
+            return result?.data ?? new();
+        }
+
+        return new();
+    }
 }
 

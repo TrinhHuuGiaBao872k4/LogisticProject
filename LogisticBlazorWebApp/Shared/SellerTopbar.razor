@@ -1,3 +1,6 @@
+@inject NavigationManager nav
+@inject IJSRuntime js
+@inject UserStateService userState
 @using Microsoft.AspNetCore.Components.Authorization
 
 <header class="admin-topbar sticky-top border-bottom bg-body">
@@ -8,7 +11,7 @@
 
         <nav aria-label="breadcrumb" class="flex-grow-1">
             <ol class="breadcrumb m-0">
-                <li class="breadcrumb-item"><a href="/seller/dashboard">Seller</a></li>
+                <li class="breadcrumb-item"><a href="/seller/dashboard" class="text-dark">Seller</a></li>
                 <li class="breadcrumb-item active" aria-current="page">@CurrentPageTitle</li>
             </ol>
         </nav>
@@ -26,14 +29,31 @@
             </button>
 
             <div class="dropdown">
-                <button class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
-                    <i class="bi bi-person-circle me-1"></i> @DisplayName
+                <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    <i class="bi bi-person-circle me-1"></i>
+                    @userState.TenDangNhap
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="/seller/settings">Profile</a></li>
-                    <li><a class="dropdown-item" href="/seller/settings">Settings</a></li>
-                    <li><hr class="dropdown-divider" /></li>
-                    <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                    @if (userState.IsLoggedIn)
+                    {
+                        <li><a class="dropdown-item">Profile</a></li>
+                        <li><a class="dropdown-item">Settings</a></li>
+                        <li>
+                            <hr class="dropdown-divider" />
+                        </li>
+                        <li>
+                            <a class="dropdown-item text-danger" style="cursor: pointer;" @onclick="Logout">
+                                Đăng Xuất
+                            </a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li>
+                            <NavLink class="dropdown-item" href="/login">Đăng Nhập</NavLink>
+                        </li>
+                    }
                 </ul>
             </div>
         </div>
@@ -48,7 +68,21 @@
     private string DisplayName = "Seller";
 
     // Tuỳ bạn set title động bằng NavigationManager/RouteData, tạm để rỗng
-    private string CurrentPageTitle => "";
+    private string GetPageTitle()
+    {
+        var uri = nav.Uri.ToLower();
+        if (uri.Contains("/seller/dashboard")) return "Dashboard";
+        if (uri.Contains("/seller/products")) return "My Products";
+        if (uri.Contains("/seller/orders")) return "Orders";
+        if (uri.Contains("/seller/shipments")) return "Shipments";
+        if (uri.Contains("/seller/inventory")) return "Inventory";
+        if (uri.Contains("/seller/analytics")) return "Analytics";
+        if (uri.Contains("/seller/payouts")) return "Payouts";
+        if (uri.Contains("/seller/messages")) return "Messages";
+        if (uri.Contains("/seller/settings")) return "Settings";
+        return "Seller";
+    }
+    private string CurrentPageTitle => GetPageTitle();
 
     protected override async Task OnInitializedAsync()
     {
@@ -56,8 +90,23 @@
         {
             var user = (await AuthStateTask).User;
             DisplayName = user?.Identity?.Name
-                          ?? user?.FindFirst("name")?.Value
-                          ?? "Seller";
+            ?? user?.FindFirst("name")?.Value
+            ?? "Seller";
         }
+    }
+    protected override void OnInitialized()
+    {
+        userState.OnChange += OnUserStateChanged;
+    }
+
+    private async void OnUserStateChanged()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+    private async Task Logout()
+    {
+        await js.InvokeVoidAsync("localStorage.removeItem", "accessToken");
+        userState.Logout();
+        nav.NavigateTo("/");
     }
 }

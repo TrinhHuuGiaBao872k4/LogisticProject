@@ -12,6 +12,8 @@ public interface IDonHangService : IServiceBase<DonHang>
     Task<OrderTrackingViewModel?> GetOrderTrackingAsync(string maDonHang);
 
     Task<IEnumerable<DonHangUserVM>> GetAllDonHangOfUserAsync(string userId);
+    Task<IEnumerable<DonHangViewModel>> GetAllDonHangOfSellerAsync(string sellerId);
+
 }
 public class DonHangService : ServiceBase<DonHang>, IDonHangService
 {
@@ -203,5 +205,37 @@ public class DonHangService : ServiceBase<DonHang>, IDonHangService
 
         return donHangVMs;
     }
+
+    public async Task<IEnumerable<DonHangViewModel>> GetAllDonHangOfSellerAsync(string sellerId)
+    {
+        var donHangs = await _uow._donHangRepository.GetAllAsync(
+            filter: dh => dh.ChiTietDonHangs.Any(ct => ct.MaHangHoaNavigation.MaNguoiDung == sellerId),
+            include: q => q.Include(dh => dh.LichSuTrangThaiDonHangs)
+                           .ThenInclude(ls => ls.MaTrangThaiNavigation)
+                           .Include(dh => dh.ChiTietDonHangs)
+                               .ThenInclude(ct => ct.MaHangHoaNavigation)
+                           .Include(dh => dh.MaNguoiDungNavigation) // để lấy thông tin khách hàng
+        );
+
+        if (donHangs == null || !donHangs.Any())
+            return Enumerable.Empty<DonHangViewModel>();
+
+        return donHangs.Select(dh => new DonHangViewModel
+        {
+            MaDonHang = dh.MaDonHang,
+            NgayDat = dh.NgayKhoiTao,
+            NgayVanChuyen = dh.NgayVanChuyen,
+            NgayDenDuKien = dh.NgayDenDuKien,
+            TienShip = dh.TienShip ?? 0,
+            TrangThai = dh.LichSuTrangThaiDonHangs
+                         .OrderByDescending(ls => ls.NgayCapNhat)
+                         .Select(ls => ls.MaTrangThaiNavigation.TenTrangThai)
+                         .FirstOrDefault() ?? "Chưa xác định",
+            Customer = dh.MaNguoiDungNavigation?.HoTen ?? "Không xác định",
+            TongTien = dh.ChiTietDonHangs.Sum(ct => (ct.SoLuong * ct.DonGia) ?? 0)
+        }).ToList();
+    }
+
+
 
 }

@@ -67,6 +67,17 @@
   protected override void OnInitialized()
   {
     userState.OnChange += OnUserStateChanged;
+    nav.LocationChanged += OnLocationChanged;
+  }
+  private async void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+  {
+    var uri = nav.ToBaseRelativePath(e.Location).ToLower();
+    if (uri.StartsWith("login")) // khi user điều hướng đến trang login
+    {
+      await js.InvokeVoidAsync("localStorage.removeItem", "accessToken");
+      userState.Logout();
+      await InvokeAsync(StateHasChanged);
+    }
   }
 
   private async void OnUserStateChanged()

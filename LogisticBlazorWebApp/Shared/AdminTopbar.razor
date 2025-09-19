@@ -1,3 +1,7 @@
+@inject NavigationManager nav
+@inject IJSRuntime js
+@inject UserStateService userState
+
 <header class="admin-topbar sticky-top border-bottom bg-body">
     <div class="container-fluid d-flex align-items-center gap-3 py-2">
         <button class="btn btn-outline-secondary d-none d-lg-inline" @onclick="OnToggleSidebar">
@@ -16,7 +20,7 @@
                 <i class="bi bi-moon-stars"></i>
             </button>
 
-            <div class="dropdown">
+            @* <div class="dropdown">
                 <button class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
                     <i class="bi bi-person-circle me-1"></i> Admin
                 </button>
@@ -24,7 +28,38 @@
                     <li><a class="dropdown-item">Profile</a></li>
                     <li><a class="dropdown-item">Settings</a></li>
                     <li><hr class="dropdown-divider" /></li>
-                    <li><a class="dropdown-item">Logout</a></li>
+                    <li>
+                        
+                        <a class="dropdown-item text-danger" style="cursor: pointer;" @onclick="Logout">Đăng Xuất</a>
+                    </li>
+                </ul>
+            </div> *@
+            <div class="dropdown">
+                <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    <i class="bi bi-person-circle me-1"></i>
+                    @userState.TenDangNhap
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    @if (userState.IsLoggedIn)
+                    {
+                        <li><a class="dropdown-item">Profile</a></li>
+                        <li><a class="dropdown-item">Settings</a></li>
+                        <li>
+                            <hr class="dropdown-divider" />
+                        </li>
+                        <li>
+                            <a class="dropdown-item text-danger" style="cursor: pointer;" @onclick="Logout">
+                                Đăng Xuất
+                            </a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li>
+                            <NavLink class="dropdown-item" href="/login">Đăng Nhập</NavLink>
+                        </li>
+                    }
                 </ul>
             </div>
         </div>
@@ -34,4 +69,19 @@
 @code {
     [Parameter] public EventCallback OnToggleSidebar { get; set; }
     [Parameter] public EventCallback OnToggleTheme { get; set; }
+    protected override void OnInitialized()
+    {
+        userState.OnChange += OnUserStateChanged;
+    }
+
+    private async void OnUserStateChanged()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+    private async Task Logout()
+    {
+        await js.InvokeVoidAsync("localStorage.removeItem", "accessToken");
+        userState.Logout();
+        nav.NavigateTo("/");
+    }
 }
