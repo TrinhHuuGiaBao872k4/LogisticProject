@@ -23,6 +23,19 @@ namespace LogisticService.Controllers
         //     _hangHoaService = hangHoaService;
         //     _redisHelper = redisHelper;
         // }
+        private async Task RefreshHangHoaCache()
+        {
+            _redisHelper.setDatabaseRedis(1); // Chọn database Redis (nếu bạn dùng DB số 1)
+            string cacheKey = "hanghoa_list_db";
+            await _redisHelper.DeleteAsync(cacheKey);
+
+            // Lấy tất cả hàng hóa từ database
+            var hangHoaList = await _hangHoaService.GetAllHangHoaAsync();
+
+            // Lưu vào Redis (ghi đè key cũ)
+            await _redisHelper.SetAsync(cacheKey, hangHoaList, TimeSpan.FromDays(1));
+        }
+
         [HttpGet("GetAllHangHoa")]
         public async Task<IActionResult> GetAllHangHoa()
         {
@@ -31,13 +44,14 @@ namespace LogisticService.Controllers
             try
             {
                 // Thử lấy dữ liệu từ Redis
-                var cachedData = await _redisHelper.GetAsync<HTTPResponseClient<IEnumerable<HangHoa>>>(cacheKey);
+                var cachedData = await _redisHelper.GetAsync<HTTPResponseClient<IEnumerable<HangHoaReturnResult>>>(cacheKey);
                 // Nếu có dữ liệu trong cache và không rỗng
                 if (cachedData != null)
                 {
                     return Ok(cachedData);
                 }
                 // Nếu không có trong cache, lấy từ database
+                await _redisHelper.DeleteAsync(cacheKey);
                 var hangHoaList = await _hangHoaService.GetAllHangHoaAsync();
                 // Lưu vào cache với định dạng JSON rõ ràng
                 await _redisHelper.SetAsync(cacheKey, hangHoaList, TimeSpan.FromDays(1));
@@ -48,7 +62,7 @@ namespace LogisticService.Controllers
                 // Xử lý lỗi và log nếu cần
                 // Trong trường hợp lỗi deserialization, vẫn trả về dữ liệu từ database
                 var hangHoaList = await _hangHoaService.GetAllHangHoaAsync();
-                await _redisHelper.SetAsync(cacheKey, hangHoaList, TimeSpan.FromDays(1));
+                await _redisHelper.SetAsync(cacheKey, hangHoaList, TimeSpan.FromMinutes(1));
                 return Ok(hangHoaList);
             }
         }
@@ -101,6 +115,7 @@ namespace LogisticService.Controllers
                     MaNguoiDung = res.Id
                 };
                 await _hangHoaService.AddAsync(hangHoa);
+                await RefreshHangHoaCache();
                 return Ok(new HTTPResponseClient<HangHoa>
                 {
                     StatusCode = 200,
@@ -122,7 +137,7 @@ namespace LogisticService.Controllers
         }
         [HttpPut("UpdateHangHoa/{id}")]
         [Authorize]
-        public async Task<IActionResult> UpdateHangHoa([FromRoute] string id,[FromBody] HangHoaVM hangHoaVM)
+        public async Task<IActionResult> UpdateHangHoa([FromRoute] string id, [FromBody] HangHoaVM hangHoaVM)
         {
             var header = HttpContext.Request.Headers;
             var token = header["Authorization"].First().Substring(7);
@@ -151,12 +166,13 @@ namespace LogisticService.Controllers
                         Message = $"Không tìm thấy hàng hóa với mã {id}"
                     });
                 }
-                var entity  = hangHoa.Data;
+                var entity = hangHoa.Data;
                 entity.MaLoaiHangHoa = hangHoaVM.MaLoaiHangHoa ?? entity.MaLoaiHangHoa;
                 entity.TenHangHoa = hangHoaVM.TenHangHoa ?? entity.TenHangHoa;
                 entity.HinhAnh = hangHoaVM.HinhAnh ?? entity.HinhAnh;
                 entity.GiaHangHoa = hangHoaVM.GiaHangHoa ?? entity.GiaHangHoa;
                 await _hangHoaService.UpdateAsync(entity);
+                await RefreshHangHoaCache();
                 return Ok(new HTTPResponseClient<HangHoa>
                 {
                     StatusCode = 200,
@@ -198,6 +214,7 @@ namespace LogisticService.Controllers
             {
                 var hangHoa = await _hangHoaService.GetByIdAsync(id);
                 await _hangHoaService.DeleteAsync(id);
+                await RefreshHangHoaCache();
                 return Ok(new HTTPResponseClient<HangHoa>
                 {
                     StatusCode = 200,
