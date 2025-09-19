@@ -2,7 +2,7 @@ using System.Text.Json;
 using StackExchange.Redis;
 public class RedisHelper
 {
-    private  IDatabase _db {get;set;}
+    private IDatabase _db { get; set; }
     private readonly JsonSerializerOptions _jsonOptions;
     private readonly IConnectionMultiplexer _connection;
 
@@ -17,7 +17,8 @@ public class RedisHelper
         };
     }
 
-    public void setDatabaseRedis(int db) {
+    public void setDatabaseRedis(int db)
+    {
         _db = _connection.GetDatabase(db);
     }
 
@@ -50,4 +51,5 @@ public class RedisHelper
     // ===== Delete & Exist =====
     public async Task<bool> DeleteAsync(string key) => await _db.KeyDeleteAsync(key);
     public async Task<bool> ExistsAsync(string key) => await _db.KeyExistsAsync(key);
+    
 }

@@ -28,11 +28,15 @@ public class HangHoaService : ServiceBase<HangHoa>, IHangHoaService
     }
     public async Task<HTTPResponseClient<IEnumerable<HangHoaReturnResult>>> GetAllHangHoaAsync()
     {
-        var res = await _repository.GetAllAsync();
+        var res = await _context.HangHoas
+        .Include(h => h.TonKhos) // include tồn kho
+        .OrderBy(h => h.MaHangHoa)
+        .Take(100) // nếu muốn giới hạn
+        .ToListAsync();
         HTTPResponseClient<IEnumerable<HangHoaReturnResult>> data = new HTTPResponseClient<IEnumerable<HangHoaReturnResult>>()
         {
             StatusCode = 200,
-            Data = res.ToList().Skip(0).Take(10).Select(n => new HangHoaReturnResult
+            Data = res.ToList().Skip(0).Take(100).Select(n => new HangHoaReturnResult
             {
                 MaHangHoa = n.MaHangHoa,
                 MaLoaiHangHoa = n.MaLoaiHangHoa,
@@ -41,7 +45,7 @@ public class HangHoaService : ServiceBase<HangHoa>, IHangHoaService
                 HinhAnh = n.HinhAnh,
                 GiaHangHoa = n.GiaHangHoa,
                 MaNguoiDung = n.MaNguoiDung,
-                SoLuongTonKho = n.TonKhos.Sum(tk => tk.SoLuongTon)??0
+                SoLuongTonKho = n.TonKhos.Sum(tk => tk.SoLuongTon) ?? 0
             }).ToList(),
             DateTime = DateTime.Now,
             Message = "Successfully"
@@ -64,7 +68,7 @@ public class HangHoaService : ServiceBase<HangHoa>, IHangHoaService
     {
         var res = await _repository.GetByIdAsync(id);
         HangHoaReturnResult result = new HangHoaReturnResult()
-        { 
+        {
             MaHangHoa = res.MaHangHoa,
             MaLoaiHangHoa = res.MaLoaiHangHoa,
             TenHangHoa = res.TenHangHoa,
@@ -72,7 +76,7 @@ public class HangHoaService : ServiceBase<HangHoa>, IHangHoaService
             HinhAnh = res.HinhAnh,
             GiaHangHoa = res.GiaHangHoa,
             MaNguoiDung = res.MaNguoiDung,
-            SoLuongTonKho = res.TonKhos.Sum(tk => tk.SoLuongTon)??0
+            SoLuongTonKho = res.TonKhos.Sum(tk => tk.SoLuongTon) ?? 0
         };
         HTTPResponseClient<HangHoaReturnResult> data = new HTTPResponseClient<HangHoaReturnResult>()
         {
