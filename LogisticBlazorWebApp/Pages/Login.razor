@@ -18,7 +18,7 @@
             <InputText @bind-Value="loginModel.MatKhau" type="password" class="form-control mb-1 rounded-3"
                 placeholder="Mật Khẩu" />
             <ValidationMessage For="@(() => loginModel.MatKhau)" />
-
+            
             <button type="submit" class="btn btn-primary w-100 mt-3 rounded-3">Đăng nhập</button>
 
             @if (!string.IsNullOrEmpty(errorMessage))
@@ -71,7 +71,7 @@
                         nav.NavigateTo("/");
                         break;
                     case "Seller":
-nav.NavigateTo("/seller/dashboard");
+                        nav.NavigateTo("/seller/dashboard");
                         break;
                     default:
                         nav.NavigateTo("/");

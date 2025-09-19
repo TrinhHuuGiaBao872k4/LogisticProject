@@ -56,14 +56,6 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9naW4ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Cybersoft.net/LogisticProject/LogisticBlazorWebApp/Pages/LoginSellerAdmin.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9naW5TZWxsZXJBZG1pbi5yYXpvcg==
-build_metadata.AdditionalFiles.CssScope = 
-
-[D:/Cybersoft.net/LogisticProject/LogisticBlazorWebApp/Pages/LoginUser.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9naW5Vc2VyLnJhem9y
-build_metadata.AdditionalFiles.CssScope = 
-
 [D:/Cybersoft.net/LogisticProject/LogisticBlazorWebApp/Pages/Product.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 

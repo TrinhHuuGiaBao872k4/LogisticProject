@@ -10,26 +10,26 @@
         <div class="card p-4 shadow rounded-4" style="width: 450px;">
             <h4 class="mb-4 text-center text-success">Đăng Ký Tài Khoản</h4>
 
-            <InputText @bind-Value="registerModel.HoTen" class="form-control mb-2" placeholder="Họ tên" />
-            <ValidationMessage For="@(() => registerModel.HoTen)" />
+            <InputText @bind-Value="registerModel.HoTen" class="form-control mb-2" placeholder="Họ tên"
+                maxlength="50" />
 
-            <InputDate @bind-Value="registerModel.NgaySinh" class="form-control mb-2" />
-            <ValidationMessage For="@(() => registerModel.NgaySinh)" />
+            <InputDate @bind-Value="registerModel.NgaySinh" class="form-control mb-2"
+                max="@DateTime.Today.AddYears(-16).ToString("yyyy-MM-dd")" />
 
-            <InputText @bind-Value="registerModel.CCCD" class="form-control mb-2" placeholder="CCCD" />
-            <ValidationMessage For="@(() => registerModel.CCCD)" />
+            <InputText @bind-Value="registerModel.CCCD" class="form-control mb-2" placeholder="CCCD" maxlength="12"
+                inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,12)" />
 
-            <InputText @bind-Value="registerModel.DiaChi" class="form-control mb-2" placeholder="Địa chỉ" />
-            <ValidationMessage For="@(() => registerModel.DiaChi)" />
+            <InputText @bind-Value="registerModel.DiaChi" class="form-control mb-2" placeholder="Địa chỉ"
+                maxlength="200" />
 
-            <InputText @bind-Value="registerModel.SDT" class="form-control mb-2" placeholder="Số điện thoại" />
-            <ValidationMessage For="@(() => registerModel.SDT)" />
+            <InputText @bind-Value="registerModel.SDT" class="form-control mb-2" placeholder="Số điện thoại"
+                maxlength="11" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)" />
 
-            <InputText @bind-Value="registerModel.TenDanhNhap" class="form-control mb-2" placeholder="Tên đăng nhập" />
-            <ValidationMessage For="@(() => registerModel.TenDanhNhap)" />
+            <InputText @bind-Value="registerModel.TenDanhNhap" class="form-control mb-2" placeholder="Tên đăng nhập"
+                maxlength="30" />
 
-            <InputText @bind-Value="registerModel.MatKhau" type="password" class="form-control mb-3" placeholder="Mật khẩu" />
-            <ValidationMessage For="@(() => registerModel.MatKhau)" />
+            <InputText @bind-Value="registerModel.MatKhau" type="password" class="form-control mb-3"
+                placeholder="Mật khẩu" maxlength="100" />
 
             <button type="submit" class="btn btn-success w-100">Đăng ký</button>
 
