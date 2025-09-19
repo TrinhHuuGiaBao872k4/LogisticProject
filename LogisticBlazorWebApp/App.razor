@@ -1,12 +1,38 @@
-﻿<Router AppAssembly="@typeof(App).Assembly">
-    <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(HomeMasterPage)" />
-        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
-    </Found>
-    <NotFound>
-        <PageTitle>Not found</PageTitle>
-        <LayoutView Layout="@typeof(HomeMasterPage)">
+﻿<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(HomeMasterPage)">
+                <NotAuthorized>
+                    @* Khi chưa đăng nhập hoặc không đủ quyền *@
+                    <p class="text-danger">Bạn chưa có quyền truy cập. Vui lòng <a href="/login">đăng nhập</a>.</p>
+                </NotAuthorized>
+                <Authorizing>
+                    <p>Đang kiểm tra quyền truy cập...</p>
+                </Authorizing>
+            </AuthorizeRouteView>
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <PageTitle>Not found</PageTitle>
             <p role="alert">Sorry, there's nothing at this address.</p>
-        </LayoutView>
-    </NotFound>
-</Router>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>
+
+@code {
+    [Inject] private IJSRuntime JS { get; set; } = default!;
+    [Inject] private CustomAuthStateProvider AuthProvider { get; set; } = default!;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Lấy token từ localStorage (chỉ được gọi sau khi render)
+            var token = await JS.InvokeAsync<string>("localStorage.getItem", "accessToken");
+            if (!string.IsNullOrEmpty(token))
+            {
+                AuthProvider.MarkUserAsAuthenticated(token);
+            }
+        }
+    }
+}

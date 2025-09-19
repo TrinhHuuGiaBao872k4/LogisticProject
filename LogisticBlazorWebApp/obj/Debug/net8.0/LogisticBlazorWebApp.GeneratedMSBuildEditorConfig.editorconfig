@@ -26,8 +26,36 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWJvdXRVcy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/DotNet01/LogisticProject/LogisticBlazorWebApp/Pages/Admin/AdminInventoryPage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5cQWRtaW5JbnZlbnRvcnlQYWdlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/DotNet01/LogisticProject/LogisticBlazorWebApp/Pages/Admin/AdminOrderPage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5cQWRtaW5PcmRlclBhZ2UucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/DotNet01/LogisticProject/LogisticBlazorWebApp/Pages/Admin/AdminPage.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5cQWRtaW5QYWdlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/DotNet01/LogisticProject/LogisticBlazorWebApp/Pages/Admin/AdminProductPage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5cQWRtaW5Qcm9kdWN0UGFnZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/DotNet01/LogisticProject/LogisticBlazorWebApp/Pages/Admin/AdminProfilePage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5cQWRtaW5Qcm9maWxlUGFnZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/DotNet01/LogisticProject/LogisticBlazorWebApp/Pages/Admin/AdminSettingPage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5cQWRtaW5TZXR0aW5nUGFnZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/DotNet01/LogisticProject/LogisticBlazorWebApp/Pages/Admin/AdminShipmentPage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5cQWRtaW5TaGlwbWVudFBhZ2UucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/DotNet01/LogisticProject/LogisticBlazorWebApp/Pages/Admin/AdminWarehousePage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5cQWRtaW5XYXJlaG91c2VQYWdlLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/DotNet01/LogisticProject/LogisticBlazorWebApp/Pages/Cart.razor]
@@ -92,6 +120,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [D:/DotNet01/LogisticProject/LogisticBlazorWebApp/Pages/Seller/SellerProductPage.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2VsbGVyXFNlbGxlclByb2R1Y3RQYWdlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/DotNet01/LogisticProject/LogisticBlazorWebApp/Pages/Seller/SellerProfilePage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2VsbGVyXFNlbGxlclByb2ZpbGVQYWdlLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/DotNet01/LogisticProject/LogisticBlazorWebApp/Pages/Seller/SellerSettingPage.razor]
