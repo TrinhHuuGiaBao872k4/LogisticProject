@@ -5,33 +5,52 @@
 
 <EditForm Model="registerModel" OnValidSubmit="HandleRegister">
     <DataAnnotationsValidator />
-    <ValidationSummary />
 
     <div class="d-flex justify-content-center align-items-center vh-100 ">
         <div class="card p-4 shadow rounded-4" style="width: 450px;">
             <h4 class="mb-4 text-center text-dark">Đăng Ký Tài Khoản</h4>
 
-            <InputText @bind-Value="registerModel.HoTen" class="form-control mb-2" placeholder="Họ tên" />
-            <ValidationMessage For="@(() => registerModel.HoTen)" />
+            <div class="mb-3">
+                <InputText @bind-Value="registerModel.HoTen" class="form-control" placeholder="Họ tên" maxlength="50" />
+                <ValidationMessage For="@(() => registerModel.HoTen)" class="text-danger small" />
+            </div>
 
-            <InputDate @bind-Value="registerModel.NgaySinh" class="form-control mb-2" />
-            <ValidationMessage For="@(() => registerModel.NgaySinh)" />
+            <div class="mb-3">
+                <InputDate @bind-Value="registerModel.NgaySinh" class="form-control"
+                    max="@DateTime.Today.AddYears(-16).ToString("yyyy-MM-dd")" />
+                <ValidationMessage For="@(() => registerModel.NgaySinh)" class="text-danger small" />
+            </div>
 
-            <InputText @bind-Value="registerModel.CCCD" class="form-control mb-2" placeholder="CCCD" />
-            <ValidationMessage For="@(() => registerModel.CCCD)" />
+            <div class="mb-3">
+                <InputText @bind-Value="registerModel.CCCD" class="form-control" placeholder="CCCD" maxlength="12"
+                    inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,12)" />
+                <ValidationMessage For="@(() => registerModel.CCCD)" class="text-danger small" />
+            </div>
 
-            <InputText @bind-Value="registerModel.DiaChi" class="form-control mb-2" placeholder="Địa chỉ" />
-            <ValidationMessage For="@(() => registerModel.DiaChi)" />
+            <div class="mb-3">
+                <InputText @bind-Value="registerModel.DiaChi" class="form-control" placeholder="Địa chỉ"
+                    maxlength="200" />
+                <ValidationMessage For="@(() => registerModel.DiaChi)" class="text-danger small" />
+            </div>
 
-            <InputText @bind-Value="registerModel.SDT" class="form-control mb-2" placeholder="Số điện thoại" />
-            <ValidationMessage For="@(() => registerModel.SDT)" />
+            <div class="mb-3">
+                <InputText @bind-Value="registerModel.SDT" class="form-control" placeholder="Số điện thoại"
+                    maxlength="11" inputmode="numeric"
+                    oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)" />
+                <ValidationMessage For="@(() => registerModel.SDT)" class="text-danger small" />
+            </div>
 
-            <InputText @bind-Value="registerModel.TenDanhNhap" class="form-control mb-2" placeholder="Tên đăng nhập" />
-            <ValidationMessage For="@(() => registerModel.TenDanhNhap)" />
+            <div class="mb-3">
+                <InputText @bind-Value="registerModel.TenDanhNhap" class="form-control" placeholder="Tên đăng nhập"
+                    maxlength="30" />
+                <ValidationMessage For="@(() => registerModel.TenDanhNhap)" class="text-danger small" />
+            </div>
 
-            <InputText @bind-Value="registerModel.MatKhau" type="password" class="form-control mb-3" placeholder="Mật khẩu" />
-            <ValidationMessage For="@(() => registerModel.MatKhau)" />
-
+            <div class="mb-3">
+                <InputText @bind-Value="registerModel.MatKhau" type="password" class="form-control"
+                    placeholder="Mật khẩu" maxlength="100" />
+                <ValidationMessage For="@(() => registerModel.MatKhau)" class="text-danger small" />
+            </div>
             <button type="submit" class="btn btn-primary w-100">Đăng ký</button>
 
             @if (!string.IsNullOrEmpty(message))

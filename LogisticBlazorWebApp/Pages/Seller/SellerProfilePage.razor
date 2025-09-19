@@ -1,0 +1,39 @@
+@page "/seller/profile"
+@attribute [Authorize(Roles = "Seller")]
+@layout SellerLayout
+@inject ProfileService profileService
+@inject NavigationManager nav
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            @if (profile == null)
+            {
+                <div class="card p-4 shadow text-center">
+                    <p>Đang tải thông tin...</p>
+                </div>
+            }
+            else
+            {
+                <div class="card p-4 shadow rounded-4 text-center mb-4">
+                    <h4 class="mb-4 text-primary">Thông Tin Cá Nhân</h4>
+
+                    <p><strong>👤 Họ Tên:</strong> @profile.HoTen</p>
+                    <p><strong>🎂 Ngày Sinh:</strong> @profile.NgaySinh.ToString("dd/MM/yyyy")</p>
+                    <p><strong>🪪 CCCD:</strong> @profile.Cccd</p>
+                    <p><strong>📍 Địa Chỉ:</strong> @profile.DiaChi</p>
+                    <p><strong>📞 Số Điện Thoại:</strong> @profile.Sdt</p>
+                    <p><strong>🎖️ Mã Vai Trò:</strong> @profile.MaVaiTro?.Trim()</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private UserProfileViewModel? profile;
+    protected override async Task OnInitializedAsync()
+    {
+        profile = await profileService.GetProfileAsync();
+    }
+}

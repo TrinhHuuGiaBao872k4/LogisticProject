@@ -1,4 +1,5 @@
 @page "/profile"
+@attribute [Authorize(Roles = "Seller,SuperAdmin,Admin,Customer,Shipper,WarehouseStaff,Accountant")]
 @inject ProfileService profileService
 @inject DonHangService donHangService
 @inject DonHangHubService donHangHub

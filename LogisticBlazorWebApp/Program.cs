@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 
 
@@ -40,9 +41,13 @@ builder.Services.AddSingleton<UserStateService>();
 builder.Services.AddScoped<ProfileService>();
 builder.Services.AddScoped<RegisterService>();
 builder.Services.AddScoped<DonHangService>();
-
-
 builder.Services.AddScoped<DonHangHubService>();
+
+builder.Services.AddScoped<CustomAuthStateProvider>();
+builder.Services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredService<CustomAuthStateProvider>());
+builder.Services.AddAuthorizationCore();
+
+
 
 
 //setup middleware 

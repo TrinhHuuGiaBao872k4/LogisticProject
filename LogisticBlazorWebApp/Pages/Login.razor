@@ -3,24 +3,26 @@
 @inject LoginService loginService
 @inject NavigationManager nav
 @inject IJSRuntime js
+
 @inject UserStateService userState
+@inject CustomAuthStateProvider authProvider
 
 <EditForm Model="loginModel" OnValidSubmit="HandleLogin">
     <DataAnnotationsValidator />
-    <ValidationSummary />
 
     <div class="d-flex justify-content-center align-items-center" style="height: 940px">
         <div class="card p-4 shadow rounded-4" style="width: 350px;">
             <h3 class="text-center mb-4">Đăng nhập</h3>
-
-            <InputText @bind-Value="loginModel.TenDangNhap" class="form-control mb-1 rounded-3"
-                placeholder="Tên Đăng Nhập" />
-            <ValidationMessage For="@(() => loginModel.TenDangNhap)" />
-
-            <InputText @bind-Value="loginModel.MatKhau" type="password" class="form-control mb-1 rounded-3"
-                placeholder="Mật Khẩu" />
-            <ValidationMessage For="@(() => loginModel.MatKhau)" />
-
+            <div class="mb-3">
+                <InputText @bind-Value="loginModel.TenDangNhap" class="form-control mb-1 rounded-3"
+                    placeholder="Tên Đăng Nhập" maxlength="30" />
+                <ValidationMessage For="@(() => loginModel.TenDangNhap)" class="text-danger small" />
+            </div>
+            <div class="mb-3">
+                <InputText @bind-Value="loginModel.MatKhau" type="password" class="form-control mb-1 rounded-3"
+                    placeholder="Mật Khẩu" maxlength="100" />
+                <ValidationMessage For="@(() => loginModel.MatKhau)" class="text-danger small" />
+            </div>
             <button type="submit" class="btn btn-primary w-100 mt-3 rounded-3">Đăng nhập</button>
 
             @if (!string.IsNullOrEmpty(errorMessage))
@@ -55,6 +57,7 @@
                 var token = result.data.AccessToken;
 
                 await js.InvokeVoidAsync("localStorage.setItem", "accessToken", token);
+
                 // Giải mã token
                 var handler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
                 var jwtToken = handler.ReadJwtToken(token);
@@ -62,7 +65,7 @@
                 string userId = jwtToken.Claims.FirstOrDefault(c => c.Type == "MaNguoiDung")?.Value ?? "";
                 string username = jwtToken.Claims.FirstOrDefault(c => c.Type == "TenDanhNhap")?.Value ?? "";
                 string role = jwtToken.Claims.FirstOrDefault(c => c.Type == "role")?.Value ?? "";
-
+                authProvider.MarkUserAsAuthenticated(token);
                 userState.SetUser(username);
                 switch (role)
                 {
