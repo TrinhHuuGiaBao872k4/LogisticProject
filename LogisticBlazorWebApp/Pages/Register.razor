@@ -1,4 +1,5 @@
 @page "/register"
+@layout EmptyLayout
 @inject RegisterService registerService
 @inject NavigationManager nav
 
@@ -6,9 +7,9 @@
     <DataAnnotationsValidator />
     <ValidationSummary />
 
-    <div class="d-flex justify-content-center align-items-center vh-100 bg-light">
+    <div class="d-flex justify-content-center align-items-center vh-100 ">
         <div class="card p-4 shadow rounded-4" style="width: 450px;">
-            <h4 class="mb-4 text-center text-success">Đăng Ký Tài Khoản</h4>
+            <h4 class="mb-4 text-center text-dark">Đăng Ký Tài Khoản</h4>
 
             <InputText @bind-Value="registerModel.HoTen" class="form-control mb-2" placeholder="Họ tên" />
             <ValidationMessage For="@(() => registerModel.HoTen)" />
@@ -31,7 +32,7 @@
             <InputText @bind-Value="registerModel.MatKhau" type="password" class="form-control mb-3" placeholder="Mật khẩu" />
             <ValidationMessage For="@(() => registerModel.MatKhau)" />
 
-            <button type="submit" class="btn btn-success w-100">Đăng ký</button>
+            <button type="submit" class="btn btn-primary w-100">Đăng ký</button>
 
             @if (!string.IsNullOrEmpty(message))
             {

@@ -292,4 +292,24 @@ public class DonHangController : BaseController
         return Success(donHangVMs, "Lấy lịch sử đơn hàng thành công");
     }
 
+    [HttpGet("GetAllDonHangOfSeller")]
+    [Authorize]
+    public async Task<ActionResult<HTTPResponseClient<IEnumerable<DonHangViewModel>>>> GetAllDonHangOfSeller()
+    {
+        var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Substring(7);
+        if (string.IsNullOrEmpty(token))
+            return Fail<IEnumerable<DonHangViewModel>>("Token không hợp lệ", 401);
+
+        var userInfo = _jwtAuthService.DecodePayloadTokenInfo(token);
+        if (userInfo == null || userInfo.Role != "Seller")
+            return Fail<IEnumerable<DonHangViewModel>>("Người dùng không phải Seller", 403);
+
+        var donHangVMs = await _donHangService.GetAllDonHangOfSellerAsync(userInfo.Id);
+
+        if (!donHangVMs.Any())
+            return Fail<IEnumerable<DonHangViewModel>>("Seller chưa có đơn hàng nào");
+
+        return Success(donHangVMs, "Lấy danh sách đơn hàng của Seller thành công");
+    }
+
 }
